@@ -1,0 +1,48 @@
+{
+    "name": "mordoc",
+    "version": "0.1.0",
+    "description": "A static site generator for documentation with SSG + SPA capabilities",
+    "bin": {
+      "mordoc": "./bin/cli.js"
+    },
+    "scripts": {
+      "dev": "node bin/cli.js dev",
+      "build": "node bin/cli.js build",
+      "prepublishOnly": "tsc"
+    },
+    "keywords": [
+      "documentation",
+      "static-site-generator",
+      "ssg",
+      "markdown",
+      "markdoc",
+      "react"
+    ],
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+      "react": "^19.2.0",
+      "react-dom": "^19.2.0",
+      "react-router-dom": "^7.9.3",
+      "@markdoc/markdoc": "^0.5.4",
+      "pagefind": "^1.4.0",
+      "js-yaml": "^4.1.0",
+      "fast-glob": "^3.3.3",
+      "ws": "^8.18.3",
+      "sirv-cli": "^2.0.2"
+    },
+    "devDependencies": {
+      "esbuild": "^0.25.10",
+      "eslint": "^9.36.0",
+      "typescript": "^5.9.3",      
+      "prettier": "^3.6.2",
+      "@types/node": "^24.6.2",
+      "@types/react": "^19.2.0",
+      "@types/react-dom": "^19.2.0",
+      "@types/js-yaml": "^4.0.9",
+      "@types/ws": "^8.5.13"
+    },
+    "engines": {
+      "node": ">=18.0.0"
+    }
+  }

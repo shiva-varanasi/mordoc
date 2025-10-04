@@ -10,6 +10,9 @@ import { SearchProvider } from './contexts/SearchContext';
 import { SiteConfig } from '../types/config';
 import { ProcessedContent } from '../types/content';
 import { useContentData } from './hooks/useContent';
+import Layout from '../components/Layout';
+import ContentPage from '../components/ContentPage';
+import SearchModal from '../components/SearchModal';
 
 interface AppProps {
   siteConfig: SiteConfig;
@@ -41,7 +44,9 @@ function AppContent() {
   // Fetch content when route changes (for SPA navigation)
   useEffect(() => {
     // Only fetch if not initial load (initial content is already injected)
-    const isInitialLoad = (window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming)?.type === 'navigate';
+    const navEntries = window.performance.getEntriesByType('navigation');
+    const isInitialLoad = navEntries.length > 0 && 
+      (navEntries[0] as PerformanceNavigationTiming)?.type === 'navigate';
     
     if (!isInitialLoad) {
       fetchContent(location.pathname);
@@ -49,25 +54,16 @@ function AppContent() {
   }, [location.pathname, fetchContent]);
 
   return (
-    <Routes>
-      <Route path="*" element={<PageRenderer />} />
-    </Routes>
-  );
-}
-
-/**
- * Page renderer - Renders the current page content
- */
-function PageRenderer() {
-  // Placeholder for now - will be replaced with actual Layout component
-  return (
-    <div className="app-container">
-      <div className="content-wrapper">
-        <h1>Mordoc App</h1>
-        <p>Content will be rendered here</p>
-        <p>This will be replaced with Layout and content components</p>
-      </div>
-    </div>
+    <>
+      <Layout>
+        <Routes>
+          <Route path="*" element={<ContentPage />} />
+        </Routes>
+      </Layout>
+      
+      {/* Search modal (rendered outside layout) */}
+      <SearchModal />
+    </>
   );
 }
 

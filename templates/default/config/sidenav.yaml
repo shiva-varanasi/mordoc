@@ -1,0 +1,10 @@
+- label: Home
+  path: /
+
+- label: Getting Started
+  path: /getting-started
+
+- label: Guides
+  children:
+    - label: First Steps
+      path: /guides/first-steps

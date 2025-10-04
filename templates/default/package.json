@@ -1,0 +1,20 @@
+{
+  "name": "my-documentation",
+  "version": "1.0.0",
+  "description": "Documentation site powered by Mordoc",
+  "private": true,
+  "scripts": {
+    "dev": "mordoc dev",
+    "build": "mordoc build",
+    "build:verbose": "mordoc build --verbose",
+    "build:drafts": "mordoc build --drafts"
+  },
+  "keywords": [
+    "documentation",
+    "docs"
+  ],
+  "author": "",
+  "dependencies": {
+    "mordoc": "^0.1.0"
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "colors": {
+    "primary": {
+      "light": "#000000",
+      "dark": "#ffffff"
+    },
+    "secondary": {
+      "light": "#404040",
+      "dark": "#b0b0b0"
+    },
+    "background": {
+      "light": "#ffffff",
+      "dark": "#0a0a0a"
+    },
+    "surface": {
+      "light": "#f8f8f8",
+      "dark": "#1a1a1a"
+    },
+    "text": {
+      "primary": {
+        "light": "#000000",
+        "dark": "#ffffff"
+      },
+      "secondary": {
+        "light": "#666666",
+        "dark": "#999999"
+      },
+      "disabled": {
+        "light": "#cccccc",
+        "dark": "#404040"
+      }
+    },
+    "border": {
+      "light": "#e0e0e0",
+      "dark": "#333333"
+    },
+    "link": {
+      "light": "#000000",
+      "dark": "#ffffff"
+    },
+    "success": {
+      "light": "#2d3436",
+      "dark": "#dfe6e9"
+    },
+    "warning": {
+      "light": "#636e72",
+      "dark": "#b2bec3"
+    },
+    "error": {
+      "light": "#000000",
+      "dark": "#ffffff"
+    },
+    "info": {
+      "light": "#2d3436",
+      "dark": "#dfe6e9"
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "base": {
+        "family": "-apple-system",
+        "fallbacks": ["BlinkMacSystemFont", "\"Segoe UI\"", "Roboto", "\"Helvetica Neue\"", "Arial", "sans-serif"]
+      },
+      "heading": {
+        "family": "-apple-system",
+        "fallbacks": ["BlinkMacSystemFont", "\"Segoe UI\"", "Roboto", "\"Helvetica Neue\"", "Arial", "sans-serif"],
+        "weight": 600
+      },
+      "mono": {
+        "family": "\"SF Mono\"",
+        "fallbacks": ["Monaco", "\"Cascadia Code\"", "\"Roboto Mono\"", "Consolas", "\"Courier New\"", "monospace"]
+      }
+    },
+    "fontSize": {
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "base": "1rem",
+      "lg": "1.125rem",
+      "xl": "1.25rem",
+      "2xl": "1.5rem",
+      "3xl": "1.875rem",
+      "4xl": "2.25rem"
+    },
+    "lineHeight": {
+      "tight": 1.25,
+      "normal": 1.5,
+      "relaxed": 1.75
+    },
+    "fontWeight": {
+      "normal": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700
+    }
+  },
+  "layout": {
+    "containerWidth": {
+      "sm": "640px",
+      "md": "768px",
+      "lg": "1024px",
+      "xl": "1280px"
+    },
+    "spacing": {
+      "xs": "0.25rem",
+      "sm": "0.5rem",
+      "md": "1rem",
+      "lg": "1.5rem",
+      "xl": "2rem",
+      "2xl": "3rem"
+    },
+    "borderRadius": {
+      "sm": "0.125rem",
+      "md": "0.25rem",
+      "lg": "0.5rem",
+      "full": "9999px"
+    },
+    "header": {
+      "height": "4rem"
+    },
+    "sidebar": {
+      "width": "16rem",
+      "collapsedWidth": "4rem"
+    }
+  }
+}

@@ -6,6 +6,7 @@ const fs = require('fs');
 // Get the command from arguments
 const args = process.argv.slice(2);
 const command = args[0];
+const commandArgs = args.slice(1); // Arguments after the command
 
 // Display help text
 function showHelp() {
@@ -24,7 +25,9 @@ Options:
 
 Examples:
   mordoc build
+  mordoc build --verbose --drafts
   mordoc dev
+  mordoc dev --port 8080
   `);
 }
 
@@ -48,13 +51,15 @@ async function main() {
     switch (command) {
       case 'build': {
         const buildHandler = require('../dist/cli/build.js');
-        await buildHandler.build();
+        const options = buildHandler.parseBuildArgs(commandArgs);
+        await buildHandler.build(options);
         break;
       }
       
       case 'dev': {
         const devHandler = require('../dist/cli/dev.js');
-        await devHandler.dev();
+        const options = devHandler.parseDevArgs(commandArgs);
+        await devHandler.dev(options);
         break;
       }
       

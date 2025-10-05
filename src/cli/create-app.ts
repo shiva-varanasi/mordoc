@@ -234,3 +234,27 @@ function showSuccessMessage(projectName: string, skipInstall: boolean, duration:
 
   console.log('Happy documenting! 📚\n');
 }
+
+// Execute if run directly (not imported)
+if (require.main === module) {
+  const args = process.argv.slice(2);
+  const projectName = args[0];
+  
+  if (!projectName) {
+    console.error('Please specify a project name:');
+    console.error('  node dist/cli/create-app.js my-docs');
+    process.exit(1);
+  }
+  
+  const options: CreateAppOptions = {};
+  for (let i = 1; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === '--skip-install') {
+      options.skipInstall = true;
+    } else if (arg === '--skip-git') {
+      options.skipGit = true;
+    }
+  }
+  
+  createApp(projectName, options);
+}

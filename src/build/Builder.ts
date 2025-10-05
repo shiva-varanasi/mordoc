@@ -14,6 +14,7 @@ import { ContentIndexer } from './ContentIndexer';
 import { HtmlGenerator } from './HtmlGenerator';
 import { ProcessedContent, ContentDataFile } from '../types/content';
 import { SiteConfig } from '../types/config';
+import { ClientBundler } from './ClientBundler';
 
 export interface BuilderOptions {
   projectRoot: string; // Path to user's project
@@ -87,11 +88,23 @@ export class Builder {
       this.log('Generating theme CSS...');
       this.generateThemeCSS(siteConfig);
 
-      // Step 8: Copy static assets
+      // Step 8: Bundle client React app
+      this.log('Bundling client application...');
+      await this.bundleClientApp();
+
+      // Step 9: Copy static assets (renumber from 8)
       this.log('Copying static assets...');
       this.copyStaticAssets(siteConfig);
 
-      // Step 9: Generate client config
+      // Step 10: Generate client config (renumber from 9)
+      this.log('Generating client configuration...');
+      this.generateClientConfig(siteConfig);
+
+      // Step 11: Copy static assets
+      this.log('Copying static assets...');
+      this.copyStaticAssets(siteConfig);
+
+      // Step 12: Generate client config
       this.log('Generating client configuration...');
       this.generateClientConfig(siteConfig);
 
@@ -259,6 +272,23 @@ export class Builder {
 
     const cssPath = path.join(assetsDir, 'theme.css');
     fs.writeFileSync(cssPath, css, 'utf8');
+  }
+
+  /**
+   * Bundle client React application
+   */
+  private async bundleClientApp(): Promise<void> {
+    // Get the Mordoc package root (where src/ is located)
+    const mordocRoot = path.join(__dirname, '../..');
+
+    const bundler = new ClientBundler({
+      projectRoot: mordocRoot,
+      outputDir: this.outputDir,
+      minify: !this.options.verbose, // Don't minify in verbose mode for debugging
+      sourcemap: this.options.verbose, // Generate sourcemaps in verbose mode
+    });
+
+    await bundler.bundle();
   }
 
   /**

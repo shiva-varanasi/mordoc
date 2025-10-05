@@ -33,8 +33,10 @@ export class ContentProcessor {
     // Extract frontmatter from AST
     const frontmatter = this.extractFrontmatter(ast);
 
-    // Validate frontmatter (title is required)
-    this.validateFrontmatter(frontmatter, rawFile.filePath);
+    // If title is missing, try to extract from first H1 or filename
+    if (!frontmatter.title || frontmatter.title.trim() === '') {
+      frontmatter.title = this.extractTitleFromContent(ast, rawFile.filePath);
+    }
 
     // Generate table of contents from headings
     const toc = this.generateTableOfContents(ast);
@@ -111,12 +113,70 @@ export class ContentProcessor {
   }
 
   /**
+   * Extract title from content (first H1) or filename as fallback
+   * @param ast - Markdoc AST
+   * @param filePath - File path for fallback title generation
+   * @returns Extracted or generated title
+   */
+  private extractTitleFromContent(ast: any, filePath: string): string {
+    // Try to find the first H1 heading in the content
+    let firstH1: string | null = null;
+
+    this.walkAST(ast, (node: any) => {
+      if (!firstH1 && node.type === 'heading' && node.attributes?.level === 1) {
+        firstH1 = this.extractTextFromNode(node);
+      }
+    });
+
+    if (firstH1) {
+      return firstH1;
+    }
+
+    // Fallback: generate title from filename
+    return this.generateTitleFromFilename(filePath);
+  }
+
+  /**
+   * Generate a readable title from filename
+   * @param filePath - File path (e.g., "en/getting-started.md")
+   * @returns Human-readable title
+   */
+  private generateTitleFromFilename(filePath: string): string {
+    // Extract filename without extension
+    const parts = filePath.split('/');
+    const filename = parts[parts.length - 1].replace(/\.(md|mdx)$/, '');
+
+    // Handle index files
+    if (filename === 'index') {
+      // Use parent directory name if available
+      if (parts.length > 2) {
+        return this.humanizeSlug(parts[parts.length - 2]);
+      }
+      return 'Home';
+    }
+
+    // Convert filename to title (e.g., "getting-started" -> "Getting Started")
+    return this.humanizeSlug(filename);
+  }
+
+  /**
+   * Convert a slug to human-readable title
+   * @param slug - Slugified string
+   * @returns Human-readable string
+   */
+  private humanizeSlug(slug: string): string {
+    return slug
+      .split(/[-_]/)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+
+  /**
    * Validate frontmatter has required fields
    */
   private validateFrontmatter(frontmatter: Frontmatter, filePath: string): void {
-    if (!frontmatter.title || frontmatter.title.trim() === '') {
-      throw new Error(`Missing required 'title' in frontmatter for ${filePath}`);
-    }
+    // Currently no required fields - title is handled by extractTitleFromContent fallback
+    // Add validation for other required fields here if needed in the future
   }
 
   /**
@@ -227,10 +287,14 @@ export class ContentProcessor {
 
     this.walkAST(ast, (node: any) => {
       if (node.type === 'text') {
-        const text = node.attributes?.content || '';
-        // Split by whitespace and count non-empty words
-        const words = text.split(/\s+/).filter((word: string) => word.length > 0);
-        wordCount += words.length;
+        const content = node.attributes?.content;
+        
+        // Only count if content is actually a string
+        // Markdoc variables and other objects should be skipped
+        if (typeof content === 'string') {
+          const words = content.split(/\s+/).filter((word: string) => word.length > 0);
+          wordCount += words.length;
+        }
       }
     });
 
@@ -251,7 +315,11 @@ export class ContentProcessor {
   getMetadataOnly(rawFile: RawContentFile): ContentMetadata {
     const ast = Markdoc.parse(rawFile.content);
     const frontmatter = this.extractFrontmatter(ast);
-    this.validateFrontmatter(frontmatter, rawFile.filePath);
+    
+    // Apply title fallback if missing
+    if (!frontmatter.title || frontmatter.title.trim() === '') {
+      frontmatter.title = this.extractTitleFromContent(ast, rawFile.filePath);
+    }
 
     const toc = this.generateTableOfContents(ast);
     const wordCount = this.calculateWordCount(ast);

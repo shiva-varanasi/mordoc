@@ -1,25 +1,18 @@
 /**
- * ThemeGenerator - Generates CSS from StyleConfig
- * Converts theme configuration into CSS custom properties and base styles
+ * ThemeGenerator - Generates CSS variables from StyleConfig
+ * Converts theme configuration into CSS custom properties
  */
 
-import { StyleConfig, ColorScheme, FontConfig } from '../types/config';
+import { StyleConfig, FontConfig } from '../types/config';
 
 export class ThemeGenerator {
   constructor(private styleConfig: StyleConfig) {}
 
   /**
-   * Generate complete CSS string for the theme
+   * Generate CSS variables for the theme
    */
   generateCSS(): string {
-    const sections = [
-      this.generateCSSVariables(),
-      this.generateTypographyStyles(),
-      this.generateLayoutStyles(),
-      this.generateBaseStyles(),
-    ];
-
-    return sections.join('\n\n');
+    return this.generateCSSVariables();
   }
 
   /**
@@ -138,178 +131,6 @@ export class ThemeGenerator {
     variables.push('}');
 
     return variables.join('\n');
-  }
-
-  /**
-   * Generate typography styles
-   */
-  private generateTypographyStyles(): string {
-    const styles: string[] = [];
-
-    styles.push('/* Typography Styles */');
-    styles.push('body {');
-    styles.push('  font-family: var(--font-family-base);');
-    styles.push('  font-size: var(--font-size-base);');
-    styles.push('  line-height: var(--line-height-normal);');
-    styles.push('  font-weight: var(--font-weight-normal);');
-    styles.push('  color: var(--color-text-primary);');
-    styles.push('  background-color: var(--color-background);');
-    styles.push('}');
-
-    styles.push('');
-    styles.push('h1, h2, h3, h4, h5, h6 {');
-    styles.push('  font-family: var(--font-family-heading);');
-    styles.push('  font-weight: var(--font-weight-semibold);');
-    styles.push('  line-height: var(--line-height-tight);');
-    styles.push('  color: var(--color-text-primary);');
-    styles.push('  margin-top: var(--spacing-xl);');
-    styles.push('  margin-bottom: var(--spacing-md);');
-    styles.push('}');
-
-    styles.push('');
-    styles.push('h1 { font-size: var(--font-size-4xl); }');
-    styles.push('h2 { font-size: var(--font-size-3xl); }');
-    styles.push('h3 { font-size: var(--font-size-2xl); }');
-    styles.push('h4 { font-size: var(--font-size-xl); }');
-    styles.push('h5 { font-size: var(--font-size-lg); }');
-    styles.push('h6 { font-size: var(--font-size-base); }');
-
-    styles.push('');
-    styles.push('p {');
-    styles.push('  margin-top: 0;');
-    styles.push('  margin-bottom: var(--spacing-md);');
-    styles.push('}');
-
-    styles.push('');
-    styles.push('a {');
-    styles.push('  color: var(--color-link);');
-    styles.push('  text-decoration: underline;');
-    styles.push('  transition: opacity 0.2s ease;');
-    styles.push('}');
-
-    styles.push('');
-    styles.push('a:hover {');
-    styles.push('  opacity: 0.8;');
-    styles.push('}');
-
-    styles.push('');
-    styles.push('code, pre {');
-    styles.push('  font-family: var(--font-family-mono);');
-    styles.push('  font-size: var(--font-size-sm);');
-    styles.push('}');
-
-    styles.push('');
-    styles.push('code {');
-    styles.push('  background-color: var(--color-surface);');
-    styles.push('  padding: 0.125rem 0.375rem;');
-    styles.push('  border-radius: var(--border-radius-sm);');
-    styles.push('}');
-
-    styles.push('');
-    styles.push('pre {');
-    styles.push('  background-color: var(--color-surface);');
-    styles.push('  padding: var(--spacing-md);');
-    styles.push('  border-radius: var(--border-radius-md);');
-    styles.push('  overflow-x: auto;');
-    styles.push('  margin-bottom: var(--spacing-md);');
-    styles.push('}');
-
-    styles.push('');
-    styles.push('pre code {');
-    styles.push('  background-color: transparent;');
-    styles.push('  padding: 0;');
-    styles.push('}');
-
-    return styles.join('\n');
-  }
-
-  /**
-   * Generate layout styles
-   */
-  private generateLayoutStyles(): string {
-    const styles: string[] = [];
-
-    styles.push('/* Layout Styles */');
-    styles.push('* {');
-    styles.push('  box-sizing: border-box;');
-    styles.push('}');
-
-    styles.push('');
-    styles.push('html, body {');
-    styles.push('  margin: 0;');
-    styles.push('  padding: 0;');
-    styles.push('  width: 100%;');
-    styles.push('  height: 100%;');
-    styles.push('}');
-
-    styles.push('');
-    styles.push('.container {');
-    styles.push('  max-width: var(--container-width-xl);');
-    styles.push('  margin: 0 auto;');
-    styles.push('  padding: 0 var(--spacing-md);');
-    styles.push('}');
-
-    styles.push('');
-    styles.push('.container-sm { max-width: var(--container-width-sm); }');
-    styles.push('.container-md { max-width: var(--container-width-md); }');
-    styles.push('.container-lg { max-width: var(--container-width-lg); }');
-
-    return styles.join('\n');
-  }
-
-  /**
-   * Generate base utility styles
-   */
-  private generateBaseStyles(): string {
-    const styles: string[] = [];
-
-    styles.push('/* Base Utility Styles */');
-    styles.push('hr {');
-    styles.push('  border: none;');
-    styles.push('  border-top: 1px solid var(--color-border);');
-    styles.push('  margin: var(--spacing-lg) 0;');
-    styles.push('}');
-
-    styles.push('');
-    styles.push('blockquote {');
-    styles.push('  margin: var(--spacing-md) 0;');
-    styles.push('  padding-left: var(--spacing-md);');
-    styles.push('  border-left: 4px solid var(--color-border);');
-    styles.push('  color: var(--color-text-secondary);');
-    styles.push('}');
-
-    styles.push('');
-    styles.push('ul, ol {');
-    styles.push('  padding-left: var(--spacing-xl);');
-    styles.push('  margin-bottom: var(--spacing-md);');
-    styles.push('}');
-
-    styles.push('');
-    styles.push('li {');
-    styles.push('  margin-bottom: var(--spacing-sm);');
-    styles.push('}');
-
-    styles.push('');
-    styles.push('table {');
-    styles.push('  width: 100%;');
-    styles.push('  border-collapse: collapse;');
-    styles.push('  margin-bottom: var(--spacing-md);');
-    styles.push('}');
-
-    styles.push('');
-    styles.push('th, td {');
-    styles.push('  text-align: left;');
-    styles.push('  padding: var(--spacing-sm) var(--spacing-md);');
-    styles.push('  border-bottom: 1px solid var(--color-border);');
-    styles.push('}');
-
-    styles.push('');
-    styles.push('th {');
-    styles.push('  font-weight: var(--font-weight-semibold);');
-    styles.push('  background-color: var(--color-surface);');
-    styles.push('}');
-
-    return styles.join('\n');
   }
 
   /**

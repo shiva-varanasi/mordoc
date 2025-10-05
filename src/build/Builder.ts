@@ -15,6 +15,7 @@ import { HtmlGenerator } from './HtmlGenerator';
 import { ProcessedContent, ContentDataFile } from '../types/content';
 import { SiteConfig } from '../types/config';
 import { ClientBundler } from './ClientBundler';
+import { StylesGenerator } from '../config/StylesGenerator';
 
 export interface BuilderOptions {
   projectRoot: string; // Path to user's project
@@ -264,14 +265,20 @@ export class Builder {
    * Generate theme CSS from style config
    */
   private generateThemeCSS(siteConfig: SiteConfig): void {
-    const themeGenerator = new ThemeGenerator(siteConfig.style);
-    const css = themeGenerator.generateCSS();
-
     const assetsDir = path.join(this.outputDir, 'assets');
     fs.mkdirSync(assetsDir, { recursive: true });
-
-    const cssPath = path.join(assetsDir, 'theme.css');
-    fs.writeFileSync(cssPath, css, 'utf8');
+  
+    // Generate theme.css (CSS variables)
+    const themeGenerator = new ThemeGenerator(siteConfig.style);
+    const themeCss = themeGenerator.generateCSS();
+    const themePath = path.join(assetsDir, 'theme.css');
+    fs.writeFileSync(themePath, themeCss, 'utf8');
+  
+    // Generate styles.css (component styles)
+    const stylesGenerator = new StylesGenerator();
+    const stylesCss = stylesGenerator.generateCSS();
+    const stylesPath = path.join(assetsDir, 'styles.css');
+    fs.writeFileSync(stylesPath, stylesCss, 'utf8');
   }
 
   /**

@@ -7,6 +7,7 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { ProcessedContent } from '../types/content';
 import { SiteConfig } from '../types/config';
+import MarkdocRenderer from '../components/MarkdocRenderer';
 
 export interface HtmlGeneratorOptions {
   siteConfig: SiteConfig;
@@ -118,31 +119,52 @@ export class HtmlGenerator {
   }
 
   /**
-   * Generate body content (placeholder for now, will be enhanced with actual React components)
+   * Generate body content with server-side rendered Markdoc content
    */
   private generateBody(content: ProcessedContent): string {
-    const { metadata } = content;
+    const { metadata, renderable } = content;
 
-    // For now, generate a simple HTML structure
-    // This will be replaced with actual React component rendering in later implementation
+    // Render Markdoc content to HTML string
+    const contentHtml = ReactDOMServer.renderToString(
+      React.createElement(MarkdocRenderer, { content: renderable })
+    );
+
+    // Generate full page HTML with placeholder structure
+    // React will hydrate the full layout on client-side
     const bodyHtml = `
-    <div class="page-container">
+    <div class="layout">
       <header class="site-header">
-        <div class="container">
-          <h1>${this.escapeHtml(this.siteConfig.metadata.title)}</h1>
+        <div class="header-container">
+          <div class="header-brand">
+            <a href="/" class="header-logo-link">
+              <span class="header-title">${this.escapeHtml(this.siteConfig.metadata.title)}</span>
+            </a>
+          </div>
         </div>
       </header>
-      <main class="content-main">
-        <div class="container">
-          <article class="content-article">
-            <h1>${this.escapeHtml(metadata.frontmatter.title)}</h1>
-            ${metadata.frontmatter.description ? `<p class="lead">${this.escapeHtml(metadata.frontmatter.description)}</p>` : ''}
-            <div class="content-body" data-pagefind-body>
-              <!-- Content will be hydrated by React -->
-            </div>
-          </article>
+      
+      <div class="layout-container">
+        <main class="layout-main">
+          <div class="content-page">
+            <article class="content-article">
+              <header class="content-header">
+                <h1 class="content-title">${this.escapeHtml(metadata.frontmatter.title)}</h1>
+                ${metadata.frontmatter.description ? `<p class="content-description">${this.escapeHtml(metadata.frontmatter.description)}</p>` : ''}
+              </header>
+              
+              <div class="content-body" data-pagefind-body>
+                ${contentHtml}
+              </div>
+            </article>
+          </div>
+        </main>
+      </div>
+      
+      <footer class="site-footer">
+        <div class="footer-container">
+          <p class="footer-text">© ${new Date().getFullYear()} ${this.escapeHtml(this.siteConfig.metadata.title)}</p>
         </div>
-      </main>
+      </footer>
     </div>`;
 
     return bodyHtml;

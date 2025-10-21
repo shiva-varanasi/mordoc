@@ -13,13 +13,12 @@ export interface ContentIndexerOptions {
 }
 
 export class ContentIndexer {
-  private options: Required<ContentIndexerOptions>;
+  private includeDrafts: boolean;
+  private defaultLanguage: string;
 
   constructor(options: ContentIndexerOptions = {}) {
-    this.options = {
-      includeDrafts: options.includeDrafts ?? false,
-      defaultLanguage: options.defaultLanguage ?? 'en',
-    };
+    this.includeDrafts = options.includeDrafts ?? false;
+    this.defaultLanguage = options.defaultLanguage ?? 'en';
   }
 
   /**
@@ -32,7 +31,7 @@ export class ContentIndexer {
 
     for (const content of processedContent) {
       // Skip drafts if not including them
-      if (!this.options.includeDrafts && content.metadata.frontmatter.draft) {
+      if (!this.includeDrafts && content.metadata.frontmatter.draft) {
         continue;
       }
 
@@ -52,7 +51,7 @@ export class ContentIndexer {
     const { slug, language, frontmatter } = metadata;
 
     // Build full URL path
-    const path = buildPathWithLanguage(slug, language, this.options.defaultLanguage);
+    const path = buildPathWithLanguage(slug, language, this.defaultLanguage);
 
     return {
       slug,

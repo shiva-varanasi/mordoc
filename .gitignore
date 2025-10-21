@@ -4,3 +4,4 @@ dist/
 *.log
 project-structure.txt
 test-docs/
+dev-rebuild.ps1

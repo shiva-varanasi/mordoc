@@ -11,27 +11,26 @@ export interface ClientBundlerOptions {
   outputDir: string; // User's dist/ directory
   minify?: boolean; // Minify output (default: true)
   sourcemap?: boolean; // Generate sourcemaps (default: false)
-  watch?: boolean; // Watch mode (default: false)
 }
 
 export class ClientBundler {
-  private options: Required<ClientBundlerOptions>;
+  private projectRoot: string;
+  private outputDir: string;
+  private minify: boolean;
+  private sourcemap: boolean;
 
   constructor(options: ClientBundlerOptions) {
-    this.options = {
-      projectRoot: options.projectRoot,
-      outputDir: options.outputDir,
-      minify: options.minify ?? true,
-      sourcemap: options.sourcemap ?? false,
-      watch: options.watch ?? false,
-    };
+    this.projectRoot = options.projectRoot;
+    this.outputDir = options.outputDir;
+    this.minify = options.minify ?? true;
+    this.sourcemap = options.sourcemap ?? false;
   }
 
   /**
    * Bundle the client application
    */
   async bundle(): Promise<void> {
-    const assetsDir = path.join(this.options.outputDir, 'assets');
+    const assetsDir = path.join(this.outputDir, 'assets');
 
     // Ensure assets directory exists
     if (!fs.existsSync(assetsDir)) {
@@ -39,7 +38,7 @@ export class ClientBundler {
     }
 
     // Entry point for client app
-    const entryPoint = path.join(this.options.projectRoot, 'src/client/main.tsx');
+    const entryPoint = path.join(this.projectRoot, 'src/client/main.tsx');
 
     // Check if entry point exists
     if (!fs.existsSync(entryPoint)) {
@@ -54,12 +53,12 @@ export class ClientBundler {
         platform: 'browser',
         target: ['es2020'],
         format: 'iife',
-        minify: this.options.minify,
-        sourcemap: this.options.sourcemap,
+        minify: this.minify,
+        sourcemap: this.sourcemap,
         jsx: 'automatic',
         jsxImportSource: 'react',
         define: {
-          'process.env.NODE_ENV': this.options.minify ? '"production"' : '"development"',
+          'process.env.NODE_ENV': this.minify ? '"production"' : '"development"',
         },
         loader: {
           '.tsx': 'tsx',
@@ -99,8 +98,8 @@ export class ClientBundler {
    * Watch mode for development (future enhancement)
    */
   async watch(): Promise<void> {
-    const assetsDir = path.join(this.options.outputDir, 'assets');
-    const entryPoint = path.join(this.options.projectRoot, 'src/client/main.tsx');
+    const assetsDir = path.join(this.outputDir, 'assets');
+    const entryPoint = path.join(this.projectRoot, 'src/client/main.tsx');
 
     if (!fs.existsSync(assetsDir)) {
       fs.mkdirSync(assetsDir, { recursive: true });
@@ -140,7 +139,7 @@ export class ClientBundler {
     size: number;
     files: string[];
   }> {
-    const mainJsPath = path.join(this.options.outputDir, 'assets/main.js');
+    const mainJsPath = path.join(this.outputDir, 'assets/main.js');
 
     if (!fs.existsSync(mainJsPath)) {
       return { size: 0, files: [] };

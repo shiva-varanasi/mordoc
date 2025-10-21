@@ -31,7 +31,9 @@ export class Builder {
   private contentDir: string;
   private configDir: string;
   private publicDir: string;
-  private options: Required<BuilderOptions>;
+  private clean: boolean;
+  private includeDrafts: boolean;
+  private verbose: boolean;
 
   constructor(options: BuilderOptions) {
     this.projectRoot = options.projectRoot;
@@ -39,14 +41,9 @@ export class Builder {
     this.contentDir = path.join(this.projectRoot, 'content');
     this.configDir = path.join(this.projectRoot, 'config');
     this.publicDir = path.join(this.projectRoot, 'public');
-
-    this.options = {
-      projectRoot: options.projectRoot,
-      outputDir: this.outputDir,
-      clean: options.clean ?? true,
-      includeDrafts: options.includeDrafts ?? false,
-      verbose: options.verbose ?? false,
-    };
+    this.clean = options.clean ?? true;
+    this.includeDrafts = options.includeDrafts ?? false;
+    this.verbose = options.verbose ?? false;
   }
 
   /**
@@ -57,7 +54,7 @@ export class Builder {
 
     try {
       // Step 1: Clean and prepare output directory
-      if (this.options.clean) {
+      if (this.clean) {
         this.log('Cleaning output directory...');
         this.cleanOutputDir();
       }
@@ -113,7 +110,7 @@ export class Builder {
       this.printBuildStats(processedContent);
     } catch (error) {
       console.error('Build failed:', (error as Error).message);
-      if (this.options.verbose) {
+      if (this.verbose) {
         console.error((error as Error).stack);
       }
       throw error;
@@ -157,7 +154,7 @@ export class Builder {
     siteConfig: SiteConfig
   ): string {
     const indexer = new ContentIndexer({
-      includeDrafts: this.options.includeDrafts,
+      includeDrafts: this.includeDrafts,
       defaultLanguage: siteConfig.defaultLanguage,
     });
 
@@ -184,7 +181,7 @@ export class Builder {
 
     for (const content of processedContent) {
       // Skip drafts in production
-      if (!this.options.includeDrafts && content.metadata.frontmatter.draft) {
+      if (!this.includeDrafts && content.metadata.frontmatter.draft) {
         continue;
       }
 
@@ -235,7 +232,7 @@ export class Builder {
 
     for (const content of processedContent) {
       // Skip drafts
-      if (!this.options.includeDrafts && content.metadata.frontmatter.draft) {
+      if (!this.includeDrafts && content.metadata.frontmatter.draft) {
         continue;
       }
 
@@ -291,8 +288,8 @@ export class Builder {
     const bundler = new ClientBundler({
       projectRoot: mordocRoot,
       outputDir: this.outputDir,
-      minify: !this.options.verbose, // Don't minify in verbose mode for debugging
-      sourcemap: this.options.verbose, // Generate sourcemaps in verbose mode
+      minify: !this.verbose, // Don't minify in verbose mode for debugging
+      sourcemap: this.verbose, // Generate sourcemaps in verbose mode
     });
 
     await bundler.bundle();
@@ -387,7 +384,7 @@ export class Builder {
    * Log message if verbose mode is enabled
    */
   private log(message: string): void {
-    if (this.options.verbose || true) {
+    if (this.verbose || true) {
       // Always log for now
       console.log(message);
     }

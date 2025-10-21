@@ -36,9 +36,8 @@ export class ContentLoader {
     }
 
     // Find all .md and .mdx files recursively
-    const files = await fg(['**/*.md', '**/*.mdx'], {
+    const files = await fg(['**/*.md'], {
       cwd: this.contentDir,
-      ignore: ['**/node_modules/**', '**/.git/**'],
     });
 
     // Sort files alphabetically for consistent ordering

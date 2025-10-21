@@ -18,11 +18,9 @@ import {
 } from '../types/config';
 
 export class ConfigLoader {
-  private projectRoot: string;
   private configDir: string;
 
   constructor(projectRoot: string) {
-    this.projectRoot = projectRoot;
     this.configDir = path.join(projectRoot, 'config');
   }
 
@@ -345,10 +343,17 @@ export class ConfigLoader {
   private loadAssets(): AssetConfig {
     const assets: AssetConfig = {};
 
-    // Check for logo
-    const logoPath = path.join(this.configDir, 'logo.png');
-    if (fs.existsSync(logoPath)) {
-      assets.logo = 'logo.png';
+    // Check for logo in different formats (SVG preferred, then PNG, then JPG)
+    const logoFormats = ['svg', 'png', 'jpg', 'jpeg'];
+    let logoFound = false;
+
+    for (const format of logoFormats) {
+      const logoPath = path.join(this.configDir, `logo.${format}`);
+      if (fs.existsSync(logoPath)) {
+        assets.logo = `logo.${format}`;
+        logoFound = true;
+        break;  // Use the first format found
+      }
     }
 
     // Check for favicon

@@ -48,10 +48,7 @@ export class ContentIndexer {
    */
   private createIndexEntry(content: ProcessedContent): ContentIndexEntry {
     const { metadata } = content;
-    const { slug, language, frontmatter } = metadata;
-
-    // Build full URL path
-    const path = buildPathWithLanguage(slug, language, this.defaultLanguage);
+    const { slug, language, frontmatter, path } = metadata;
 
     return {
       slug,

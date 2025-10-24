@@ -4,6 +4,8 @@
  */
 
 import Markdoc from '@markdoc/markdoc';
+import util from "node:util"; // for console.log temporary
+
 import {
   ProcessedContent,
   ContentMetadata,
@@ -28,10 +30,22 @@ export class ContentProcessor {
    */
   process(rawFile: RawContentFile): ProcessedContent {
     // Parse markdown with Markdoc
+    console.log('rawFile.content', rawFile.content);
     const ast = Markdoc.parse(rawFile.content);
+
+    console.log("=== AST ===");
+
+    console.log(
+      util.inspect(ast, { depth: null, colors: false })
+    );
 
     // Extract frontmatter from AST
     const frontmatter = this.extractFrontmatter(ast);
+
+    console.log("=== FRONTMATTER ===");
+    console.log(
+      util.inspect(frontmatter, { depth: null, colors: false })
+    );
 
     // If title is missing, try to extract from first H1 or filename
     if (!frontmatter.title || frontmatter.title.trim() === '') {
@@ -41,6 +55,11 @@ export class ContentProcessor {
     // Generate table of contents from headings
     const toc = this.generateTableOfContents(ast);
 
+    console.log("=== TOC ===");
+    console.log(
+      util.inspect(toc, { depth: null, colors: false })
+    );
+
     // Calculate word count and reading time
     const wordCount = this.calculateWordCount(ast);
     const readingTime = this.calculateReadingTime(wordCount);
@@ -48,11 +67,17 @@ export class ContentProcessor {
     // Transform AST to renderable tree
     const renderable = Markdoc.transform(ast);
 
+    console.log("=== RENDERABLE ===");
+    console.log(
+      util.inspect(renderable, { depth: null, colors: false })
+    );
+
     // Build metadata
     const metadata: ContentMetadata = {
       slug: rawFile.route.slug,
       filePath: rawFile.filePath,
       language: rawFile.route.language,
+      path: rawFile.route.path,
       frontmatter,
       toc,
       wordCount,
@@ -184,14 +209,21 @@ export class ContentProcessor {
    */
   private generateTableOfContents(ast: any): TableOfContents {
     const headings: TocEntry[] = [];
-
+    let foundFirstH1 = false;
+  
     // Walk the AST to find all heading nodes
     this.walkAST(ast, (node: any) => {
       if (node.type === 'heading') {
         const level = node.attributes?.level || 1;
         const text = this.extractTextFromNode(node);
         const id = this.generateHeadingId(text);
-
+  
+        // Skip the first H1 heading (page title)
+        if (level === 1 && !foundFirstH1) {
+          foundFirstH1 = true;
+          return;
+        }
+  
         headings.push({
           id,
           text,
@@ -199,7 +231,7 @@ export class ContentProcessor {
         });
       }
     });
-
+  
     // Build hierarchical structure
     return this.buildTocHierarchy(headings);
   }
@@ -329,6 +361,7 @@ export class ContentProcessor {
       slug: rawFile.route.slug,
       filePath: rawFile.filePath,
       language: rawFile.route.language,
+      path: rawFile.route.path,
       frontmatter,
       toc,
       wordCount,

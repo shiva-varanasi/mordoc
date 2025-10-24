@@ -36,19 +36,19 @@ export class HtmlGenerator {
     const { frontmatter } = metadata;
 
     // Build full URL for this page
-    const pageUrl = this.baseUrl + this.buildPagePath(content);
+    const pageUrl = this.baseUrl + content.metadata.path;
 
     // Generate HTML structure
     const html = `<!DOCTYPE html>
-<html lang="${metadata.language}">
-<head>
-  ${this.generateHead(content, pageUrl)}
-</head>
-<body>
-  <div id="root">${this.generateBody(content)}</div>
-  ${this.generateScripts(content)}
-</body>
-</html>`;
+    <html lang="${metadata.language}">
+    <head>
+      ${this.generateHead(content, pageUrl)}
+    </head>
+    <body>
+      <div id="root">${this.generateBody(content)}</div>
+      ${this.generateScripts(content)}
+    </body>
+    </html>`;
 
     return html;
   }
@@ -198,22 +198,6 @@ export class HtmlGenerator {
     scripts.push(`  <script src="/pagefind/pagefind-ui.js" defer></script>`);
 
     return scripts.join('\n');
-  }
-
-  /**
-   * Build page path for URL
-   */
-  private buildPagePath(content: ProcessedContent): string {
-    const { metadata } = content;
-    const { slug, language } = metadata;
-
-    // Default language has no prefix
-    if (language === this.siteConfig.defaultLanguage) {
-      return slug === 'index' ? '/' : `/${slug}`;
-    }
-
-    // Other languages have prefix
-    return slug === 'index' ? `/${language}` : `/${language}/${slug}`;
   }
 
   /**

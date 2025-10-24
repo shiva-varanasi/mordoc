@@ -34,6 +34,7 @@ export interface ContentMetadata {
   slug: string; // URL-friendly identifier (e.g., "getting-started")
   filePath: string; // Relative path from content/ (e.g., "en/getting-started.md")
   language: string; // Language code (e.g., "en", "es")
+  path: string; // Full URL path (e.g., "/getting-started" or "/es/comenzar")
   frontmatter: Frontmatter;
   toc: TableOfContents;
   wordCount: number;

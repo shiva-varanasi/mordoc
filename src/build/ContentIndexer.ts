@@ -64,20 +64,10 @@ export class ContentIndexer {
 
   /**
    * Sort index entries
-   * Priority: order (ascending) > title (alphabetical)
+   * based on title alphabetically
    */
   private sortEntries(entries: ContentIndexEntry[]): ContentIndex {
     return entries.sort((a, b) => {
-      // First, sort by order if both have it
-      if (a.order !== undefined && b.order !== undefined) {
-        return a.order - b.order;
-      }
-
-      // If only one has order, it comes first
-      if (a.order !== undefined) return -1;
-      if (b.order !== undefined) return 1;
-
-      // Otherwise, sort alphabetically by title
       return a.title.localeCompare(b.title);
     });
   }

@@ -42,6 +42,7 @@ export class ConfigLoader {
       style,
       navigation,
       assets,
+      assetsPath: '/assets',
     };
 
     // Validate the complete configuration

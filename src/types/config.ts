@@ -151,6 +151,7 @@ export interface SiteConfig {
     additionalSidenavs?: Record<string, SideNavConfig>;
   };
   assets: AssetConfig;
+  assetsPath: string; // Path from where assets would be served on the HTML pages
 }
 
 // Partial configuration for user overrides

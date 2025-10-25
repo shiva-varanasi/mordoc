@@ -159,7 +159,7 @@ export class Builder {
     });
 
     const index = indexer.createIndex(processedContent);
-    return indexer.toJSON(index, false); // Minified JSON for production
+    return indexer.toJSON(index, false); // Minified JSON for production    
   }
 
   /**

@@ -11,19 +11,13 @@ import MarkdocRenderer from '../components/MarkdocRenderer';
 
 export interface HtmlGeneratorOptions {
   siteConfig: SiteConfig;
-  baseUrl?: string;
-  assetsPath?: string; // Path to assets (default: '/assets')
 }
 
 export class HtmlGenerator {
   private siteConfig: SiteConfig;
-  private baseUrl: string;
-  private assetsPath: string;
 
   constructor(options: HtmlGeneratorOptions) {
     this.siteConfig = options.siteConfig;
-    this.baseUrl = options.baseUrl || options.siteConfig.metadata.baseUrl || '';
-    this.assetsPath = options.assetsPath || '/assets';
   }
 
   /**
@@ -36,7 +30,7 @@ export class HtmlGenerator {
     const { frontmatter } = metadata;
 
     // Build full URL for this page
-    const pageUrl = this.baseUrl + content.metadata.path;
+    const pageUrl = this.siteConfig.metadata.baseUrl + content.metadata.path;
 
     // Generate HTML structure
     const html = `<!DOCTYPE html>
@@ -105,12 +99,12 @@ export class HtmlGenerator {
 
     // Favicon
     if (this.siteConfig.assets.favicon) {
-      headParts.push(`<link rel="icon" href="${this.assetsPath}/${this.siteConfig.assets.favicon}">`);
+      headParts.push(`<link rel="icon" href="${this.siteConfig.assetsPath}/${this.siteConfig.assets.favicon}">`);
     }
 
     // Stylesheets
-    headParts.push(`<link rel="stylesheet" href="${this.assetsPath}/theme.css">`);
-    headParts.push(`<link rel="stylesheet" href="${this.assetsPath}/styles.css">`);
+    headParts.push(`<link rel="stylesheet" href="${this.siteConfig.assetsPath}/theme.css">`);
+    headParts.push(`<link rel="stylesheet" href="${this.siteConfig.assetsPath}/styles.css">`);
 
     // Pagefind CSS (for search)
     headParts.push(`<link rel="stylesheet" href="/pagefind/pagefind-ui.css">`);
@@ -192,7 +186,7 @@ export class HtmlGenerator {
     scripts.push(`  </script>`);
 
     // Client-side React bundle
-    scripts.push(`  <script src="${this.assetsPath}/main.js" defer></script>`);
+    scripts.push(`  <script src="${this.siteConfig.assetsPath}/main.js" defer></script>`);
 
     // Pagefind search script
     scripts.push(`  <script src="/pagefind/pagefind-ui.js" defer></script>`);
@@ -225,8 +219,8 @@ export class HtmlGenerator {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>404 - Page Not Found | ${this.escapeHtml(this.siteConfig.metadata.title)}</title>
-  <link rel="stylesheet" href="${this.assetsPath}/theme.css">
-  <link rel="stylesheet" href="${this.assetsPath}/styles.css">
+  <link rel="stylesheet" href="${this.siteConfig.assetsPath}/theme.css">
+  <link rel="stylesheet" href="${this.siteConfig.assetsPath}/styles.css">
 </head>
 <body>
   <div id="root">
@@ -240,7 +234,7 @@ export class HtmlGenerator {
       </main>
     </div>
   </div>
-  <script src="${this.assetsPath}/main.js" defer></script>
+  <script src="${this.siteConfig.assetsPath}/main.js" defer></script>
 </body>
 </html>`;
 

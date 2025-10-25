@@ -73,62 +73,6 @@ export class ContentIndexer {
   }
 
   /**
-   * Filter index entries by language
-   * @param index - Content index
-   * @param language - Language code
-   * @returns Filtered index
-   */
-  filterByLanguage(index: ContentIndex, language: string): ContentIndex {
-    return index.filter((entry) => entry.language === language);
-  }
-
-  /**
-   * Filter index entries by tag
-   * @param index - Content index
-   * @param tag - Tag to filter by
-   * @returns Filtered index
-   */
-  filterByTag(index: ContentIndex, tag: string): ContentIndex {
-    return index.filter((entry) => entry.tags?.includes(tag));
-  }
-
-  /**
-   * Group index entries by language
-   * @param index - Content index
-   * @returns Map of language to entries
-   */
-  groupByLanguage(index: ContentIndex): Map<string, ContentIndex> {
-    const grouped = new Map<string, ContentIndex>();
-
-    for (const entry of index) {
-      const existing = grouped.get(entry.language) || [];
-      existing.push(entry);
-      grouped.set(entry.language, existing);
-    }
-
-    return grouped;
-  }
-
-  /**
-   * Get all unique tags from index
-   * @param index - Content index
-   * @returns Array of unique tags
-   */
-  getAllTags(index: ContentIndex): string[] {
-    const tagsSet = new Set<string>();
-
-    for (const entry of index) {
-      if (entry.tags) {
-        for (const tag of entry.tags) {
-          tagsSet.add(tag);
-        }
-      }
-    }
-
-    return Array.from(tagsSet).sort();
-  }
-
-  /**
    * Convert index to JSON string
    * @param index - Content index
    * @param pretty - Pretty print JSON (default: false)
@@ -139,43 +83,5 @@ export class ContentIndexer {
       return JSON.stringify(index, null, 2);
     }
     return JSON.stringify(index);
-  }
-
-  /**
-   * Get statistics about the index
-   * @param index - Content index
-   * @returns Statistics object
-   */
-  getStats(index: ContentIndex): {
-    total: number;
-    byLanguage: Record<string, number>;
-    byTag: Record<string, number>;
-    drafts: number;
-  } {
-    const stats = {
-      total: index.length,
-      byLanguage: {} as Record<string, number>,
-      byTag: {} as Record<string, number>,
-      drafts: 0,
-    };
-
-    for (const entry of index) {
-      // Count by language
-      stats.byLanguage[entry.language] = (stats.byLanguage[entry.language] || 0) + 1;
-
-      // Count by tag
-      if (entry.tags) {
-        for (const tag of entry.tags) {
-          stats.byTag[tag] = (stats.byTag[tag] || 0) + 1;
-        }
-      }
-
-      // Count drafts
-      if (entry.draft) {
-        stats.drafts++;
-      }
-    }
-
-    return stats;
   }
 }

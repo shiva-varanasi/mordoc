@@ -191,7 +191,8 @@ export class ConfigLoader {
           xl: '1.25rem',
           '2xl': '1.5rem',
           '3xl': '1.875rem',
-          '4xl': '2.25rem',
+          '4xl': '2rem',
+          '5xl': '2.5rem',
         },
         lineHeight: {
           tight: 1.25,

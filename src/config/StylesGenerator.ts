@@ -427,6 +427,7 @@ th {
 
 .content-title {
   margin-top: 0;
+  font-size: var(--font-size-5xl);
 }
 
 .content-description {

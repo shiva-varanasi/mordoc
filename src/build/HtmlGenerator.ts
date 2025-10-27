@@ -26,15 +26,13 @@ export class HtmlGenerator {
    * @returns Complete HTML string
    */
   generatePage(content: ProcessedContent): string {
-    const { metadata, renderable } = content;
-    const { frontmatter } = metadata;
 
     // Build full URL for this page
     const pageUrl = this.siteConfig.metadata.baseUrl + content.metadata.path;
 
     // Generate HTML structure
     const html = `<!DOCTYPE html>
-    <html lang="${metadata.language}">
+    <html lang="${content.metadata.language}">
     <head>
       ${this.generateHead(content, pageUrl)}
     </head>

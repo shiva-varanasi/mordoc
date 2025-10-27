@@ -47,10 +47,8 @@ export class ContentProcessor {
       util.inspect(frontmatter, { depth: null, colors: false })
     );
 
-    // If title is missing, try to extract from first H1 or filename
-    if (!frontmatter.title || frontmatter.title.trim() === '') {
-      frontmatter.title = this.extractTitleFromContent(ast, rawFile.filePath);
-    }
+    // Validate frontmatter has required fields
+    this.validateFrontmatter(frontmatter, rawFile.filePath);
 
     // Generate table of contents from headings
     const toc = this.generateTableOfContents(ast);
@@ -115,50 +113,48 @@ export class ContentProcessor {
     // Markdoc stores frontmatter in ast.attributes
     const attributes = ast.attributes || {};
 
+    let parsedFrontmatter: Record<string, any> = {};
+    
+    // Check if frontmatter is a string
+    if (typeof attributes.frontmatter === 'string') {
+      // Split by newlines and parse each line
+      const lines = attributes.frontmatter.split('\n');
+      
+      for (const line of lines) {
+        // Find the first colon which separates key and value
+        const colonIndex = line.indexOf(':');
+        if (colonIndex > 0) {
+          const key = line.substring(0, colonIndex).trim();
+          const value = line.substring(colonIndex + 1).trim();
+          
+          parsedFrontmatter[key] = value;
+        }
+      }
+    } else {
+      // Use attributes directly if frontmatter is not a string
+      parsedFrontmatter = attributes;
+    }
+
     // Build frontmatter object with required title field
     const frontmatter: Frontmatter = {
-      title: attributes.title || '',
-      description: attributes.description,
-      order: attributes.order !== undefined ? Number(attributes.order) : undefined,
-      draft: attributes.draft === true || attributes.draft === 'true',
-      tags: Array.isArray(attributes.tags) ? attributes.tags : undefined,
-      date: attributes.date,
-      author: attributes.author,
-      sidenavRef: attributes.sidenavRef,
+      title: parsedFrontmatter.title || '',
+      description: parsedFrontmatter.description,
+      order: parsedFrontmatter.order !== undefined ? Number(parsedFrontmatter.order) : undefined,
+      draft: parsedFrontmatter.draft === true || parsedFrontmatter.draft === 'true',
+      tags: Array.isArray(parsedFrontmatter.tags) ? parsedFrontmatter.tags : undefined,
+      date: parsedFrontmatter.date,
+      author: parsedFrontmatter.author,
+      sidenavRef: parsedFrontmatter.sidenavRef,
     };
 
     // Add any custom frontmatter fields
-    for (const [key, value] of Object.entries(attributes)) {
+    for (const [key, value] of Object.entries(parsedFrontmatter)) {
       if (!(key in frontmatter)) {
         frontmatter[key] = value;
       }
     }
 
     return frontmatter;
-  }
-
-  /**
-   * Extract title from content (first H1) or filename as fallback
-   * @param ast - Markdoc AST
-   * @param filePath - File path for fallback title generation
-   * @returns Extracted or generated title
-   */
-  private extractTitleFromContent(ast: any, filePath: string): string {
-    // Try to find the first H1 heading in the content
-    let firstH1: string | null = null;
-
-    this.walkAST(ast, (node: any) => {
-      if (!firstH1 && node.type === 'heading' && node.attributes?.level === 1) {
-        firstH1 = this.extractTextFromNode(node);
-      }
-    });
-
-    if (firstH1) {
-      return firstH1;
-    }
-
-    // Fallback: generate title from filename
-    return this.generateTitleFromFilename(filePath);
   }
 
   /**
@@ -197,11 +193,12 @@ export class ContentProcessor {
   }
 
   /**
-   * Validate frontmatter has required fields
+   * Validate frontmatter required fields
    */
   private validateFrontmatter(frontmatter: Frontmatter, filePath: string): void {
-    // Currently no required fields - title is handled by extractTitleFromContent fallback
-    // Add validation for other required fields here if needed in the future
+    if (!frontmatter.title || frontmatter.title.trim() === '') {
+      throw new Error(`Missing required frontmatter 'title' in ${filePath}. All content files must include a title in frontmatter.`);
+    }
   }
 
   /**
@@ -209,7 +206,6 @@ export class ContentProcessor {
    */
   private generateTableOfContents(ast: any): TableOfContents {
     const headings: TocEntry[] = [];
-    let foundFirstH1 = false;
   
     // Walk the AST to find all heading nodes
     this.walkAST(ast, (node: any) => {
@@ -217,12 +213,6 @@ export class ContentProcessor {
         const level = node.attributes?.level || 1;
         const text = this.extractTextFromNode(node);
         const id = this.generateHeadingId(text);
-  
-        // Skip the first H1 heading (page title)
-        if (level === 1 && !foundFirstH1) {
-          foundFirstH1 = true;
-          return;
-        }
   
         headings.push({
           id,
@@ -347,11 +337,8 @@ export class ContentProcessor {
   getMetadataOnly(rawFile: RawContentFile): ContentMetadata {
     const ast = Markdoc.parse(rawFile.content);
     const frontmatter = this.extractFrontmatter(ast);
-    
-    // Apply title fallback if missing
-    if (!frontmatter.title || frontmatter.title.trim() === '') {
-      frontmatter.title = this.extractTitleFromContent(ast, rawFile.filePath);
-    }
+
+    this.validateFrontmatter(frontmatter, rawFile.filePath);
 
     const toc = this.generateTableOfContents(ast);
     const wordCount = this.calculateWordCount(ast);

@@ -90,19 +90,11 @@ export class Builder {
       this.log('Bundling client application...');
       await this.bundleClientApp();
 
-      // Step 9: Copy static assets (renumber from 8)
+      // Step 9: Copy static assets
       this.log('Copying static assets...');
       this.copyStaticAssets(siteConfig);
 
-      // Step 10: Generate client config (renumber from 9)
-      this.log('Generating client configuration...');
-      this.generateClientConfig(siteConfig);
-
-      // Step 11: Copy static assets
-      this.log('Copying static assets...');
-      this.copyStaticAssets(siteConfig);
-
-      // Step 12: Generate client config
+      // Step 10: Generate client config
       this.log('Generating client configuration...');
       this.generateClientConfig(siteConfig);
 

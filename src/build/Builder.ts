@@ -267,7 +267,7 @@ export class Builder {
   
     // Generate theme.css (CSS variables)
     const themeGenerator = new ThemeGenerator(siteConfig.style);
-    const themeCss = themeGenerator.generateCSS();
+    const themeCss = themeGenerator.generateCSSVariables();
     const themePath = path.join(assetsDir, 'theme.css');
     fs.writeFileSync(themePath, themeCss, 'utf8');
   

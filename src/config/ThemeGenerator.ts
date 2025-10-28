@@ -9,16 +9,9 @@ export class ThemeGenerator {
   constructor(private styleConfig: StyleConfig) {}
 
   /**
-   * Generate CSS variables for the theme
-   */
-  generateCSS(): string {
-    return this.generateCSSVariables();
-  }
-
-  /**
    * Generate CSS custom properties (variables) for colors, typography, and layout
    */
-  private generateCSSVariables(): string {
+  generateCSSVariables(): string {
     const { colors, typography, layout } = this.styleConfig;
 
     const variables: string[] = [];

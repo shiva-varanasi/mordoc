@@ -54,8 +54,6 @@ export class RouteManager {
     // Determine paths in dist/ directory
     const contentPath = this.getContentDataPath(slug, language);
     console.log('contentPath inside route manager: ', contentPath);
-    const htmlPath = this.getHtmlPath(slug, language);
-    console.log('htmlPath inside route manager: ', htmlPath);
 
     return {
       path: urlPath,
@@ -63,7 +61,6 @@ export class RouteManager {
       dirPath,
       language,
       contentPath,
-      htmlPath,
     };
   }
 

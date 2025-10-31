@@ -10,7 +10,6 @@ export interface Route {
   dirPath: string;   // Directory path (e.g., "guides")
   language: string; // Language code
   contentPath: string; // Path to JSON file in dist/content-data/
-  htmlPath: string; // Path to static HTML file in dist/
 }
 
 // Route map for quick lookups (path -> route)

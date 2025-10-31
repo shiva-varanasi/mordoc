@@ -7,6 +7,7 @@
 export interface Route {
   path: string; // Full URL path (e.g., "/getting-started" or "/es/comenzar")
   slug: string; // Content slug
+  dirPath: string;   // Directory path (e.g., "guides")
   language: string; // Language code
   contentPath: string; // Path to JSON file in dist/content-data/
   htmlPath: string; // Path to static HTML file in dist/

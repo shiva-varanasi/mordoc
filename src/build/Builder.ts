@@ -192,7 +192,7 @@ export class Builder {
    */
   private writeHtmlFile(content: ProcessedContent, html: string): void {
     const { metadata } = content;
-    const { language, slug } = metadata;
+    const { language, slug, path: urlPath } = metadata;
 
     // Determine output path
     let outputPath: string;
@@ -200,12 +200,12 @@ export class Builder {
       // Default language
       outputPath = slug === 'index'
         ? path.join(this.outputDir, 'index.html')
-        : path.join(this.outputDir, slug, 'index.html');
+        : path.join(this.outputDir, urlPath, 'index.html');
     } else {
       // Non-default language
       outputPath = slug === 'index'
         ? path.join(this.outputDir, language, 'index.html')
-        : path.join(this.outputDir, language, slug, 'index.html');
+        : path.join(this.outputDir, language, urlPath, 'index.html');
     }
 
     // Ensure directory exists

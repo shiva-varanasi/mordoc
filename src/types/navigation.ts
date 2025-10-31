@@ -9,7 +9,6 @@ export interface Route {
   slug: string; // Content slug
   dirPath: string;   // Directory path (e.g., "guides")
   language: string; // Language code
-  contentPath: string; // Path to JSON file in dist/content-data/
 }
 
 // Route map for quick lookups (path -> route)

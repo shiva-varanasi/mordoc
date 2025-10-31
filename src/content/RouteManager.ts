@@ -51,16 +51,11 @@ export class RouteManager {
     );
     console.log('urlPath inside route manager: ', urlPath);
 
-    // Determine paths in dist/ directory
-    const contentPath = this.getContentDataPath(slug, language);
-    console.log('contentPath inside route manager: ', contentPath);
-
     return {
       path: urlPath,
       slug,
       dirPath,
       language,
-      contentPath,
     };
   }
 
@@ -78,26 +73,6 @@ export class RouteManager {
     }
 
     return routeMap;
-  }
-
-  /**
-   * Get content data JSON file path in dist/content-data/
-   * @param slug - Content slug
-   * @param language - Language code
-   * @returns Path to JSON file relative to dist/
-   */
-  private getContentDataPath(slug: string, language: string): string {
-    // For default language: content-data/slug.json
-    // For other languages: content-data/lang/slug.json
-    if (language === this.defaultLanguage) {
-      return slug === 'index' 
-        ? 'content-data/index.json'
-        : `content-data/${slug}.json`;
-    }
-
-    return slug === 'index'
-      ? `content-data/${language}/index.json`
-      : `content-data/${language}/${slug}.json`;
   }
 
   /**

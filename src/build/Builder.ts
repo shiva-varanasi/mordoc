@@ -221,31 +221,56 @@ export class Builder {
   private generateContentDataFiles(processedContent: ProcessedContent[]): void {
     const contentDataDir = path.join(this.outputDir, 'content-data');
     fs.mkdirSync(contentDataDir, { recursive: true });
-
+  
     for (const content of processedContent) {
       // Skip drafts
       if (!this.includeDrafts && content.metadata.frontmatter.draft) {
         continue;
       }
-
+  
       const dataFile: ContentDataFile = {
         metadata: content.metadata,
         renderable: content.renderable,
       };
-
+  
       const json = JSON.stringify(dataFile);
-      const { language, slug } = content.metadata;
-
+      const { language, slug, dirPath } = content.metadata;
+  
       // Determine output path
       let outputPath: string;
       if (language === 'en') {
-        outputPath = path.join(contentDataDir, `${slug}.json`);
+        // For default language
+        if (slug === 'index' && !dirPath) {
+          // Root index page
+          outputPath = path.join(contentDataDir, 'index.json');
+        } else if (dirPath) {
+          // Page in subdirectory
+          outputPath = path.join(contentDataDir, dirPath, `${slug}.json`);
+        } else {
+          // Page at root level
+          outputPath = path.join(contentDataDir, `${slug}.json`);
+        }
       } else {
+        // For non-default languages
         const langDir = path.join(contentDataDir, language);
         fs.mkdirSync(langDir, { recursive: true });
-        outputPath = path.join(langDir, `${slug}.json`);
+        
+        if (slug === 'index' && !dirPath) {
+          // Root index page in non-default language
+          outputPath = path.join(langDir, 'index.json');
+        } else if (dirPath) {
+          // Page in subdirectory in non-default language
+          outputPath = path.join(langDir, dirPath, `${slug}.json`);
+        } else {
+          // Page at root level in non-default language
+          outputPath = path.join(langDir, `${slug}.json`);
+        }
       }
-
+  
+      // Ensure directory exists
+      fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+      
+      // Write file
       fs.writeFileSync(outputPath, json, 'utf8');
     }
   }

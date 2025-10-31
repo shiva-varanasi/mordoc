@@ -35,6 +35,7 @@ export interface ContentMetadata {
   filePath: string; // Relative path from content/ (e.g., "en/getting-started.md")
   language: string; // Language code (e.g., "en", "es")
   path: string; // Full URL path (e.g., "/getting-started" or "/es/comenzar")
+  dirPath: string; // Directory path (e.g., "guides" for "guides/first-steps")
   frontmatter: Frontmatter;
   toc: TableOfContents;
   wordCount: number;

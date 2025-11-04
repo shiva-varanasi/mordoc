@@ -17,6 +17,16 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
   
 
   useEffect(() => {
+    // Get header height from CSS variable for consistent spacing
+    const headerHeightRem = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue('--header-height')
+    );
+    // Get actual root font size instead of assuming 16px
+    const rootFontSize = parseFloat(
+      getComputedStyle(document.documentElement).fontSize
+    );
+    const headerHeightPx = headerHeightRem * rootFontSize;
+    
     // Track which heading is currently visible
     const observer = new IntersectionObserver(
       (entries) => {
@@ -27,7 +37,8 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
         });
       },
       {
-        rootMargin: '-80px 0px -80% 0px',
+        // Adjust viewport to account for fixed header and focus on content area
+        rootMargin: `-${headerHeightPx}px 0px -80% 0px`,
       }
     );
 
@@ -46,7 +57,25 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
     const element = document.getElementById(id);
     console.log('element inside table of contents: ', element);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      // Get header height from CSS variable
+      const headerHeightRem = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--header-height')
+      );
+      // Get actual root font size instead of assuming 16px
+      const rootFontSize = parseFloat(
+        getComputedStyle(document.documentElement).fontSize
+      );
+      const headerHeightPx = headerHeightRem * rootFontSize;
+      
+      // Calculate scroll position accounting for fixed header
+      const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition = elementPosition - headerHeightPx;
+      
+      // Scroll to element with smooth animation
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
       setActiveId(id);
     }
   };

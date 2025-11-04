@@ -64,6 +64,9 @@ export class ContentProcessor {
 
     // Transform AST to renderable tree
     const renderable = Markdoc.transform(ast);
+    
+    // Add heading anchors to renderable for table of contents
+    this.addHeadingAnchors(renderable);
 
     console.log("=== RENDERABLE ===");
     console.log(
@@ -329,6 +332,60 @@ export class ContentProcessor {
    */
   private calculateReadingTime(wordCount: number): number {
     return Math.ceil(wordCount / this.averageReadingSpeed);
+  }
+
+  /**
+   * Ensure every heading tag in the renderable tree has a stable id
+   */
+  private addHeadingAnchors(node: any): void {
+    if (!node || typeof node !== 'object') {
+      return;
+    }
+
+    if (node instanceof Markdoc.Tag) {
+      if (/^h[1-6]$/.test(node.name)) {
+        const text = this.extractTextFromRenderable(node.children);
+        const id = this.generateHeadingId(text);
+        node.attributes = {
+          ...(node.attributes ?? {}),
+          id,
+        };
+      }
+
+      if (Array.isArray(node.children)) {
+        node.children.forEach((child: any) => this.addHeadingAnchors(child));
+      }
+      return;
+    }
+
+    if (Array.isArray(node)) {
+      node.forEach((child) => this.addHeadingAnchors(child));
+    }
+  }
+
+  /**
+   * Extract plain text from the renderable Markdoc tree
+   */
+  private extractTextFromRenderable(node: any): string {
+    if (!node) return '';
+
+    if (typeof node === 'string') {
+      return node;
+    }
+
+    if (Array.isArray(node)) {
+      return node.map((child) => this.extractTextFromRenderable(child)).join('');
+    }
+
+    if (node instanceof Markdoc.Tag) {
+      return this.extractTextFromRenderable(node.children);
+    }
+
+    if (typeof node === 'object' && node.attributes?.content) {
+      return String(node.attributes.content);
+    }
+
+    return '';
   }
 
   /**

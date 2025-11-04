@@ -14,6 +14,7 @@ interface TableOfContentsProps {
  */
 export function TableOfContents({ toc }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>('');
+  
 
   useEffect(() => {
     // Track which heading is currently visible
@@ -32,7 +33,9 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
 
     // Observe all headings
     const headings = document.querySelectorAll('h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]');
+    console.log('headings inside table of contents: ', headings);
     headings.forEach((heading) => observer.observe(heading));
+    console.log('toc inside table of contents: ', toc);
 
     return () => {
       headings.forEach((heading) => observer.unobserve(heading));
@@ -41,6 +44,7 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
 
   const handleClick = (id: string) => {
     const element = document.getElementById(id);
+    console.log('element inside table of contents: ', element);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
       setActiveId(id);

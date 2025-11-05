@@ -3,6 +3,39 @@
  * These interfaces define the structure of user configuration files
  */
 
+// ============================================
+// USER-FACING CONFIGURATION (style.json)
+// ============================================
+
+/**
+ * User-facing style configuration from style.json
+ * Simplified structure for Level 1 users
+ */
+export interface UserStyleConfig {
+  fontFamily?: string;
+  light?: ThemeConfig;
+  dark?: ThemeConfig;
+}
+
+export interface ThemeConfig {
+  brandColor?: string;
+  navigation?: NavigationConfig;
+  header?: HeaderConfig;
+}
+
+export interface NavigationConfig {
+  textColor?: string;
+  hoverColor?: string;
+}
+
+export interface HeaderConfig {
+  background?: string;
+}
+
+// ============================================
+// INTERNAL PROCESSED CONFIGURATION
+// ============================================
+
 // Color definition supporting light and dark modes
 export interface ColorScheme {
   light: string;
@@ -94,10 +127,18 @@ export interface ColorsConfig {
   warning: ColorScheme;
   error: ColorScheme;
   info: ColorScheme;
+  navigation: {
+    text: ColorScheme;
+    hover: ColorScheme;
+    active: ColorScheme;
+  };
+  header: {
+    background: ColorScheme;
+  };
 }
 
-// Main style configuration (maps to style.json)
-export interface StyleConfig {
+// Processed style configuration (internal use after transformation)
+export interface ProcessedStyleConfig {
   colors: ColorsConfig;
   typography: TypographyConfig;
   layout: LayoutConfig;
@@ -144,21 +185,19 @@ export interface SiteConfig {
   metadata: SiteMetadata;
   languages: LanguageConfig[];
   defaultLanguage: string;
-  style: StyleConfig;
+  style: ProcessedStyleConfig;
   navigation: {
     sidenav: SideNavConfig;
     topnav?: TopNavConfig;
-    // Additional sidenav files (e.g., "guides" -> guides-sidenav.yaml)
     additionalSidenavs?: Record<string, SideNavConfig>;
   };
   assets: AssetConfig;
-  assetsPath: string; // Path from where assets would be served on the HTML pages
+  assetsPath: string;
 }
-
-// Partial configuration for user overrides
-export type PartialStyleConfig = DeepPartial<StyleConfig>;
 
 // Utility type for deep partial
 type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
 };
+
+export type PartialUserStyleConfig = DeepPartial<UserStyleConfig>;

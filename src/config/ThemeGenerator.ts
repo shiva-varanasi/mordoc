@@ -3,10 +3,10 @@
  * Converts theme configuration into CSS custom properties
  */
 
-import { StyleConfig, FontConfig } from '../types/config';
+import { ProcessedStyleConfig, FontConfig } from '../types/config';
 
 export class ThemeGenerator {
-  constructor(private styleConfig: StyleConfig) {}
+  constructor(private styleConfig: ProcessedStyleConfig) {}
 
   /**
    * Generate CSS custom properties (variables) for colors, typography, and layout
@@ -32,6 +32,18 @@ export class ThemeGenerator {
     variables.push(`  --color-warning: ${colors.warning.light};`);
     variables.push(`  --color-error: ${colors.error.light};`);
     variables.push(`  --color-info: ${colors.info.light};`);
+
+    // Navigation colors (light mode)
+    variables.push('');
+    variables.push(`  /* Navigation - Light Mode */`);
+    variables.push(`  --nav-text-color: ${colors.navigation.text.light};`);
+    variables.push(`  --nav-hover-color: ${colors.navigation.hover.light};`);
+    variables.push(`  --nav-active-color: ${colors.navigation.active.light};`);
+
+    // Header colors (light mode)
+    variables.push('');
+    variables.push(`  /* Header - Light Mode */`);
+    variables.push(`  --header-background: ${colors.header.background.light};`);
 
     // Typography variables
     variables.push('');
@@ -101,6 +113,18 @@ export class ThemeGenerator {
     variables.push(`  --color-warning: ${colors.warning.dark};`);
     variables.push(`  --color-error: ${colors.error.dark};`);
     variables.push(`  --color-info: ${colors.info.dark};`);
+
+    // Navigation colors (dark mode)
+    variables.push('');
+    variables.push(`  /* Navigation - Dark Mode */`);
+    variables.push(`  --nav-text-color: ${colors.navigation.text.dark};`);
+    variables.push(`  --nav-hover-color: ${colors.navigation.hover.dark};`);
+    variables.push(`  --nav-active-color: ${colors.navigation.active.dark};`);
+
+    // Header colors (dark mode)
+    variables.push('');
+    variables.push(`  /* Header - Dark Mode */`);
+    variables.push(`  --header-background: ${colors.header.background.dark};`);
     variables.push('}');
 
     // Prefer dark mode based on system preference
@@ -120,6 +144,10 @@ export class ThemeGenerator {
     variables.push(`    --color-warning: ${colors.warning.dark};`);
     variables.push(`    --color-error: ${colors.error.dark};`);
     variables.push(`    --color-info: ${colors.info.dark};`);
+    variables.push(`    --nav-text-color: ${colors.navigation.text.dark};`);
+    variables.push(`    --nav-hover-color: ${colors.navigation.hover.dark};`);
+    variables.push(`    --nav-active-color: ${colors.navigation.active.dark};`);
+    variables.push(`    --header-background: ${colors.header.background.dark};`);
     variables.push('  }');
     variables.push('}');
 

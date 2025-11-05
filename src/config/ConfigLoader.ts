@@ -8,7 +8,8 @@ import path from 'path';
 import yaml from 'js-yaml';
 import {
   SiteConfig,
-  StyleConfig,
+  ProcessedStyleConfig,
+  UserStyleConfig,
   SideNavConfig,
   TopNavConfig,
   NavigationItem,
@@ -86,10 +87,31 @@ export class ConfigLoader {
   }
 
   /**
-   * Load style configuration with black and white default theme
+   * Load and transform user style configuration
    */
-  private loadStyleConfig(): StyleConfig {
-    const defaultStyle: StyleConfig = {
+  private loadStyleConfig(): ProcessedStyleConfig {
+    const defaultStyle = this.getDefaultProcessedConfig();
+
+    const styleJsonPath = path.join(this.configDir, 'style.json');
+    if (!fs.existsSync(styleJsonPath)) {
+      return defaultStyle;
+    }
+
+    try {
+      const userStyleJson = fs.readFileSync(styleJsonPath, 'utf8');
+      const userStyle: UserStyleConfig = JSON.parse(userStyleJson);
+      const transformedStyle = this.transformUserStyleToProcessed(userStyle);
+      return this.deepMerge(defaultStyle, transformedStyle) as ProcessedStyleConfig;
+    } catch (error) {
+      throw new Error(`Failed to parse style.json: ${(error as Error).message}`);
+    }
+  }
+
+  /**
+   * Get default processed style configuration
+   */
+  private getDefaultProcessedConfig(): ProcessedStyleConfig {
+    return {
       colors: {
         primary: {
           light: '#000000',
@@ -144,6 +166,26 @@ export class ConfigLoader {
         info: {
           light: '#2d3436',
           dark: '#dfe6e9',
+        },
+        navigation: {
+          text: {
+            light: '#666666',
+            dark: '#999999',
+          },
+          hover: {
+            light: '#000000',
+            dark: '#ffffff',
+          },
+          active: {
+            light: '#000000',
+            dark: '#ffffff',
+          },
+        },
+        header: {
+          background: {
+            light: '#ffffff',
+            dark: '#0a0a0a',
+          },
         },
       },
       typography: {
@@ -236,19 +278,121 @@ export class ConfigLoader {
         },
       },
     };
+  }
 
-    // Try to load user's style.json
-    const styleJsonPath = path.join(this.configDir, 'style.json');
-    if (fs.existsSync(styleJsonPath)) {
-      try {
-        const userStyle = JSON.parse(fs.readFileSync(styleJsonPath, 'utf8'));
-        return this.deepMerge(defaultStyle, userStyle) as StyleConfig;
-      } catch (error) {
-        throw new Error(`Failed to parse style.json: ${(error as Error).message}`);
+  /**
+   * Transform user-facing config to internal processed config
+   */
+  private transformUserStyleToProcessed(
+    userStyle: UserStyleConfig
+  ): Partial<ProcessedStyleConfig> {
+    const processed: Partial<ProcessedStyleConfig> = {
+      colors: {} as any,
+      typography: {} as any,
+      layout: {} as any,
+    };
+
+    // Type assertion helper - we know colors is initialized
+    const colors = processed.colors!;
+
+    // Handle font family (applies to both base and heading)
+    if (userStyle.fontFamily) {
+      const fontParts = userStyle.fontFamily.split(',').map((f) => f.trim());
+      const primaryFont = fontParts[0];
+      const fallbacks = fontParts.slice(1);
+
+      processed.typography = {
+        fontFamily: {
+          base: {
+            family: primaryFont,
+            fallbacks: fallbacks.length > 0 ? fallbacks : undefined,
+          },
+          heading: {
+            family: primaryFont,
+            fallbacks: fallbacks.length > 0 ? fallbacks : undefined,
+            weight: 600,
+          },
+        },
+      } as any;
+    }
+
+    // Handle light theme colors
+    if (userStyle.light) {
+      const light = userStyle.light;
+
+      if (light.brandColor) {
+        colors.primary = { light: light.brandColor } as any;
+        colors.navigation = {
+          active: { light: light.brandColor },
+        } as any;
+      }
+
+      if (light.navigation) {
+        if (!colors.navigation) colors.navigation = {} as any;
+
+        if (light.navigation.textColor) {
+          colors.navigation.text = {
+            light: light.navigation.textColor,
+          } as any;
+        }
+
+        if (light.navigation.hoverColor) {
+          colors.navigation.hover = {
+            light: light.navigation.hoverColor,
+          } as any;
+        }
+      }
+
+      if (light.header?.background) {
+        colors.header = {
+          background: { light: light.header.background },
+        } as any;
       }
     }
 
-    return defaultStyle;
+    // Handle dark theme colors
+    if (userStyle.dark) {
+      const dark = userStyle.dark;
+
+      if (dark.brandColor) {
+        if (!colors.primary) colors.primary = {} as any;
+        (colors.primary as any).dark = dark.brandColor;
+
+        if (!colors.navigation) colors.navigation = {} as any;
+        if (!colors.navigation.active) {
+          colors.navigation.active = {} as any;
+        }
+        (colors.navigation.active as any).dark = dark.brandColor;
+      }
+
+      if (dark.navigation) {
+        if (!colors.navigation) colors.navigation = {} as any;
+
+        if (dark.navigation.textColor) {
+          if (!colors.navigation.text) {
+            colors.navigation.text = {} as any;
+          }
+          (colors.navigation.text as any).dark = dark.navigation.textColor;
+        }
+
+        if (dark.navigation.hoverColor) {
+          if (!colors.navigation.hover) {
+            colors.navigation.hover = {} as any;
+          }
+          (colors.navigation.hover as any).dark = dark.navigation.hoverColor;
+        }
+      }
+
+      if (dark.header?.background) {
+        if (!colors.header) colors.header = {} as any;
+        if (!colors.header.background) {
+          colors.header.background = {} as any;
+        }
+        (colors.header.background as any).dark = dark.header.background;
+      }
+    }
+
+    return processed;
   }
 
   /**

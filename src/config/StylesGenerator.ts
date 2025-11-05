@@ -216,7 +216,7 @@ th {
     return `/* Header */
 .site-header {
   height: var(--header-height);
-  background-color: var(--color-background);
+  background-color: var(--header-background);
   border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
@@ -269,15 +269,19 @@ th {
 
 .header-nav-link {
   text-decoration: none;
-  color: var(--color-text-secondary);
+  color: var(--nav-text-color);
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--border-radius-md);
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .header-nav-link:hover {
-  background: var(--color-surface);
-  color: var(--color-text-primary);
+  color: var(--nav-hover-color);
+}
+
+.header-nav-link.active {
+  color: var(--nav-active-color);
+  font-weight: var(--font-weight-medium);
 }
 
 .header-actions {
@@ -379,19 +383,18 @@ th {
   display: block;
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--border-radius-md);
-  color: var(--color-text-secondary);
+  color: var(--nav-text-color);
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .sidenav-link:hover {
-  background: var(--color-surface);
-  color: var(--color-text-primary);
+  color: var(--nav-hover-color);
 }
 
 .sidenav-link.active {
-  background: var(--color-primary);
-  color: var(--color-background);
+  color: var(--nav-active-color);
+  font-weight: var(--font-weight-medium);
 }
 
 .sidenav-sublist {
@@ -509,7 +512,7 @@ th {
 }
 
 .toc-link.active {
-  color: var(--color-primary);
+  color: var(--nav-active-color);
   font-weight: var(--font-weight-medium);
 }
 

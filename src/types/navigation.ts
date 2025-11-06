@@ -28,15 +28,6 @@ export interface NavigationNode {
 // Navigation tree (hierarchical structure)
 export type NavigationTree = NavigationNode[];
 
-// Breadcrumb item
-export interface BreadcrumbItem {
-  label: string;
-  path?: string; // Omit path for current page
-}
-
-// Breadcrumb trail
-export type Breadcrumbs = BreadcrumbItem[];
-
 // Page navigation link (prev/next)
 export interface PageNavigationLink {
   label: string;
@@ -66,7 +57,6 @@ export interface NavigationContext {
   currentLanguage: string;
   sidenav: NavigationTree;
   topnav?: NavigationTree;
-  breadcrumbs: Breadcrumbs;
   pageNavigation: PageNavigation;
   languageSwitcher: LanguageSwitcher;
 }

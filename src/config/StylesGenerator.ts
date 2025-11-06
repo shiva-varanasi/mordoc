@@ -18,7 +18,6 @@ export class StylesGenerator {
       this.generateSideNavStyles(),
       this.generateContentStyles(),
       this.generateTOCStyles(),
-      this.generateBreadcrumbsStyles(),
       this.generatePageNavigationStyles(),
       this.generateSearchModalStyles(),
       this.generateUtilityStyles(),
@@ -634,49 +633,6 @@ export class StylesGenerator {
       font-size: var(--font-size-base);
     }
   }`;  
-  }
-
-  /**
-   * Breadcrumbs styles
-   */
-  private generateBreadcrumbsStyles(): string {
-    return `/* Breadcrumbs */
-  .breadcrumbs {
-    margin-bottom: var(--spacing-lg);
-  }
-
-  .breadcrumbs-list {
-    display: flex;
-    flex-wrap: wrap;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    gap: var(--spacing-xs);
-  }
-
-  .breadcrumbs-item {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    font-size: var(--font-size-sm);
-  }
-
-  .breadcrumbs-link {
-    color: var(--color-text-secondary);
-    text-decoration: none;
-  }
-
-  .breadcrumbs-link:hover {
-    color: var(--color-primary);
-  }
-
-  .breadcrumbs-current {
-    color: var(--color-text-primary);
-  }
-
-  .breadcrumbs-separator {
-    color: var(--color-text-disabled);
-  }`;
   }
 
   /**

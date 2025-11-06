@@ -55,11 +55,6 @@ export function ContentPage() {
 
   return (
     <div className="content-page">
-      {/* Breadcrumbs */}
-      <div className="content-breadcrumbs">
-        <Breadcrumbs />
-      </div>
-
       <div className="content-wrapper">
         {/* Main content area */}
         <article className="content-article">

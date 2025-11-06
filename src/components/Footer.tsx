@@ -18,7 +18,6 @@ export function Footer() {
         <div className="footer-content">
           <p className="footer-text">
             © {currentYear} {config.metadata.title}
-            {config.metadata.author && ` • ${config.metadata.author}`}
           </p>
           
           <p className="footer-powered">

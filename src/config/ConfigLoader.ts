@@ -59,14 +59,24 @@ export class ConfigLoader {
     const defaultMetadata: SiteMetadata = {
       title: 'Documentation',
       description: 'Product documentation',
-      author: '',
       keywords: [],
       baseUrl: '',
     };
 
-    // TODO: Load from a metadata.json or config.json file if exists
-    // For now, return defaults
-    return defaultMetadata;
+    const siteJsonPath = path.join(this.configDir, 'site.json');
+    if (!fs.existsSync(siteJsonPath)) {
+      return defaultMetadata;
+    }
+
+    try {
+      const siteJsonContent = fs.readFileSync(siteJsonPath, 'utf8');
+      const userMetadata: Partial<SiteMetadata> = JSON.parse(siteJsonContent);
+      
+      // Merge user metadata with defaults
+      return { ...defaultMetadata, ...userMetadata };
+    } catch (error) {
+      throw new Error(`Failed to parse site.json: ${(error as Error).message}`);
+    }
   }
 
   /**

@@ -66,7 +66,7 @@ export class HtmlGenerator {
     }
 
     // Author
-    const author = frontmatter.author || this.siteConfig.metadata.author;
+    const author = frontmatter.author
     if (author) {
       headParts.push(`<meta name="author" content="${this.escapeHtml(author)}">`);
     }

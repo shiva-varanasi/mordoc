@@ -169,7 +169,6 @@ export interface LanguageConfig {
 export interface SiteMetadata {
   title: string;
   description?: string;
-  author?: string;
   keywords?: string[];
   baseUrl?: string;
 }

@@ -32,10 +32,9 @@ export function Layout({ children, showSidebar = true }: LayoutProps) {
         
         <main className="layout-main">
           {children}
+          <Footer />
         </main>
-      </div>
-      
-      <Footer />
+      </div>  
     </div>
   );
 }

@@ -31,8 +31,10 @@ export function Layout({ children, showSidebar = true }: LayoutProps) {
         )}
         
         <main className="layout-main">
-          {children}
-          <Footer />
+        <div className="layout-main-inner">
+            {children}
+            <Footer />
+          </div>
         </main>
       </div>  
     </div>

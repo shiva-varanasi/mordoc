@@ -82,15 +82,13 @@ export class StylesGenerator {
   .layout-container {
     display: flex;
     flex: 1;
-    max-width: var(--container-width-xl);
-    margin: 0 auto;
     width: 100%;
     overflow: hidden;
     height: calc(100vh - var(--header-height));
   }
 
   .layout-sidebar {
-    width: var(--sidebar-width);
+    width: 300px;
     flex-shrink: 0;
     border-right: 1px solid var(--color-border);
     overflow-y: auto;
@@ -100,15 +98,57 @@ export class StylesGenerator {
   .layout-main {
     flex: 1;
     min-width: 0;
-    padding: var(--spacing-lg);
     overflow-y: auto;
     height: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .layout-main-inner {
+    width: 100%;
+    max-width: 1400px;
+    padding: var(--spacing-lg);
   }
 
   .container {
     max-width: var(--container-width-xl);
     margin: 0 auto;
     padding: 0 var(--spacing-md);
+  }
+  
+  /* Responsive Layout */
+  @media (max-width: 1024px) {
+    .layout-sidebar {
+      width: 220px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .layout-sidebar {
+      width: 200px;
+    }
+
+    .layout-main-inner {
+      padding: var(--spacing-md);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .layout-container {
+      flex-direction: column;
+    }
+
+    .layout-sidebar {
+      width: 100%;
+      height: auto;
+      max-height: 300px;
+      border-right: none;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .layout-main-inner {
+      padding: var(--spacing-sm);
+    }
   }`;
   }
 
@@ -345,13 +385,13 @@ export class StylesGenerator {
   .footer-text, .footer-powered {
     margin: var(--spacing-sm) 0;
   }`;
-    }
+  }
 
-    /**
-     * SideNav styles
-     */
-    private generateSideNavStyles(): string {
-      return `/* SideNav */
+  /**
+   * SideNav styles
+   */
+  private generateSideNavStyles(): string {
+    return `/* SideNav */
   .sidenav {
     padding: var(--spacing-lg) var(--spacing-md);
   }
@@ -415,17 +455,19 @@ export class StylesGenerator {
   private generateContentStyles(): string {
     return `/* Content Page */
   .content-page {
-    max-width: 100%;
+    width: 100%;
   }
 
   .content-wrapper {
     display: flex;
-    gap: var(--spacing-xl);
+    gap: var(--spacing-2xl);
+    width: 100%;
   }
 
   .content-article {
     flex: 1;
     min-width: 0;
+    max-width: 900px;
   }
 
   .content-header {
@@ -469,9 +511,55 @@ export class StylesGenerator {
   }
 
   .content-toc {
-    width: 16rem;
+    width: 280px;
     flex-shrink: 0;
-  }`;
+  
+  /* Responsive Content */
+  @media (max-width: 1280px) {
+    .content-toc {
+      width: 240px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .content-toc {
+      width: 220px;
+    }
+
+    .content-article {
+      max-width: 720px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .content-wrapper {
+      flex-direction: column;
+    }
+
+    .content-article {
+      max-width: 100%;
+    }
+
+    .content-toc {
+      width: 100%;
+      order: -1;
+    }
+
+    .content-title {
+      font-size: var(--font-size-3xl);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .content-title {
+      font-size: var(--font-size-2xl);
+    }
+
+    .content-meta {
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+  }`;  
   }
 
   /**
@@ -492,6 +580,9 @@ export class StylesGenerator {
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
     margin-bottom: var(--spacing-md);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-secondary);
   }
 
   .toc-list {
@@ -511,6 +602,7 @@ export class StylesGenerator {
     text-decoration: none;
     font-size: var(--font-size-sm);
     transition: color 0.2s ease;
+    line-height: var(--line-height-relaxed);
   }
 
   .toc-link:hover {
@@ -526,7 +618,22 @@ export class StylesGenerator {
     list-style: none;
     margin-left: var(--spacing-md);
     padding-left: 0;
-  }`;
+  
+  /* Responsive TOC */
+  @media (max-width: 768px) {
+    .toc {
+      position: relative;
+      top: 0;
+      max-height: 400px;
+      border-left: none;
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .toc-title {
+      font-size: var(--font-size-base);
+    }
+  }`;  
   }
 
   /**

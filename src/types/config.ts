@@ -94,6 +94,7 @@ export interface LayoutConfig {
     lg: string;
     xl: string;
     '2xl': string;
+    '3xl': string;
   };
   borderRadius: {
     sm: string;

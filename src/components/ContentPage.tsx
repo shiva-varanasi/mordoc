@@ -6,14 +6,15 @@ import React from 'react';
 import { useContent } from '../client/contexts/ContentContext';
 import MarkdocRenderer from './MarkdocRenderer';
 import TableOfContents from './TableOfContents';
-import Breadcrumbs from './Breadcrumbs';
 import PageNavigation from './PageNavigation';
+import { useConfig } from '../client/contexts/ConfigContext';
 
 /**
  * Content page component - displays documentation page
  */
 export function ContentPage() {
   const { currentContent, isLoading, error } = useContent();
+  const { config } = useConfig();
 
   // Loading state
   if (isLoading) {
@@ -105,6 +106,17 @@ export function ContentPage() {
           {/* Page navigation (prev/next) */}
           <footer className="content-footer">
             <PageNavigation />
+  
+            {/* Site footer info */}
+            <div className="content-footer-info">
+              <p className="footer-text">
+                © {new Date().getFullYear()} {config.metadata.title}
+              </p>
+              
+              <p className="content-footer-powered">
+                Powered by <a href="https://github.com/yourusername/mordoc" target="_blank" rel="noopener noreferrer">Mordoc</a>
+              </p>
+            </div>
           </footer>
         </article>
 

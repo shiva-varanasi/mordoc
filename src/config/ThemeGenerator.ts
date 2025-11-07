@@ -84,6 +84,7 @@ export class ThemeGenerator {
     variables.push(`  --spacing-lg: ${layout.spacing.lg};`);
     variables.push(`  --spacing-xl: ${layout.spacing.xl};`);
     variables.push(`  --spacing-2xl: ${layout.spacing['2xl']};`);
+    variables.push(`  --spacing-3xl: ${layout.spacing['3xl']};`);
 
     variables.push(`  --border-radius-sm: ${layout.borderRadius.sm};`);
     variables.push(`  --border-radius-md: ${layout.borderRadius.md};`);

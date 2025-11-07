@@ -9,71 +9,87 @@ import { useSearch } from '../client/hooks/useSearch';
 
 /**
  * Site header component
+ * Two-row layout: top row with logo/search/actions, optional bottom row with navigation
  */
 export function Header() {
   const { config } = useConfig();
   const { openSearch } = useSearch();
 
+  const hasTopNav = config.navigation.topnav && config.navigation.topnav.length > 0;
+
   return (
-    <header className="site-header">
-      <div className="header-container">
-        {/* Logo and site title */}
-        <div className="header-brand">
-          <Link to="/" className="header-logo-link">
-            {config.assets.logo ? (
-              <img
-                src={`/assets/${config.assets.logo}`}
-                alt={config.metadata.title}
-                className="header-logo"
-              />
-            ) : (
-              <span className="header-title">{config.metadata.title}</span>
-            )}
-          </Link>
-        </div>
+    <header className={`site-header ${hasTopNav ? 'has-nav' : 'no-nav'}`}>
+      {/* Top row: Logo, Search, and Actions */}
+      <div className="header-top">
+        <div className="header-container">
+          {/* Logo and site title */}
+          <div className="header-brand">
+            <Link to="/" className="header-logo-link">
+              {config.assets.logo ? (
+                <img
+                  src={`/assets/${config.assets.logo}`}
+                  alt={config.metadata.title}
+                  className="header-logo"
+                />
+              ) : (
+                <span className="header-title">{config.metadata.title}</span>
+              )}
+            </Link>
+          </div>
 
-        {/* Top navigation */}
-        {config.navigation.topnav && config.navigation.topnav.length > 0 && (
-          <nav className="header-nav">
-            <ul className="header-nav-list">
-              {config.navigation.topnav.map((item, index) => (
-                <li key={index} className="header-nav-item">
-                  {item.path ? (
-                    item.external ? (
-                      <a
-                        href={item.path}
-                        className="header-nav-link"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {item.label}
-                      </a>
-                    ) : (
-                      <Link to={item.path} className="header-nav-link">
-                        {item.label}
-                      </Link>
-                    )
-                  ) : (
-                    <span className="header-nav-label">{item.label}</span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </nav>
-        )}
+          {/* Centered search button */}
+          <div className="header-search">
+            <button
+              className="header-search-button"
+              onClick={openSearch}
+              aria-label="Open search"
+            >
+              <span className="search-icon">🔍</span>
+              <span className="search-text">Search</span>
+              <span className="search-shortcut">⌘K</span>
+            </button>
+          </div>
 
-        {/* Search button */}
-        <div className="header-actions">
-          <button
-            className="header-search-button"
-            onClick={openSearch}
-            aria-label="Open search"
-          >
-            <span className="search-icon">🔍</span>
-            <span className="search-shortcut">⌘K</span>
-          </button>
+          {/* Right side actions */}
+          <div className="header-actions">
+            {/* Reserved for future additions */}
+          </div>
         </div>
       </div>
+
+      {/* Bottom row: Navigation menu (only rendered if topnav exists) */}
+      {hasTopNav && (
+        <div className="header-bottom">
+          <div className="header-container">
+            <nav className="header-nav">
+              <ul className="header-nav-list">
+                {config.navigation.topnav!.map((item, index) => (
+                  <li key={index} className="header-nav-item">
+                    {item.path ? (
+                      item.external ? (
+                        <a
+                          href={item.path}
+                          className="header-nav-link"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {item.label}
+                        </a>
+                      ) : (
+                        <Link to={item.path} className="header-nav-link">
+                          {item.label}
+                        </Link>
+                      )
+                    ) : (
+                      <span className="header-nav-label">{item.label}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

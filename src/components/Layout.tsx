@@ -4,7 +4,6 @@
 
 import React, { ReactNode } from 'react';
 import Header from './Header';
-import Footer from './Footer';
 import SideNav from './SideNav';
 import { useConfig } from '../client/contexts/ConfigContext';
 
@@ -33,7 +32,6 @@ export function Layout({ children, showSidebar = true }: LayoutProps) {
         <main className="layout-main">
         <div className="layout-main-inner">
             {children}
-            <Footer />
           </div>
         </main>
       </div>  

@@ -272,6 +272,7 @@ export class ConfigLoader {
           lg: '1.5rem',
           xl: '2rem',
           '2xl': '3rem',
+          '3xl': '4rem',
         },
         borderRadius: {
           sm: '0.125rem',

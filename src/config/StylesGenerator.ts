@@ -165,12 +165,12 @@ export class StylesGenerator {
     margin-bottom: var(--spacing-md);
   }
 
-  h1 { font-size: var(--font-size-4xl); }
-  h2 { font-size: var(--font-size-3xl); }
-  h3 { font-size: var(--font-size-2xl); }
-  h4 { font-size: var(--font-size-xl); }
-  h5 { font-size: var(--font-size-lg); }
-  h6 { font-size: var(--font-size-base); }
+  h1 { font-size: var(--font-size-2xl); }
+  h2 { font-size: var(--font-size-xl); }
+  h3 { font-size: var(--font-size-lg); }
+  h4 { font-size: var(--font-size-base); }
+  h5 { font-size: var(--font-size-sm); }
+  h6 { font-size: var(--font-size-xs); }
 
   p {
     margin-top: 0;
@@ -532,11 +532,13 @@ export class StylesGenerator {
 
   .content-header {
     margin-bottom: var(--spacing-xl);
+    border-bottom: 1px solid var(--color-border);
   }
 
   .content-title {
     margin-top: 0;
-    font-size: var(--font-size-5xl);
+    font-size: 36px;
+    margin-bottom: 12px;
   }
 
   .content-description {
@@ -550,7 +552,7 @@ export class StylesGenerator {
     gap: var(--spacing-md);
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
   }
 
   .content-tags {
@@ -577,6 +579,7 @@ export class StylesGenerator {
   
   .content-footer {
     margin-top: var(--spacing-3xl);
+    margin-bottom: var(--spacing-2xl);
     padding-top: var(--spacing-xl);
     border-top: 1px solid var(--color-border);
   }

@@ -13,6 +13,7 @@ export class StylesGenerator {
       this.generateBaseStyles(),
       this.generateLayoutStyles(),
       this.generateTypographyStyles(),
+      this.generatePrismStyles(),
       this.generateHeaderStyles(),
       this.generateFooterStyles(),
       this.generateSideNavStyles(),
@@ -249,6 +250,164 @@ export class StylesGenerator {
     font-weight: var(--font-weight-semibold);
     background-color: var(--color-surface);
   }`;
+  }
+
+  /**
+   * Prism syntax highlighting styles
+   */
+  private generatePrismStyles(): string {
+    return `/* Prism Syntax Highlighting */
+    /* Based on Prism Tomorrow theme with adjustments for light/dark modes */
+
+    /* Code block wrapper with header */
+    .code-block-wrapper {
+      position: relative;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .code-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-sm) var(--spacing-md);
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-bottom: none;
+      border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+    }
+
+    .code-block-language {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-secondary);
+      text-transform: capitalize;
+      font-family: var(--font-family-base);
+    }
+
+    .code-block-copy {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.25rem;
+      background: transparent;
+      border: none;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      border-radius: var(--border-radius-sm);
+      transition: all 0.2s ease;
+    }
+
+    .code-block-copy:hover {
+      background-color: var(--color-background);
+      color: var(--color-text-primary);
+    }
+
+    .code-block-copy:active {
+      transform: scale(0.95);
+    }
+
+    .code-block-copy svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Adjust pre styles for wrapper */
+    .code-block-wrapper pre {
+      margin-top: 0;
+      margin-bottom: 0;
+      border: 1px solid var(--color-border);
+      border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+    }
+
+    .token.comment,
+    .token.prolog,
+    .token.doctype,
+    .token.cdata {
+      color: #6a737d;
+    }
+
+    .token.punctuation {
+      color: var(--color-text-primary);
+    }
+
+    .token.namespace {
+      opacity: 0.7;
+    }
+
+    .token.property,
+    .token.tag,
+    .token.boolean,
+    .token.number,
+    .token.constant,
+    .token.symbol,
+    .token.deleted {
+      color: #0184bc;
+    }
+
+    .token.selector,
+    .token.attr-name,
+    .token.string,
+    .token.char,
+    .token.builtin,
+    .token.inserted {
+      color: #50a14f;
+    }
+
+    .token.operator,
+    .token.entity,
+    .token.url,
+    .language-css .token.string,
+    .style .token.string {
+      color: #a626a4;
+    }
+
+    .token.atrule,
+    .token.attr-value,
+    .token.keyword {
+      color: #a626a4;
+    }
+
+    .token.function,
+    .token.class-name {
+      color: #c18401;
+    }
+
+    .token.regex,
+    .token.important,
+    .token.variable {
+      color: #e45649;
+    }
+
+    .token.important,
+    .token.bold {
+      font-weight: bold;
+    }
+
+    .token.italic {
+      font-style: italic;
+    }
+
+    .token.entity {
+      cursor: help;
+    }
+
+    /* Code block enhancements */
+    pre[class*="language-"] {
+      position: relative;
+      line-height: 1.5;
+    }
+
+    code[class*="language-"],
+    pre[class*="language-"] {
+      color: var(--color-text-primary);
+      text-align: left;
+      white-space: pre;
+      word-spacing: normal;
+      word-break: normal;
+      word-wrap: normal;
+      tab-size: 2;
+      hyphens: none;
+    }`;
   }
 
   /**

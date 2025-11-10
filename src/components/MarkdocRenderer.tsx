@@ -5,6 +5,7 @@
 import React from 'react';
 import Markdoc from '@markdoc/markdoc';
 import { MarkdocRenderableNode } from '../types/content';
+import CodeBlock from './CodeBlock';
 
 interface MarkdocRendererProps {
   content: MarkdocRenderableNode;
@@ -50,8 +51,10 @@ function getDefaultComponents(): Record<string, React.ComponentType<any>> {
       );
     },
 
-    //code blocks
-    pre: (props: any) => <pre className="code-block" {...props} />,
+    // Code blocks with syntax highlighting
+    CodeBlock: CodeBlock,
+    
+    // Inline code (not highlighted)
     code: (props: any) => <code className="inline-code" {...props} />,
 
     //tables

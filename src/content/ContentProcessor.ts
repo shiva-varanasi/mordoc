@@ -63,7 +63,17 @@ export class ContentProcessor {
     const readingTime = this.calculateReadingTime(wordCount);
 
     // Transform AST to renderable tree
-    const renderable = Markdoc.transform(ast);
+    const renderable = Markdoc.transform(ast, {
+      nodes: {
+        fence: {
+          render: 'CodeBlock',
+          attributes: {
+            language: { type: String },
+            content: { type: String },
+          },
+        },
+      },
+    });
     
     // Add heading anchors to renderable for table of contents
     this.addHeadingAnchors(renderable);

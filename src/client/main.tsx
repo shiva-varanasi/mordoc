@@ -60,12 +60,16 @@ function initializeApp() {
     return;
   }
 
-  // Hydrate the React app
+  // Hydrate the React app with BrowserRouter (client-side)
   hydrateRoot(
     rootElement,
     <React.StrictMode>
       <BrowserRouter>
-        <App siteConfig={siteConfig} initialContent={initialContent} />
+        <App 
+          siteConfig={siteConfig} 
+          initialContent={initialContent}
+          isServerRender={false}
+        />
       </BrowserRouter>
     </React.StrictMode>
   );

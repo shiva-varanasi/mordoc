@@ -5,9 +5,13 @@
 
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
+import { StaticRouter } from 'react-router';
 import { ProcessedContent } from '../types/content';
 import { SiteConfig } from '../types/config';
-import MarkdocRenderer from '../components/MarkdocRenderer';
+import App from '../client/App';
+import { ConfigProvider } from '../client/contexts/ConfigContext';
+import { ContentProvider } from '../client/contexts/ContentContext';
+import { SearchProvider } from '../client/contexts/SearchContext';
 
 export interface HtmlGeneratorOptions {
   siteConfig: SiteConfig;
@@ -111,53 +115,39 @@ export class HtmlGenerator {
   }
 
   /**
-   * Generate body content with server-side rendered Markdoc content
+   * Generate body content with full React SSR
+   * Renders the complete App component tree including Layout, Header, SideNav, etc.
    */
   private generateBody(content: ProcessedContent): string {
-    const { metadata, renderable } = content;
+    const pagePath = content.metadata.path;
 
-    // Render Markdoc content to HTML string
-    const contentHtml = ReactDOMServer.renderToString(
-      React.createElement(MarkdocRenderer, { content: renderable })
+    // Render the full React component tree with StaticRouter
+    const bodyHtml = ReactDOMServer.renderToString(
+      React.createElement(
+        StaticRouter,
+        { location: pagePath },
+        React.createElement(
+          ConfigProvider,
+          { config: this.siteConfig, children: 
+            React.createElement(
+              ContentProvider,
+              { initialContent: content, children:
+                React.createElement(
+                  SearchProvider,
+                  { children:
+                    React.createElement(App, {
+                      siteConfig: this.siteConfig,
+                      initialContent: content,
+                      isServerRender: true
+                    })
+                  }
+                )
+              }
+            )
+          }
+        )
+      )
     );
-
-    // Generate full page HTML with placeholder structure
-    // React will hydrate the full layout on client-side
-    const bodyHtml = `
-    <div class="layout">
-      <header class="site-header">
-        <div class="header-container">
-          <div class="header-brand">
-            <a href="/" class="header-logo-link">
-              <span class="header-title">${this.escapeHtml(this.siteConfig.metadata.title)}</span>
-            </a>
-          </div>
-        </div>
-      </header>
-      
-      <div class="layout-container">
-        <main class="layout-main">
-          <div class="content-page">
-            <article class="content-article">
-              <header class="content-header">
-                <h1 class="content-title">${this.escapeHtml(metadata.frontmatter.title)}</h1>
-                ${metadata.frontmatter.description ? `<p class="content-description">${this.escapeHtml(metadata.frontmatter.description)}</p>` : ''}
-              </header>
-              
-              <div class="content-body" data-pagefind-body>
-                ${contentHtml}
-              </div>
-            </article>
-          </div>
-        </main>
-      </div>
-      
-      <footer class="site-footer">
-        <div class="footer-container">
-          <p class="footer-text">© ${new Date().getFullYear()} ${this.escapeHtml(this.siteConfig.metadata.title)}</p>
-        </div>
-      </footer>
-    </div>`;
 
     return bodyHtml;
   }

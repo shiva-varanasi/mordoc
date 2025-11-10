@@ -12,9 +12,12 @@ export function useSearch() {
   const searchContext = useSearchContext();
 
   /**
-   * Setup keyboard shortcuts for search
+   * Setup keyboard shortcuts for search (client-side only)
    */
   useEffect(() => {
+    // Skip on server
+    if (typeof window === 'undefined') return;
+
     const handleKeyDown = (event: KeyboardEvent) => {
       // Cmd+K or Ctrl+K to open search
       if ((event.metaKey || event.ctrlKey) && event.key === 'k') {

@@ -17,17 +17,19 @@ import SearchModal from '../components/SearchModal';
 interface AppProps {
   siteConfig: SiteConfig;
   initialContent: ProcessedContent | null;
+  isServerRender?: boolean;
 }
 
 /**
  * Main App component
+ * Works on both server (SSR) and client (hydration + SPA)
  */
-function App({ siteConfig, initialContent }: AppProps) {
+function App({ siteConfig, initialContent, isServerRender = false }: AppProps) {
   return (
     <ConfigProvider config={siteConfig}>
       <ContentProvider initialContent={initialContent}>
         <SearchProvider>
-          <AppContent />
+          <AppContent isServerRender={isServerRender} />
         </SearchProvider>
       </ContentProvider>
     </ConfigProvider>
@@ -37,12 +39,15 @@ function App({ siteConfig, initialContent }: AppProps) {
 /**
  * App content with routing (inside providers)
  */
-function AppContent() {
+function AppContent({ isServerRender }: { isServerRender: boolean }) {
   const location = useLocation();
   const { fetchContent } = useContentData();
 
   // Fetch content when route changes (for SPA navigation)
   useEffect(() => {
+    // Skip on server render
+    if (isServerRender) return;
+
     // Only fetch if not initial load (initial content is already injected)
     const navEntries = window.performance.getEntriesByType('navigation');
     const isInitialLoad = navEntries.length > 0 && 
@@ -51,7 +56,7 @@ function AppContent() {
     if (!isInitialLoad) {
       fetchContent(location.pathname);
     }
-  }, [location.pathname, fetchContent]);
+  }, [location.pathname, fetchContent, isServerRender]);
 
   return (
     <>
@@ -61,8 +66,8 @@ function AppContent() {
         </Routes>
       </Layout>
       
-      {/* Search modal (rendered outside layout) */}
-      <SearchModal />
+      {/* Search modal only renders on client */}
+      {!isServerRender && <SearchModal />}
     </>
   );
 }

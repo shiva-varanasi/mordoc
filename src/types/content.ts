@@ -52,21 +52,6 @@ export interface ProcessedContent {
   rawContent?: string; // Original markdown (optional, useful for search)
 }
 
-// Content index entry (lightweight metadata for content-index.json)
-export interface ContentIndexEntry {
-  slug: string;
-  language: string;
-  title: string;
-  description?: string;
-  path: string; // Full URL path (e.g., "/getting-started" or "/es/comenzar")
-  order?: number;
-  tags?: string[];
-  draft?: boolean;
-}
-
-// Content index (master list of all content)
-export type ContentIndex = ContentIndexEntry[];
-
 // Content data file (JSON file for SPA navigation)
 export interface ContentDataFile {
   metadata: ContentMetadata;

@@ -10,7 +10,6 @@ import { ThemeGenerator } from '../config/ThemeGenerator';
 import { ContentLoader, RawContentFile } from '../content/ContentLoader';
 import { ContentProcessor } from '../content/ContentProcessor';
 import { RouteManager } from '../content/RouteManager';
-import { ContentIndexer } from './ContentIndexer';
 import { HtmlGenerator } from './HtmlGenerator';
 import { ProcessedContent, ContentDataFile } from '../types/content';
 import { SiteConfig } from '../types/config';
@@ -69,32 +68,27 @@ export class Builder {
       const processedContent = await this.loadAndProcessContent(siteConfig);
       this.log(`Processed ${processedContent.length} content files`);
 
-      // Step 4: Generate content index
-      this.log('Generating content index...');
-      const contentIndex = this.generateContentIndex(processedContent, siteConfig);
-      this.writeContentIndex(contentIndex);
-
-      // Step 5: Generate static HTML pages
+      // Step 4: Generate static HTML pages
       this.log('Generating static HTML pages...');
       await this.generateHtmlPages(processedContent, siteConfig);
 
-      // Step 6: Generate content data JSON files (for SPA navigation)
+      // Step 5: Generate content data JSON files (for SPA navigation)
       this.log('Generating content data files...');
       this.generateContentDataFiles(processedContent);
 
-      // Step 7: Generate theme CSS
+      // Step 6: Generate theme CSS
       this.log('Generating theme CSS...');
       this.generateThemeCSS(siteConfig);
 
-      // Step 8: Bundle client React app
+      // Step 7: Bundle client React app
       this.log('Bundling client application...');
       await this.bundleClientApp();
 
-      // Step 9: Copy static assets
+      // Step 8: Copy static assets
       this.log('Copying static assets...');
       this.copyStaticAssets(siteConfig);
 
-      // Step 10: Generate client config
+      // Step 9: Generate client config
       this.log('Generating client configuration...');
       this.generateClientConfig(siteConfig);
 
@@ -136,30 +130,6 @@ export class Builder {
     const processedContent = contentProcessor.processAll(rawFiles);
 
     return processedContent;
-  }
-
-  /**
-   * Generate content index
-   */
-  private generateContentIndex(
-    processedContent: ProcessedContent[],
-    siteConfig: SiteConfig
-  ): string {
-    const indexer = new ContentIndexer({
-      includeDrafts: this.includeDrafts,
-      defaultLanguage: siteConfig.defaultLanguage,
-    });
-
-    const index = indexer.createIndex(processedContent);
-    return indexer.toJSON(index, false); // Minified JSON for production    
-  }
-
-  /**
-   * Write content index to file
-   */
-  private writeContentIndex(indexJson: string): void {
-    const indexPath = path.join(this.outputDir, 'content-index.json');
-    fs.writeFileSync(indexPath, indexJson, 'utf8');
   }
 
   /**

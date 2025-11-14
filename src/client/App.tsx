@@ -42,20 +42,19 @@ function App({ siteConfig, initialContent, isServerRender = false }: AppProps) {
 function AppContent({ isServerRender }: { isServerRender: boolean }) {
   const location = useLocation();
   const { fetchContent } = useContentData();
+  const hasHydratedRef = React.useRef(false);
 
   // Fetch content when route changes (for SPA navigation)
   useEffect(() => {
     // Skip on server render
     if (isServerRender) return;
 
-    // Only fetch if not initial load (initial content is already injected)
-    const navEntries = window.performance.getEntriesByType('navigation');
-    const isInitialLoad = navEntries.length > 0 && 
-      (navEntries[0] as PerformanceNavigationTiming)?.type === 'navigate';
-    
-    if (!isInitialLoad) {
-      fetchContent(location.pathname);
+    if (!hasHydratedRef.current) {
+      hasHydratedRef.current = true; // skip only the initial hydration run
+      return;
     }
+
+    fetchContent(location.pathname);
   }, [location.pathname, fetchContent, isServerRender]);
 
   return (

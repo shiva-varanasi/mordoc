@@ -56,28 +56,37 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
   const handleClick = (id: string) => {
     const element = document.getElementById(id);
     console.log('element inside table of contents: ', element);
-    if (element) {
-      // Get header height from CSS variable
-      const headerHeightRem = parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue('--header-height')
-      );
-      // Get actual root font size instead of assuming 16px
-      const rootFontSize = parseFloat(
-        getComputedStyle(document.documentElement).fontSize
-      );
-      const headerHeightPx = headerHeightRem * rootFontSize;
-      
-      // Calculate scroll position accounting for fixed header
+    if (!element) return;
+
+    const scrollContainer = document.querySelector('.layout-main') as HTMLElement | null;
+
+    const headerHeightRem = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue('--header-height')
+    );
+    const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const headerHeightPx = headerHeightRem * rootFontSize;
+
+    if (scrollContainer) {
+      const containerTop = scrollContainer.getBoundingClientRect().top;
+      const elementTop = element.getBoundingClientRect().top;
+      const offset =
+        scrollContainer.scrollTop + (elementTop - containerTop) - headerHeightPx;
+
+      scrollContainer.scrollTo({
+        top: offset,
+        behavior: 'smooth',
+      });
+    } else {
       const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
       const offsetPosition = elementPosition - headerHeightPx;
-      
-      // Scroll to element with smooth animation
+
       window.scrollTo({
         top: offsetPosition,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
-      setActiveId(id);
     }
+
+    setActiveId(id);
   };
 
   return (

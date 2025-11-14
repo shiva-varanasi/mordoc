@@ -2,7 +2,7 @@
  * useSearch hook - Re-export and extend search functionality
  */
 
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useSearch as useSearchContext } from '../contexts/SearchContext';
 
 /**
@@ -10,6 +10,7 @@ import { useSearch as useSearchContext } from '../contexts/SearchContext';
  */
 export function useSearch() {
   const searchContext = useSearchContext();
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   /**
    * Setup keyboard shortcuts for search (client-side only)
@@ -42,19 +43,28 @@ export function useSearch() {
    * Debounced search function
    */
   const debouncedSearch = useCallback(
-    (() => {
-      let timeoutId: NodeJS.Timeout;
-
-      return (query: string, delay: number = 300) => {
-        clearTimeout(timeoutId);
-        
-        timeoutId = setTimeout(() => {
-          searchContext.search(query);
-        }, delay);
-      };
-    })(),
+    (query: string, delay: number = 500) => {
+      // Clear existing timeout
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      
+      // Set new timeout
+      debounceTimerRef.current = setTimeout(() => {
+        searchContext.search(query);
+      }, delay);
+    },
     [searchContext]
   );
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
 
   return {
     ...searchContext,

@@ -2,7 +2,7 @@
  * SearchContext - Manages search state and functionality
  */
 
-import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback, useRef } from 'react';
 
 export interface SearchResult {
   id: string;
@@ -44,6 +44,66 @@ interface SearchProviderProps {
   children: ReactNode;
 }
 
+// Pagefind types (minimal - Pagefind doesn't ship with TypeScript types)
+interface PagefindResult {
+  id: string;
+  score: number;
+  words: number[];
+  data: () => Promise<PagefindResultData>;
+}
+
+interface PagefindResultData {
+  url: string;
+  content: string;
+  word_count: number;
+  filters: Record<string, string[]>;
+  meta: {
+    title?: string;
+    image?: string;
+  };
+  anchors: Array<{
+    element: string;
+    id: string;
+    text: string;
+    location: number;
+  }>;
+  weighted_locations: Array<{
+    weight: number;
+    balanced_score: number;
+    location: number;
+  }>;
+  locations: number[];
+  raw_content: string;
+  raw_url: string;
+  excerpt: string;
+  sub_results: Array<{
+    title: string;
+    url: string;
+    weighted_locations: number[];
+    locations: number[];
+    excerpt: string;
+  }>;
+}
+
+interface PagefindSearchResults {
+  results: PagefindResult[];
+  unfilteredResultCount: number;
+  filters: Record<string, Record<string, number>>;
+  totalFilters: Record<string, Record<string, number>>;
+  timings: {
+    preload: number;
+    search: number;
+    total: number;
+  };
+}
+
+interface PagefindInstance {
+  search: (query: string, options?: Record<string, unknown>) => Promise<PagefindSearchResults>;
+  debouncedSearch: (query: string, options?: Record<string, unknown>) => Promise<PagefindSearchResults>;
+  preload: (query: string) => Promise<void>;
+  init: () => Promise<void>;
+}
+
 /**
  * SearchProvider - Manages search state and modal
  */
@@ -52,6 +112,10 @@ export function SearchProvider({ children }: SearchProviderProps) {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  
+  // Cache Pagefind instance to avoid re-importing
+  const pagefindRef = useRef<PagefindInstance | null>(null);
+  const pagefindLoadingRef = useRef<Promise<PagefindInstance | null> | null>(null);
 
   const openSearch = useCallback(() => {
     setIsOpen(true);
@@ -70,6 +134,57 @@ export function SearchProvider({ children }: SearchProviderProps) {
     setResults([]);
   }, []);
 
+  /**
+   * Load Pagefind instance (lazy loading)
+   */
+  const loadPagefind = useCallback(async (): Promise<PagefindInstance | null> => {
+    // Return cached instance if available
+    if (pagefindRef.current) {
+      return pagefindRef.current;
+    }
+
+    // Return existing loading promise if already loading
+    if (pagefindLoadingRef.current) {
+      return pagefindLoadingRef.current;
+    }
+
+    // Start loading Pagefind
+    pagefindLoadingRef.current = (async () => {
+      try {
+        // Dynamically import Pagefind (generated at build time)
+        const pagefindPath = '/pagefind/pagefind.js';
+        const pagefindModule: any = await import(
+          /* webpackIgnore: true */
+          /* @vite-ignore */
+          pagefindPath
+        );
+        
+        const pagefind = (pagefindModule.default || pagefindModule) as PagefindInstance;
+
+        // Initialize Pagefind (optional, but recommended)
+        if (pagefind.init) {
+          await pagefind.init();
+        }
+
+        // Cache the instance
+        pagefindRef.current = pagefind;
+        return pagefind;
+      } catch (error) {
+        console.error('Failed to load Pagefind:', error);
+        console.warn('Search functionality is not available. Run "mordoc build" to generate search index.');
+        return null;
+      } finally {
+        // Clear loading promise
+        pagefindLoadingRef.current = null;
+      }
+    })();
+
+    return pagefindLoadingRef.current;
+  }, []);
+
+  /**
+   * Perform search using Pagefind
+   */
   const search = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) {
       setResults([]);
@@ -80,26 +195,41 @@ export function SearchProvider({ children }: SearchProviderProps) {
     setQuery(searchQuery);
 
     try {
-      // Pagefind search will be implemented here
-      // For now, return empty results
-      // TODO: Integrate with Pagefind when SearchIndexer is ready
+      // Load Pagefind instance
+      const pagefind = await loadPagefind();
       
-      // Placeholder for Pagefind integration:
-      // const pagefind = await import('/pagefind/pagefind.js');
-      // const searchResults = await pagefind.search(searchQuery);
-      // const processed = await Promise.all(
-      //   searchResults.results.map(r => r.data())
-      // );
-      // setResults(processed);
-      
-      setResults([]);
+      if (!pagefind) {
+        // Pagefind not available (dev mode or build failed)
+        setResults([]);
+        return;
+      }
+
+      // Perform search
+      const searchResults = await pagefind.search(searchQuery);
+
+      // Process results in parallel
+      const processedResults = await Promise.all(
+        searchResults.results.map(async (result) => {
+          const data = await result.data();
+          
+          return {
+            id: result.id,
+            url: data.url,
+            title: data.meta.title || 'Untitled',
+            excerpt: data.excerpt || data.content.substring(0, 200) + '...',
+            score: result.score,
+          };
+        })
+      );
+
+      setResults(processedResults);
     } catch (error) {
       console.error('Search error:', error);
       setResults([]);
     } finally {
       setIsSearching(false);
     }
-  }, []);
+  }, [loadPagefind]);
 
   const value: SearchContextValue = {
     query,

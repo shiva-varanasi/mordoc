@@ -2,7 +2,7 @@
  * SearchModal - Search modal with keyboard shortcuts
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSearch } from '../client/hooks/useSearch';
 import { useNavigation } from '../client/hooks/useNavigation';
 
@@ -22,13 +22,20 @@ export function SearchModal() {
 
   const { navigateToPath } = useNavigation();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   // Focus input when modal opens
   useEffect(() => {
     if (isOpen && inputRef.current) {
       inputRef.current.focus();
+      setSelectedIndex(0);
     }
   }, [isOpen]);
+
+  // Reset selected index when results change
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [results]);
 
   // Handle input change with debounced search
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,16 +57,52 @@ export function SearchModal() {
     }
   };
 
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (results.length === 0) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedIndex((prev) => (prev + 1) % results.length);
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedIndex((prev) => (prev - 1 + results.length) % results.length);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (results[selectedIndex]) {
+          handleResultClick(results[selectedIndex].url);
+        }
+        break;
+    }
+  };
+
   if (!isOpen) {
     return null;
   }
 
   return (
     <div className="search-modal-backdrop" onClick={handleBackdropClick}>
-      <div className="search-modal">
+      <div className="search-modal" onKeyDown={handleKeyDown}>
         {/* Search input */}
         <div className="search-input-container">
-          <span className="search-input-icon">🔍</span>
+          <svg 
+              className="search-input-icon" 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="16" 
+              height="16" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </svg>
           <input
             ref={inputRef}
             type="text"
@@ -69,13 +112,6 @@ export function SearchModal() {
             onChange={handleInputChange}
             aria-label="Search"
           />
-          <button
-            className="search-close-button"
-            onClick={closeSearch}
-            aria-label="Close search"
-          >
-            <span className="search-close-icon">✕</span>
-          </button>
         </div>
 
         {/* Search results */}
@@ -87,13 +123,6 @@ export function SearchModal() {
           ) : query.trim() === '' ? (
             <div className="search-empty">
               <p className="search-empty-text">Start typing to search</p>
-              <div className="search-shortcuts">
-                <kbd>↑</kbd> <kbd>↓</kbd> to navigate
-                <span className="search-separator">•</span>
-                <kbd>Enter</kbd> to select
-                <span className="search-separator">•</span>
-                <kbd>Esc</kbd> to close
-              </div>
             </div>
           ) : results.length === 0 ? (
             <div className="search-no-results">
@@ -104,36 +133,23 @@ export function SearchModal() {
             </div>
           ) : (
             <ul className="search-results-list">
-              {results.map((result) => (
+              {results.map((result, index) => (
                 <li key={result.id} className="search-result-item">
                   <button
-                    className="search-result-link"
+                    className={`search-result-link ${index === selectedIndex ? 'selected' : ''}`}
                     onClick={() => handleResultClick(result.url)}
+                    onMouseEnter={() => setSelectedIndex(index)}
                   >
                     <div className="search-result-title">{result.title}</div>
-                    <div className="search-result-excerpt">{result.excerpt}</div>
+                    <div className="search-result-excerpt" 
+                         dangerouslySetInnerHTML={{ __html: result.excerpt }} 
+                    />
                     <div className="search-result-url">{result.url}</div>
                   </button>
                 </li>
               ))}
             </ul>
           )}
-
-          {/* Placeholder for Pagefind integration */}
-          {query.trim() !== '' && results.length === 0 && !isSearching && (
-            <div className="search-notice">
-              <p className="search-notice-text">
-                💡 Search indexing will be available after running the build process
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="search-footer">
-          <span className="search-footer-text">
-            Powered by Pagefind
-          </span>
         </div>
       </div>
     </div>

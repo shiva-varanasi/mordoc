@@ -15,6 +15,7 @@ import { ProcessedContent, ContentDataFile } from '../types/content';
 import { SiteConfig } from '../types/config';
 import { ClientBundler } from './ClientBundler';
 import { StylesGenerator } from '../config/StylesGenerator';
+import { SearchIndexer } from './SearchIndexer';
 
 export interface BuilderOptions {
   projectRoot: string; // Path to user's project
@@ -91,6 +92,10 @@ export class Builder {
       // Step 9: Generate client config
       this.log('Generating client configuration...');
       this.generateClientConfig(siteConfig);
+
+      // Step 10: Generate search index with Pagefind
+      this.log('Generating search index...');
+      await this.generateSearchIndex();
 
       this.log('✓ Build completed successfully!');
       this.printBuildStats(processedContent);
@@ -329,6 +334,28 @@ export class Builder {
     const configPath = path.join(this.outputDir, 'config.json');
     fs.writeFileSync(configPath, JSON.stringify(clientConfig), 'utf8');
   }
+
+  /**
+   * Generate search index using Pagefind
+   */
+  private async generateSearchIndex(): Promise<void> {
+    try {
+      const searchIndexer = new SearchIndexer({
+        outputDir: this.outputDir,
+        verbose: this.verbose,
+      });
+
+      await searchIndexer.generateIndex();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.warn(`⚠️  Search indexing failed: ${errorMessage}`);
+      console.warn('   Search functionality will not be available.');
+      console.warn('   The build will continue, but search will be disabled.');
+      
+      // Don't throw - allow build to complete even if search indexing fails
+      // This is useful for development or if Pagefind binary has issues
+    }
+  }  
 
   /**
    * Clean output directory

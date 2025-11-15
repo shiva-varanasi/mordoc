@@ -179,7 +179,7 @@ export class ConfigLoader {
         },
         navigation: {
           text: {
-            light: '#666666',
+            light: '#474849',
             dark: '#999999',
           },
           hover: {

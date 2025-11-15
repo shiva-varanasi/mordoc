@@ -647,10 +647,19 @@ export class StylesGenerator {
     align-items: center;
     justify-content: center;
   }
+  
+  .rotate-right {
+    transform: rotate(-90deg);
+  }
+
+  .rotate-down {
+    transform: rotate(0deg);
+  }
 
   .sidenav-link {
     display: block;
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding-top: var(--spacing-xs);
+    padding-bottom: var(--spacing-xs);
     border-radius: var(--border-radius-md);
     color: var(--nav-text-color);
     text-decoration: none;

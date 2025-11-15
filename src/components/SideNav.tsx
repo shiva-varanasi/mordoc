@@ -63,19 +63,7 @@ function SideNavItem({ item, currentPath, depth }: SideNavItemProps) {
   return (
     <li className={`sidenav-item sidenav-item-depth-${depth}`}>
       <div className="sidenav-item-content">
-        {hasChildren && (
-          <button
-            className={`sidenav-toggle ${isExpanded ? 'expanded' : 'collapsed'}`}
-            onClick={handleToggle}
-            aria-label={isExpanded ? 'Collapse' : 'Expand'}
-          >
-            <span className="sidenav-toggle-icon">
-              {isExpanded ? '▼' : '▶'}
-            </span>
-          </button>
-        )}
-
-        {item.path ? (
+      {item.path ? (
           item.external ? (
             <a
               href={item.path}
@@ -96,11 +84,37 @@ function SideNavItem({ item, currentPath, depth }: SideNavItemProps) {
             </Link>
           )
         ) : (
-          <span className={`sidenav-label-only ${hasActiveChild ? 'has-active-child' : ''}`}>
+          <span className={`sidenav-link ${hasActiveChild ? 'has-active-child' : ''}`}>
             {item.icon && <span className="sidenav-icon">{item.icon}</span>}
             <span className="sidenav-label">{item.label}</span>
           </span>
         )}
+
+        {hasChildren && (
+          <button
+            className={`sidenav-toggle ${isExpanded ? 'expanded' : 'collapsed'}`}
+            onClick={handleToggle}
+            aria-label={isExpanded ? 'Collapse' : 'Expand'}
+          >
+            <span
+              className={`sidenav-toggle-icon ${isExpanded ? 'rotate-down' : 'rotate-right'}`}
+            >
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 8 8"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M.606 2.334a.75.75 0 0 0-.022 1.06l2.875 3a.75.75 0 0 0 1.082 0L7.416 3.4a.75.75 0 0 0-1.082-1.038L4 4.79 1.667 2.357a.75.75 0 0 0-1.06-.022Z"
+                />
+              </svg>
+            </span>
+          </button>
+        )}        
       </div>
 
       {hasChildren && isExpanded && (

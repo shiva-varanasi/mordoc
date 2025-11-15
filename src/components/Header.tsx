@@ -52,14 +52,14 @@ export function Header() {
                 viewBox="0 0 24 24" 
                 fill="none" 
                 stroke="currentColor" 
-                strokeWidth="2" 
+                strokeWidth="2.5" 
                 strokeLinecap="round" 
                 strokeLinejoin="round"
               >
                 <circle cx="11" cy="11" r="8"></circle>
                 <path d="m21 21-4.3-4.3"></path>
               </svg>
-              <span className="search-text">Search</span>
+              <span className="search-text">Search...</span>
               <span className="search-shortcut">Ctrl K</span>
             </button>
           </div>

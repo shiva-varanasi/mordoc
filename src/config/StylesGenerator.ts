@@ -516,11 +516,14 @@ export class StylesGenerator {
     }
 
     .search-shortcut {
-      padding: 2px 6px;
+      padding-left: 6px;
+      padding-right: 6px;
+      padding-bottom: 1px;
       background: var(--color-surface);
       font-size: var(--font-size-sm);
       font-family: var(--font-family-base);
       color: var(--color-text-secondary);
+      font-weight: var(--font-weight-medium);
     }
 
     /* Actions section */

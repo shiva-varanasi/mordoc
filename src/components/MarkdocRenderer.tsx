@@ -6,6 +6,7 @@ import React from 'react';
 import Markdoc from '@markdoc/markdoc';
 import { MarkdocRenderableNode } from '../types/content';
 import CodeBlock from './CodeBlock';
+import Heading from './Heading';
 
 interface MarkdocRendererProps {
   content: MarkdocRenderableNode;
@@ -34,6 +35,14 @@ export function MarkdocRenderer({ content, components = {} }: MarkdocRendererPro
  */
 function getDefaultComponents(): Record<string, React.ComponentType<any>> {
   return {
+    // Headings with anchor links
+    h1: (props: any) => <Heading level={1} {...props} />,
+    h2: (props: any) => <Heading level={2} {...props} />,
+    h3: (props: any) => <Heading level={3} {...props} />,
+    h4: (props: any) => <Heading level={4} {...props} />,
+    h5: (props: any) => <Heading level={5} {...props} />,
+    h6: (props: any) => <Heading level={6} {...props} />,
+    
     //links
     a: (props: any) => {
       const { href, children, ...rest } = props;
@@ -50,9 +59,6 @@ function getDefaultComponents(): Record<string, React.ComponentType<any>> {
         </a>
       );
     },
-
-    // Code blocks with syntax highlighting
-    CodeBlock: CodeBlock,
     
     // Inline code (not highlighted)
     code: (props: any) => <code className="inline-code" {...props} />,
@@ -79,6 +85,14 @@ function getDefaultComponents(): Record<string, React.ComponentType<any>> {
         />
       );
     },
+
+    // Custom components
+    // Maps 'Heading' string → Heading component
+    Heading: Heading,        
+    
+    // Code blocks with syntax highlighting
+    CodeBlock: CodeBlock,
+
   };
 }
 

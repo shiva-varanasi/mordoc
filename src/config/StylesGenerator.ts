@@ -173,6 +173,82 @@ export class StylesGenerator {
   h5 { font-size: var(--font-size-sm); }
   h6 { font-size: var(--font-size-xs); }
 
+  /* Heading with anchor link */
+  .heading-with-anchor {
+    position: relative;
+    scroll-margin-top: calc(var(--header-height) + var(--spacing-md));
+  }
+
+  .heading-anchor-link {
+    position: absolute;
+    left: -1.5rem;
+    opacity: 0;
+    padding: 0.25rem;
+    background: transparent;
+    border: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: opacity 0.2s ease, color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius-sm);
+  }
+
+  .heading-anchor-link:hover {
+    color: var(--color-link);
+    background-color: var(--color-surface);
+  }
+
+  .heading-with-anchor:hover .heading-anchor-link {
+    opacity: 1;
+  }
+
+  .heading-anchor-link:focus {
+    opacity: 1;
+    outline: 2px solid var(--color-link);
+    outline-offset: 2px;
+  }
+
+  .heading-copied-tooltip {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background-color: var(--color-text-primary);
+    color: var(--color-background);
+    font-size: var(--font-size-xs);
+    border-radius: var(--border-radius-sm);
+    white-space: nowrap;
+    pointer-events: none;
+    font-family: var(--font-family-base);
+    font-weight: var(--font-weight-normal);
+  }
+
+  /* Mobile: show icon on touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    .heading-anchor-link {
+      opacity: 0.6;
+    }
+    
+    .heading-with-anchor:active .heading-anchor-link {
+      opacity: 1;
+    }
+  }
+
+  /* Smaller screens: move icon to the right side */
+  @media (max-width: 768px) {
+    .heading-anchor-link {
+      position: relative;
+      left: auto;
+      margin-left: 0.5rem;
+      display: inline-flex;
+      vertical-align: middle;
+    }
+  }
+
   p {
     margin-top: 0;
     margin-bottom: var(--spacing-md);

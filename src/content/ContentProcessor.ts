@@ -65,6 +65,13 @@ export class ContentProcessor {
     // Transform AST to renderable tree
     const renderable = Markdoc.transform(ast, {
       nodes: {
+        heading: {
+          render: 'Heading',
+          attributes: {
+            level: { type: Number, required: true },
+            id: { type: String },
+          },
+        },
         fence: {
           render: 'CodeBlock',
           attributes: {
@@ -353,7 +360,7 @@ export class ContentProcessor {
     }
 
     if (node instanceof Markdoc.Tag) {
-      if (/^h[1-6]$/.test(node.name)) {
+      if (node.name === 'Heading') {
         const text = this.extractTextFromRenderable(node.children);
         const id = this.generateHeadingId(text);
         node.attributes = {

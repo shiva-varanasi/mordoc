@@ -204,7 +204,7 @@ export class StylesGenerator {
     opacity: 1;
   }
 
-  .heading-anchor-link:focus {
+  .heading-anchor-link:focus-visible {
     opacity: 1;
     outline: 2px solid var(--color-link);
     outline-offset: 2px;
@@ -212,15 +212,15 @@ export class StylesGenerator {
 
   .heading-copied-tooltip {
     position: absolute;
-    left: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    margin-left: 0.5rem;
+    left: 50%;
+    top: 100%;
+    transform: translateX(-50%);
+    margin-top: 0.5rem;
     padding: 0.25rem 0.5rem;
-    background-color: var(--color-text-primary);
+    background-color: var(--color-text-secondary);
     color: var(--color-background);
-    font-size: var(--font-size-xs);
-    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-sm);
+    border-radius: var(--border-radius-md);
     white-space: nowrap;
     pointer-events: none;
     font-family: var(--font-family-base);

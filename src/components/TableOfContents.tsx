@@ -15,6 +15,46 @@ interface TableOfContentsProps {
 export function TableOfContents({ toc }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>('');
   
+  // Handle initial hash navigation on page load
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      const id = hash.slice(1);
+      const element = document.getElementById(id);
+      if (element) {
+        setTimeout(() => {
+          const headerHeightRem = parseFloat(
+            getComputedStyle(document.documentElement).getPropertyValue('--header-height')
+          );
+          const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+          const headerHeightPx = headerHeightRem * rootFontSize;
+
+          const scrollContainer = document.querySelector('.layout-main') as HTMLElement | null;
+
+          if (scrollContainer) {
+            const containerTop = scrollContainer.getBoundingClientRect().top;
+            const elementTop = element.getBoundingClientRect().top;
+            const offset = scrollContainer.scrollTop + (elementTop - containerTop) - headerHeightPx;
+
+            scrollContainer.scrollTo({
+              top: offset,
+              behavior: 'smooth',
+            });
+          } else {
+            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+            const offsetPosition = elementPosition - headerHeightPx;
+
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth',
+            });
+          }
+
+          setActiveId(id);
+        }, 100);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     // Get header height from CSS variable for consistent spacing
@@ -86,8 +126,26 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
       });
     }
 
+    window.history.pushState(null, '', `#${id}`);
     setActiveId(id);
   };
+
+  // Listen for hash changes (browser back/forward)
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const id = hash.slice(1);
+        handleClick(id);
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
 
   return (
     <nav className="toc">

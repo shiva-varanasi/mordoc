@@ -44,6 +44,20 @@ function AppContent({ isServerRender }: { isServerRender: boolean }) {
   const { fetchContent } = useContentData();
   const hasHydratedRef = React.useRef(false);
 
+  // Scroll to top on route change (unless there's a hash)
+  useEffect(() => {
+    if (!window.location.hash) {
+      // Check if using a scroll container or window
+      const scrollContainer = document.querySelector('.layout-main') as HTMLElement | null;
+      
+      if (scrollContainer) {
+        scrollContainer.scrollTo(0, 0);
+      } else {
+        window.scrollTo(0, 0);
+      }
+    }
+  }, [location.pathname]); // Runs whenever the path changes
+
   // Fetch content when route changes (for SPA navigation)
   useEffect(() => {
     // Skip on server render

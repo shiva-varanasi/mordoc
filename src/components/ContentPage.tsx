@@ -59,48 +59,52 @@ export function ContentPage() {
       <div className="content-wrapper">
         {/* Main content area */}
         <article className="content-article">
-          {/* Page header */}
-          <header className="content-header">
-            <h1 className="content-title">{frontmatter.title}</h1>
-            
-            {frontmatter.description && (
-              <p className="content-description">{frontmatter.description}</p>
-            )}
-            
-            <div className="content-meta">
-              {readingTime > 0 && (
-                <span className="content-meta-item">
-                  {readingTime} min read
-                </span>
+          <div data-pagefind-body>
+            {/* Page header */}
+            <header className="content-header">
+              <h1 className="content-title" data-pagefind-weight="10">
+                {frontmatter.title}
+              </h1>
+              
+              {frontmatter.description && (
+                <p className="content-description">{frontmatter.description}</p>
               )}
               
-              {frontmatter.author && (
-                <span className="content-meta-item">
-                  By {frontmatter.author}
-                </span>
-              )}
-              
-              {frontmatter.date && (
-                <span className="content-meta-item">
-                  {new Date(frontmatter.date).toLocaleDateString()}
-                </span>
-              )}
-            </div>
-
-            {frontmatter.tags && frontmatter.tags.length > 0 && (
-              <div className="content-tags">
-                {frontmatter.tags.map((tag, index) => (
-                  <span key={index} className="content-tag">
-                    {tag}
+              <div className="content-meta" data-pagefind-ignore>
+                {readingTime > 0 && (
+                  <span className="content-meta-item">
+                    {readingTime} min read
                   </span>
-                ))}
+                )}
+                
+                {frontmatter.author && (
+                  <span className="content-meta-item">
+                    By {frontmatter.author}
+                  </span>
+                )}
+                
+                {frontmatter.date && (
+                  <span className="content-meta-item">
+                    {new Date(frontmatter.date).toLocaleDateString()}
+                  </span>
+                )}
               </div>
-            )}
-          </header>
 
-          {/* Rendered content */}
-          <div className="content-body" data-pagefind-body>
-            <MarkdocRenderer content={renderable} />
+              {frontmatter.tags && frontmatter.tags.length > 0 && (
+                <div className="content-tags">
+                  {frontmatter.tags.map((tag, index) => (
+                    <span key={index} className="content-tag">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </header>
+
+            {/* Rendered content */}
+            <div className="content-body">
+              <MarkdocRenderer content={renderable} />
+            </div>
           </div>
 
           {/* Page navigation (prev/next) */}

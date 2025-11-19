@@ -32,7 +32,7 @@ export function CodeBlock({ language = '', content, children }: CodeBlockProps) 
   const code = (content || String(children || '')).trim();
 
   if (!code) {
-    return <pre><code></code></pre>;
+    return <pre><code data-pagefind-ignore></code></pre>;
   }
 
   // Check if language is specified
@@ -42,7 +42,7 @@ export function CodeBlock({ language = '', content, children }: CodeBlockProps) 
   if (!hasLanguage) {
     return (
       <pre>
-        <code>{code}</code>
+        <code data-pagefind-ignore>{code}</code>
       </pre>
     );
   }
@@ -117,6 +117,7 @@ export function CodeBlock({ language = '', content, children }: CodeBlockProps) 
       <pre className={`language-${normalizedLang}`}>
         <code 
           className={`language-${normalizedLang}`}
+          data-pagefind-ignore
           dangerouslySetInnerHTML={{ __html: highlightedHtml }}
         />
       </pre>

@@ -183,7 +183,7 @@ export function SearchProvider({ children }: SearchProviderProps) {
   }, []);
 
   /**
-   * Perform search using Pagefind
+   * Perform search using Pagefind with two-tier approach
    */
   const search = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) {
@@ -195,34 +195,65 @@ export function SearchProvider({ children }: SearchProviderProps) {
     setQuery(searchQuery);
 
     try {
-      // Load Pagefind instance
       const pagefind = await loadPagefind();
       
       if (!pagefind) {
-        // Pagefind not available (dev mode or build failed)
         setResults([]);
         return;
       }
 
-      // Perform search
-      const searchResults = await pagefind.search(searchQuery);
+      const trimmedQuery = searchQuery.trim();
+      const exactQuery = `"${trimmedQuery}"`;
+      const broadQuery = trimmedQuery;
 
-      // Process results in parallel
-      const processedResults = await Promise.all(
-        searchResults.results.map(async (result) => {
+      // Perform both searches in parallel
+      const [exactResults, broadResults] = await Promise.all([
+        pagefind.search(exactQuery),
+        pagefind.search(broadQuery),
+      ]);
+
+      // Track exact match IDs for deduplication
+      const exactIds = new Set(exactResults.results.map(r => r.id));
+
+      // Process exact matches first
+      const exactProcessed = await Promise.all(
+        exactResults.results.map(async (result) => {
           const data = await result.data();
-          
+          const excerptLength = 200; // TODO: Make this configurable
           return {
             id: result.id,
             url: data.url,
             title: data.meta.title || 'Untitled',
-            excerpt: data.excerpt || data.content.substring(0, 200) + '...',
+            excerpt: data.excerpt || data.content.substring(0, excerptLength) + '...',
             score: result.score,
           };
         })
       );
 
-      setResults(processedResults);
+      // Process broad matches, excluding those already in exact results
+      const broadProcessed = await Promise.all(
+        broadResults.results
+          .filter(result => !exactIds.has(result.id))
+          .map(async (result) => {
+            const data = await result.data();
+            const excerptLength = 200; // TODO: Make this configurable
+            return {
+              id: result.id,
+              url: data.url,
+              title: data.meta.title || 'Untitled',
+              excerpt: data.excerpt || data.content.substring(0, excerptLength) + '...',
+              score: result.score,
+            };
+          })
+      );
+
+      // Combine: exact matches first (sorted by score), then broad matches (sorted by score)
+      const combinedResults = [
+        ...exactProcessed.sort((a, b) => b.score - a.score),
+        ...broadProcessed.sort((a, b) => b.score - a.score),
+      ];
+
+      setResults(combinedResults);
     } catch (error) {
       console.error('Search error:', error);
       setResults([]);

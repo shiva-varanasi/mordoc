@@ -1053,9 +1053,12 @@ export class StylesGenerator {
     backdrop-filter: blur(4px);
     z-index: 1000;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: var(--spacing-xl);
+    padding-top: 10vh;
+    padding-left: var(--spacing-xl);
+    padding-right: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
     animation: fadeIn 0.15s ease-out;
   }
 
@@ -1068,10 +1071,10 @@ export class StylesGenerator {
     }
   }
 
-  @keyframes slideUp {
+  @keyframes slideDown {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(-20px);
     }
     to {
       opacity: 1;
@@ -1089,7 +1092,7 @@ export class StylesGenerator {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    animation: slideUp 0.2s ease-out;
+    animation: slideDown 0.2s ease-out;
     border: 1px solid var(--color-border);
   }
 
@@ -1099,6 +1102,7 @@ export class StylesGenerator {
     gap: var(--spacing-sm);
     padding: var(--spacing-md);
     border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
   }
 
   .search-input-icon {
@@ -1149,6 +1153,7 @@ export class StylesGenerator {
     flex: 1;
     overflow-y: auto;
     padding: var(--spacing-md);
+    min-height: 0;
   }
 
   .search-results-list {
@@ -1200,6 +1205,10 @@ export class StylesGenerator {
     color: var(--color-text-secondary);
     line-height: 1.5;
     margin-bottom: var(--spacing-xs);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .search-result-url {
@@ -1250,6 +1259,10 @@ export class StylesGenerator {
 
   /* Responsive adjustments */
   @media (max-width: 768px) {
+    .search-modal-backdrop {
+      padding-top: 5vh;
+    }
+
     .search-modal {
       width: 95%;
       max-height: 90vh;

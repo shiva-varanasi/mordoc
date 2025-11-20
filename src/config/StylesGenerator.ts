@@ -1194,7 +1194,7 @@ export class StylesGenerator {
   }
 
   .search-result-title {
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
     margin-bottom: var(--spacing-xs);
     font-size: var(--font-size-base);
@@ -1212,8 +1212,8 @@ export class StylesGenerator {
   }
 
   .search-result-url {
-    font-size: var(--font-size-xs);
-    color: var(--color-primary);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
     opacity: 0.7;
   }
 

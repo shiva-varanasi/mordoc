@@ -98,6 +98,7 @@ interface PagefindSearchResults {
 }
 
 interface PagefindInstance {
+  options?: (config: { excerptLength?: number }) => void;
   search: (query: string, options?: Record<string, unknown>) => Promise<PagefindSearchResults>;
   debouncedSearch: (query: string, options?: Record<string, unknown>) => Promise<PagefindSearchResults>;
   preload: (query: string) => Promise<void>;
@@ -161,6 +162,13 @@ export function SearchProvider({ children }: SearchProviderProps) {
         
         const pagefind = (pagefindModule.default || pagefindModule) as PagefindInstance;
 
+        // Configure Pagefind options (must be called before init)
+        if (pagefind.options) {
+          pagefind.options({
+            excerptLength: 10, // Set your desired excerpt length in words
+          });
+        }
+
         // Initialize Pagefind (optional, but recommended)
         if (pagefind.init) {
           await pagefind.init();
@@ -219,12 +227,11 @@ export function SearchProvider({ children }: SearchProviderProps) {
       const exactProcessed = await Promise.all(
         exactResults.results.map(async (result) => {
           const data = await result.data();
-          const excerptLength = 200; // TODO: Make this configurable
           return {
             id: result.id,
             url: data.url,
             title: data.meta.title || 'Untitled',
-            excerpt: data.excerpt || data.content.substring(0, excerptLength) + '...',
+            excerpt: data.excerpt || '',
             score: result.score,
           };
         })
@@ -236,12 +243,11 @@ export function SearchProvider({ children }: SearchProviderProps) {
           .filter(result => !exactIds.has(result.id))
           .map(async (result) => {
             const data = await result.data();
-            const excerptLength = 200; // TODO: Make this configurable
             return {
               id: result.id,
               url: data.url,
               title: data.meta.title || 'Untitled',
-              excerpt: data.excerpt || data.content.substring(0, excerptLength) + '...',
+              excerpt: data.excerpt || '',
               score: result.score,
             };
           })

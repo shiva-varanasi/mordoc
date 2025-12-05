@@ -15,6 +15,7 @@ export class StylesGenerator {
       this.generateTypographyStyles(),
       this.generatePrismStyles(),
       this.generateHeaderStyles(),
+      this.generateThemeToggleStyles(),
       this.generateFooterStyles(),
       this.generateSideNavStyles(),
       this.generateContentStyles(),
@@ -661,6 +662,73 @@ export class StylesGenerator {
       }
     }`;
   }
+
+  /**
+   * Theme toggle button styles
+   */
+  private generateThemeToggleStyles(): string {
+    return `/* Theme Toggle */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-full);
+      padding: 4px;
+    }
+
+    .theme-toggle-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      background: transparent;
+      border: none;
+      border-radius: var(--border-radius-sm);
+      cursor: pointer;
+      color: var(--color-text-secondary);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .theme-toggle-button:hover {
+      color: var(--color-text-primary);
+    }    
+
+    .theme-toggle-button.active:hover {
+      opacity: 0.9;
+    }
+
+    .theme-toggle-button svg {
+      width: 12px;
+      height: 12px;
+      display: block;
+      fill: none;
+      stroke: currentColor;
+    }
+
+    .theme-toggle-button.active svg {
+      fill: var(--color-text-primary);
+    }
+
+    /* Responsive: hide on very small screens */
+    @media (max-width: 480px) {
+      .theme-toggle {
+        gap: 2px;
+        padding: 3px;
+      }
+
+      .theme-toggle-button {
+        padding: 5px;
+      }
+
+      .theme-toggle-button svg {
+        width: 12px;
+        height: 12px;
+      }
+    }`;
+  }  
 
   /**
    * Footer styles

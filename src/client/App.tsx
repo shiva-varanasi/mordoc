@@ -7,6 +7,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { ConfigProvider } from './contexts/ConfigContext';
 import { ContentProvider } from './contexts/ContentContext';
 import { SearchProvider } from './contexts/SearchContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { SiteConfig } from '../types/config';
 import { ProcessedContent } from '../types/content';
 import { useContentData } from './hooks/useContent';
@@ -27,11 +28,13 @@ interface AppProps {
 function App({ siteConfig, initialContent, isServerRender = false }: AppProps) {
   return (
     <ConfigProvider config={siteConfig}>
-      <ContentProvider initialContent={initialContent}>
-        <SearchProvider>
-          <AppContent isServerRender={isServerRender} />
-        </SearchProvider>
-      </ContentProvider>
+      <ThemeProvider>
+        <ContentProvider initialContent={initialContent}>
+          <SearchProvider>
+            <AppContent isServerRender={isServerRender} />
+          </SearchProvider>
+        </ContentProvider>
+      </ThemeProvider>
     </ConfigProvider>
   );
 }

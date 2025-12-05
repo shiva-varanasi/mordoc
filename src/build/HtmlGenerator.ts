@@ -104,6 +104,9 @@ export class HtmlGenerator {
       headParts.push(`<link rel="icon" href="${this.siteConfig.assetsPath}/${this.siteConfig.assets.favicon}">`);
     }
 
+    // Theme initialization script (MUST be before stylesheets)
+    headParts.push(this.generateThemeScript()); 
+
     // Stylesheets
     headParts.push(`<link rel="stylesheet" href="${this.siteConfig.assetsPath}/theme.css">`);
     headParts.push(`<link rel="stylesheet" href="${this.siteConfig.assetsPath}/styles.css">`);
@@ -112,6 +115,24 @@ export class HtmlGenerator {
     headParts.push(`<link rel="stylesheet" href="/pagefind/pagefind-ui.css">`);
 
     return headParts.map(part => `  ${part}`).join('\n');
+  }
+
+  /**
+   * Generate theme initialization script
+   * This runs before React hydrates to prevent flash of wrong theme
+   */
+  private generateThemeScript(): string {
+    return `<script>
+      (function() {
+        try {
+          var theme = localStorage.getItem('theme');
+          if (!theme) {
+            theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {}
+      })();
+    </script>`;
   }
 
   /**
@@ -202,30 +223,31 @@ export class HtmlGenerator {
    */
   generate404Page(): string {
     const html = `<!DOCTYPE html>
-<html lang="${this.siteConfig.defaultLanguage}">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>404 - Page Not Found | ${this.escapeHtml(this.siteConfig.metadata.title)}</title>
-  <link rel="stylesheet" href="${this.siteConfig.assetsPath}/theme.css">
-  <link rel="stylesheet" href="${this.siteConfig.assetsPath}/styles.css">
-</head>
-<body>
-  <div id="root">
-    <div class="page-container">
-      <main class="content-main">
-        <div class="container" style="text-align: center; padding: 4rem 0;">
-          <h1>404</h1>
-          <p>Page not found</p>
-          <a href="/">Go to home</a>
-        </div>
-      </main>
+  <html lang="${this.siteConfig.defaultLanguage}">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | ${this.escapeHtml(this.siteConfig.metadata.title)}</title>
+    ${this.generateThemeScript()}
+    <link rel="stylesheet" href="${this.siteConfig.assetsPath}/theme.css">
+    <link rel="stylesheet" href="${this.siteConfig.assetsPath}/styles.css">
+  </head>
+  <body>
+    <div id="root">
+      <div class="page-container">
+        <main class="content-main">
+          <div class="container" style="text-align: center; padding: 4rem 0;">
+            <h1>404</h1>
+            <p>Page not found</p>
+            <a href="/">Go to home</a>
+          </div>
+        </main>
+      </div>
     </div>
-  </div>
-  <script src="${this.siteConfig.assetsPath}/main.js" defer></script>
-</body>
-</html>`;
-
+    <script src="${this.siteConfig.assetsPath}/main.js" defer></script>
+  </body>
+  </html>`;
+  
     return html;
   }
 }

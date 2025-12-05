@@ -2,10 +2,11 @@
  * Header - Site header with logo and navigation
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useConfig } from '../client/contexts/ConfigContext';
 import { useSearch } from '../client/hooks/useSearch';
+import { useTheme } from '../client/contexts/ThemeContext';
 
 /**
  * Site header component
@@ -14,6 +15,14 @@ import { useSearch } from '../client/hooks/useSearch';
 export function Header() {
   const { config } = useConfig();
   const { openSearch } = useSearch();
+  const { theme, setTheme } = useTheme();
+  
+  // Track if component has hydrated to avoid SSR mismatch
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const hasTopNav = config.navigation.topnav && config.navigation.topnav.length > 0;
 
@@ -66,7 +75,66 @@ export function Header() {
 
           {/* Right side actions */}
           <div className="header-actions">
-            {/* Reserved for future additions */}
+            {/* Theme toggle buttons */}
+            <div className="theme-toggle">
+              <button
+                className={`theme-toggle-button ${isHydrated && theme === 'light' ? 'active' : ''}`}
+                onClick={() => setTheme('light')}
+                aria-label="Switch to light mode"
+                title="Light mode"
+              >
+                <svg 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 16 16" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g clipPath="url(#clip0_light)">
+                    <path d="M8 1.11133V2.00022" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
+                    <path d="M12.8711 3.12891L12.2427 3.75735" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
+                    <path d="M14.8889 8H14" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
+                    <path d="M12.8711 12.8711L12.2427 12.2427" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
+                    <path d="M8 14.8889V14" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
+                    <path d="M3.12891 12.8711L3.75735 12.2427" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
+                    <path d="M1.11133 8H2.00022" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
+                    <path d="M3.12891 3.12891L3.75735 3.75735" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
+                    <path d="M8.00043 11.7782C10.0868 11.7782 11.7782 10.0868 11.7782 8.00043C11.7782 5.91402 10.0868 4.22266 8.00043 4.22266C5.91402 4.22266 4.22266 5.91402 4.22266 8.00043C4.22266 10.0868 5.91402 11.7782 8.00043 11.7782Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_light">
+                      <rect width="16" height="16" fill="white"></rect>
+                    </clipPath>
+                  </defs>
+                </svg>
+              </button>
+              
+                <button
+                  className={`theme-toggle-button ${isHydrated && theme === 'dark' ? 'active' : ''}`}
+                  onClick={() => setTheme('dark')}
+                  aria-label="Switch to dark mode"
+                  title="Dark mode"
+                >
+                <svg 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 16 16" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g clipPath="url(#clip0_dark)">
+                    <path d="M11.5556 10.4445C8.48717 10.4445 6.00005 7.95743 6.00005 4.88899C6.00005 3.68721 6.38494 2.57877 7.03294 1.66943C4.04272 2.22766 1.77783 4.84721 1.77783 8.0001C1.77783 11.5592 4.66317 14.4445 8.22228 14.4445C11.2196 14.4445 13.7316 12.3948 14.4525 9.62321C13.6081 10.1414 12.6187 10.4445 11.5556 10.4445Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_dark">
+                      <rect width="16" height="16" fill="white"></rect>
+                    </clipPath>
+                  </defs>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>

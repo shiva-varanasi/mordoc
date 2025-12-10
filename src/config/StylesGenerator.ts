@@ -23,6 +23,7 @@ export class StylesGenerator {
       this.generatePageNavigationStyles(),
       this.generateSearchModalStyles(),
       this.generateUtilityStyles(),
+      this.generateImageModalStyles(),
     ];
 
     return sections.join('\n\n');
@@ -326,6 +327,20 @@ export class StylesGenerator {
   th {
     font-weight: var(--font-weight-semibold);
     background-color: var(--color-surface);
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: var(--spacing-md) 0;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  img:hover {
+    opacity: 0.9;
   }`;
   }
 
@@ -971,6 +986,58 @@ export class StylesGenerator {
       gap: var(--spacing-sm);
     }
   }`;  
+  }
+
+  /**
+   * Image Modal styles
+   */
+  private generateImageModalStyles(): string {
+    return `/* Image Modal/Lightbox */
+    .image-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-xl);
+      cursor: zoom-out;
+    }
+  
+    .image-modal img {
+      max-width: 90vw;
+      max-height: 90vh;
+      width: auto;
+      height: auto;
+      cursor: default;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+  
+    .image-modal-close {
+      position: absolute;
+      top: var(--spacing-lg);
+      right: var(--spacing-lg);
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      font-size: 32px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease;
+    }
+  
+    .image-modal-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }`;
   }
 
   /**

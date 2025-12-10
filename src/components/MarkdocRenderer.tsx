@@ -7,6 +7,7 @@ import Markdoc from '@markdoc/markdoc';
 import { MarkdocRenderableNode } from '../types/content';
 import CodeBlock from './CodeBlock';
 import Heading from './Heading';
+import { Image } from './Image';
 
 interface MarkdocRendererProps {
   content: MarkdocRenderableNode;
@@ -17,6 +18,9 @@ interface MarkdocRendererProps {
  * Renders Markdoc renderable tree as React components
  */
 export function MarkdocRenderer({ content, components = {} }: MarkdocRendererProps) {
+  console.log('📄 MarkdocRenderer - content type:', typeof content);
+  console.log('📄 MarkdocRenderer - content:', content);
+  console.log('📄 Component mappings:', getDefaultComponents());
   // Markdoc's React renderer
   const rendered = Markdoc.renderers.react(content, React, {
     components: {
@@ -26,6 +30,9 @@ export function MarkdocRenderer({ content, components = {} }: MarkdocRendererPro
       ...components,
     },
   });
+
+  console.log('📄 Rendered output:', rendered);
+  console.log('📄 Rendered output type:', typeof rendered);
 
   return <>{rendered}</>;
 }
@@ -73,25 +80,15 @@ function getDefaultComponents(): Record<string, React.ComponentType<any>> {
     //blockquote
     blockquote: (props: any) => <blockquote className="callout" {...props} />,
 
-    //images
-    img: (props: any) => {
-      const { src, alt, ...rest } = props;
-      return (
-        <img
-          src={src}
-          alt={alt || ''}
-          loading="lazy"
-          {...rest}
-        />
-      );
-    },
-
     // Custom components
     // Maps 'Heading' string → Heading component
     Heading: Heading,        
     
     // Code blocks with syntax highlighting
     CodeBlock: CodeBlock,
+
+    // Images with click-to-expand
+    Image: Image,   
 
   };
 }

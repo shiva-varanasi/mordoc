@@ -79,6 +79,14 @@ export class ContentProcessor {
             content: { type: String },
           },
         },
+        image: {                             
+          render: 'Image',                    
+          attributes: {                       
+            src: { type: String, required: true },
+            alt: { type: String },
+            title: { type: String },
+          },
+        },
       },
     });
     

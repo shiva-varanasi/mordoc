@@ -8,6 +8,8 @@ import { MarkdocRenderableNode } from '../types/content';
 import CodeBlock from './CodeBlock';
 import Heading from './Heading';
 import { Image } from './Image';
+import Card from './Card';
+import CardGrid from './CardGrid';
 
 interface MarkdocRendererProps {
   content: MarkdocRenderableNode;
@@ -18,9 +20,6 @@ interface MarkdocRendererProps {
  * Renders Markdoc renderable tree as React components
  */
 export function MarkdocRenderer({ content, components = {} }: MarkdocRendererProps) {
-  console.log('📄 MarkdocRenderer - content type:', typeof content);
-  console.log('📄 MarkdocRenderer - content:', content);
-  console.log('📄 Component mappings:', getDefaultComponents());
   // Markdoc's React renderer
   const rendered = Markdoc.renderers.react(content, React, {
     components: {
@@ -30,9 +29,6 @@ export function MarkdocRenderer({ content, components = {} }: MarkdocRendererPro
       ...components,
     },
   });
-
-  console.log('📄 Rendered output:', rendered);
-  console.log('📄 Rendered output type:', typeof rendered);
 
   return <>{rendered}</>;
 }
@@ -88,7 +84,11 @@ function getDefaultComponents(): Record<string, React.ComponentType<any>> {
     CodeBlock: CodeBlock,
 
     // Images with click-to-expand
-    Image: Image,   
+    Image: Image,
+
+    // Cards and card grid containers
+    Card: Card,
+    CardGrid: CardGrid,
 
   };
 }

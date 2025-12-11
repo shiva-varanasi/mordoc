@@ -24,6 +24,7 @@ export class StylesGenerator {
       this.generateSearchModalStyles(),
       this.generateUtilityStyles(),
       this.generateImageModalStyles(),
+      this.generateCardStyles(),
     ];
 
     return sections.join('\n\n');
@@ -1437,4 +1438,124 @@ export class StylesGenerator {
     margin-bottom: var(--spacing-md);
   }`;
   }
+
+  /**
+   * Card and CardGrid styles
+   */
+  private generateCardStyles(): string {
+    return `/* Card Component Styles */
+  .card-grid {
+    display: grid;
+    gap: 1.5rem;
+    margin: 2rem 0;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .card-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .card-grid[data-cols="2"] {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .card-grid[data-cols="3"] {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .card-grid[data-cols="4"] {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .card-link {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .card-link:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    opacity: 1;
+  }
+
+  .card-link:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  }
+
+  .card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 40px;
+  }
+
+  .card-icon-img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    flex-shrink: 0;
+    margin: var(--spacing-xs) 0;
+  }
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+  }
+
+  .card-title {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    color: var(--color-text-primary);
+  }
+
+  .card-description {
+    margin: 0;
+    color:rgb(46, 46, 46);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+  }
+
+  .card-description p {
+    margin: 0;
+  }
+
+  .card-description p:not(:last-child) {
+    margin-bottom: 0.5rem;
+  }
+
+  @media (max-width: 639px) {
+    .card {
+      padding: 1.25rem;
+    }
+    
+    .card-title {
+      font-size: 1rem;
+    }
+    
+    .card-description {
+      font-size: var(--font-size-sm);
+    }
+  }`;
+  }  
 }

@@ -88,6 +88,22 @@ export class ContentProcessor {
           },
         },
       },
+      tags: {
+        card: {
+          render: 'Card',
+          attributes: {
+            title: { type: String, required: true },
+            href: { type: String },
+            icon: { type: String },
+          },
+        },
+        cardGrid: {
+          render: 'CardGrid',
+          attributes: {
+            cols: { type: Number, default: 2 },
+          },
+        },
+      },
     });
     
     // Add heading anchors to renderable for table of contents

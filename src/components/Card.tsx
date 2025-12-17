@@ -8,6 +8,26 @@ interface CardProps {
 }
 
 export function Card({ title, href, icon, children }: CardProps) {
+  const ArrowIcon = () => (
+    <svg
+      className="card-arrow"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M6 3L11 8L6 13"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+
   const content = (
     <>
       {icon && (
@@ -21,7 +41,10 @@ export function Card({ title, href, icon, children }: CardProps) {
         </div>
       )}
       <div className="card-content">
-        <h3 className="card-title">{title}</h3>
+        <h3 className="card-title">
+          <span>{title}</span>
+          {href && <ArrowIcon />}
+        </h3>
         <div className="card-description">{children}</div>
       </div>
     </>

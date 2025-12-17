@@ -1,168 +1,141 @@
 /**
- * ThemeGenerator - Generates CSS variables from StyleConfig
- * Converts theme configuration into CSS custom properties
+ * ThemeGenerator - Generates CSS variables from GlobalVariables
+ * Converts global design tokens into CSS custom properties
  */
 
-import { ProcessedStyleConfig, FontConfig } from '../types/config';
+import { GlobalVariables } from '../styles/types';
 
 export class ThemeGenerator {
-  constructor(private styleConfig: ProcessedStyleConfig) {}
+  constructor(private globalVars: GlobalVariables) {}
 
   /**
    * Generate CSS custom properties (variables) for colors, typography, and layout
    */
   generateCSSVariables(): string {
-    const { colors, typography, layout } = this.styleConfig;
+    const vars = this.globalVars;
+    const cssVars: string[] = [];
 
-    const variables: string[] = [];
+    // Light mode variables
+    cssVars.push(':root, [data-theme="light"] {');
+    cssVars.push('  /* Colors - Light Mode */');
+    cssVars.push(`  --color-primary: ${vars.primaryColorLight};`);
+    cssVars.push(`  --color-secondary: ${vars.secondaryColorLight};`);
+    cssVars.push(`  --color-background: ${vars.backgroundColorLight};`);
+    cssVars.push(`  --color-surface: ${vars.surfaceColorLight};`);
+    cssVars.push(`  --color-text-primary: ${vars.textPrimaryLight};`);
+    cssVars.push(`  --color-text-secondary: ${vars.textSecondaryLight};`);
+    cssVars.push(`  --color-text-disabled: ${vars.textDisabledLight};`);
+    cssVars.push(`  --color-border: ${vars.borderColorLight};`);
+    cssVars.push(`  --color-link: ${vars.linkColorLight};`);
+    cssVars.push(`  --color-success: ${vars.successColorLight};`);
+    cssVars.push(`  --color-warning: ${vars.warningColorLight};`);
+    cssVars.push(`  --color-error: ${vars.errorColorLight};`);
+    cssVars.push(`  --color-info: ${vars.infoColorLight};`);
 
-    // Color variables (light mode)
-    variables.push(':root, [data-theme="light"] {');
-    variables.push(`  /* Colors - Light Mode */`);
-    variables.push(`  --color-primary: ${colors.primary.light};`);
-    variables.push(`  --color-secondary: ${colors.secondary.light};`);
-    variables.push(`  --color-background: ${colors.background.light};`);
-    variables.push(`  --color-surface: ${colors.surface.light};`);
-    variables.push(`  --color-text-primary: ${colors.text.primary.light};`);
-    variables.push(`  --color-text-secondary: ${colors.text.secondary.light};`);
-    variables.push(`  --color-text-disabled: ${colors.text.disabled.light};`);
-    variables.push(`  --color-border: ${colors.border.light};`);
-    variables.push(`  --color-link: ${colors.link.light};`);
-    variables.push(`  --color-success: ${colors.success.light};`);
-    variables.push(`  --color-warning: ${colors.warning.light};`);
-    variables.push(`  --color-error: ${colors.error.light};`);
-    variables.push(`  --color-info: ${colors.info.light};`);
+    cssVars.push('');
+    cssVars.push('  /* Navigation - Light Mode */');
+    cssVars.push(`  --nav-text-color: ${vars.navTextColorLight};`);
+    cssVars.push(`  --nav-hover-color: ${vars.navHoverColorLight};`);
+    cssVars.push(`  --nav-active-color: ${vars.navActiveColorLight};`);
 
-    // Navigation colors (light mode)
-    variables.push('');
-    variables.push(`  /* Navigation - Light Mode */`);
-    variables.push(`  --nav-text-color: ${colors.navigation.text.light};`);
-    variables.push(`  --nav-hover-color: ${colors.navigation.hover.light};`);
-    variables.push(`  --nav-active-color: ${colors.navigation.active.light};`);
-
-    // Header colors (light mode)
-    variables.push('');
-    variables.push(`  /* Header - Light Mode */`);
-    variables.push(`  --header-background: ${colors.header.background.light};`);
-
-    // Typography variables
-    variables.push('');
-    variables.push(`  /* Typography */`);
-    variables.push(`  --font-family-base: ${this.formatFontFamily(typography.fontFamily.base)};`);
-    variables.push(`  --font-family-heading: ${this.formatFontFamily(typography.fontFamily.heading)};`);
-    variables.push(`  --font-family-mono: ${this.formatFontFamily(typography.fontFamily.mono)};`);
+    cssVars.push('');
+    cssVars.push('  /* Typography */');
+    cssVars.push(`  --font-family-base: ${vars.fontFamilyBase};`);
+    cssVars.push(`  --font-family-heading: ${vars.fontFamilyHeading};`);
+    cssVars.push(`  --font-family-mono: ${vars.fontFamilyMono};`);
     
-    variables.push(`  --font-size-xs: ${typography.fontSize.xs};`);
-    variables.push(`  --font-size-sm: ${typography.fontSize.sm};`);
-    variables.push(`  --font-size-base: ${typography.fontSize.base};`);
-    variables.push(`  --font-size-lg: ${typography.fontSize.lg};`);
-    variables.push(`  --font-size-xl: ${typography.fontSize.xl};`);
-    variables.push(`  --font-size-2xl: ${typography.fontSize['2xl']};`);
-    variables.push(`  --font-size-3xl: ${typography.fontSize['3xl']};`);
-    variables.push(`  --font-size-4xl: ${typography.fontSize['4xl']};`);
+    cssVars.push(`  --font-size-xs: ${vars.fontSizeXs};`);
+    cssVars.push(`  --font-size-sm: ${vars.fontSizeSm};`);
+    cssVars.push(`  --font-size-base: ${vars.fontSizeBase};`);
+    cssVars.push(`  --font-size-lg: ${vars.fontSizeLg};`);
+    cssVars.push(`  --font-size-xl: ${vars.fontSizeXl};`);
+    cssVars.push(`  --font-size-2xl: ${vars.fontSize2xl};`);
+    cssVars.push(`  --font-size-3xl: ${vars.fontSize3xl};`);
+    cssVars.push(`  --font-size-4xl: ${vars.fontSize4xl};`);
 
-    variables.push(`  --line-height-tight: ${typography.lineHeight.tight};`);
-    variables.push(`  --line-height-normal: ${typography.lineHeight.normal};`);
-    variables.push(`  --line-height-relaxed: ${typography.lineHeight.relaxed};`);
+    cssVars.push(`  --line-height-tight: ${vars.lineHeightTight};`);
+    cssVars.push(`  --line-height-normal: ${vars.lineHeightNormal};`);
+    cssVars.push(`  --line-height-relaxed: ${vars.lineHeightRelaxed};`);
 
-    variables.push(`  --font-weight-normal: ${typography.fontWeight.normal};`);
-    variables.push(`  --font-weight-medium: ${typography.fontWeight.medium};`);
-    variables.push(`  --font-weight-semibold: ${typography.fontWeight.semibold};`);
-    variables.push(`  --font-weight-bold: ${typography.fontWeight.bold};`);
+    cssVars.push(`  --font-weight-normal: ${vars.fontWeightNormal};`);
+    cssVars.push(`  --font-weight-medium: ${vars.fontWeightMedium};`);
+    cssVars.push(`  --font-weight-semibold: ${vars.fontWeightSemibold};`);
+    cssVars.push(`  --font-weight-bold: ${vars.fontWeightBold};`);
 
-    // Layout variables
-    variables.push('');
-    variables.push(`  /* Layout */`);
-    variables.push(`  --container-width-sm: ${layout.containerWidth.sm};`);
-    variables.push(`  --container-width-md: ${layout.containerWidth.md};`);
-    variables.push(`  --container-width-lg: ${layout.containerWidth.lg};`);
-    variables.push(`  --container-width-xl: ${layout.containerWidth.xl};`);
+    cssVars.push('');
+    cssVars.push('  /* Layout */');
+    cssVars.push(`  --container-width-sm: ${vars.containerWidthSm};`);
+    cssVars.push(`  --container-width-md: ${vars.containerWidthMd};`);
+    cssVars.push(`  --container-width-lg: ${vars.containerWidthLg};`);
+    cssVars.push(`  --container-width-xl: ${vars.containerWidthXl};`);
 
-    variables.push(`  --spacing-xs: ${layout.spacing.xs};`);
-    variables.push(`  --spacing-sm: ${layout.spacing.sm};`);
-    variables.push(`  --spacing-md: ${layout.spacing.md};`);
-    variables.push(`  --spacing-lg: ${layout.spacing.lg};`);
-    variables.push(`  --spacing-xl: ${layout.spacing.xl};`);
-    variables.push(`  --spacing-2xl: ${layout.spacing['2xl']};`);
-    variables.push(`  --spacing-3xl: ${layout.spacing['3xl']};`);
+    cssVars.push(`  --spacing-xs: ${vars.spacingXs};`);
+    cssVars.push(`  --spacing-sm: ${vars.spacingSm};`);
+    cssVars.push(`  --spacing-md: ${vars.spacingMd};`);
+    cssVars.push(`  --spacing-lg: ${vars.spacingLg};`);
+    cssVars.push(`  --spacing-xl: ${vars.spacingXl};`);
+    cssVars.push(`  --spacing-2xl: ${vars.spacing2xl};`);
+    cssVars.push(`  --spacing-3xl: ${vars.spacing3xl};`);
 
-    variables.push(`  --border-radius-sm: ${layout.borderRadius.sm};`);
-    variables.push(`  --border-radius-md: ${layout.borderRadius.md};`);
-    variables.push(`  --border-radius-lg: ${layout.borderRadius.lg};`);
-    variables.push(`  --border-radius-full: ${layout.borderRadius.full};`);
+    cssVars.push(`  --border-radius-sm: ${vars.borderRadiusSm};`);
+    cssVars.push(`  --border-radius-md: ${vars.borderRadiusMd};`);
+    cssVars.push(`  --border-radius-lg: ${vars.borderRadiusLg};`);
+    cssVars.push(`  --border-radius-full: ${vars.borderRadiusFull};`);
 
-    variables.push(`  --header-height: ${layout.header.height};`);
-    variables.push(`  --sidebar-width: ${layout.sidebar.width};`);
-    variables.push(`  --sidebar-collapsed-width: ${layout.sidebar.collapsedWidth};`);
+    cssVars.push(`  --header-height: ${vars.headerHeight};`);
+    cssVars.push(`  --sidebar-width: ${vars.sidebarWidth};`);
+    cssVars.push(`  --sidebar-collapsed-width: ${vars.sidebarCollapsedWidth};`);
 
-    variables.push('}');
+    cssVars.push('}');
 
-    // Dark mode color variables
-    variables.push('');
-    variables.push('[data-theme="dark"] {');
-    variables.push(`  /* Colors - Dark Mode */`);
-    variables.push(`  --color-primary: ${colors.primary.dark};`);
-    variables.push(`  --color-secondary: ${colors.secondary.dark};`);
-    variables.push(`  --color-background: ${colors.background.dark};`);
-    variables.push(`  --color-surface: ${colors.surface.dark};`);
-    variables.push(`  --color-text-primary: ${colors.text.primary.dark};`);
-    variables.push(`  --color-text-secondary: ${colors.text.secondary.dark};`);
-    variables.push(`  --color-text-disabled: ${colors.text.disabled.dark};`);
-    variables.push(`  --color-border: ${colors.border.dark};`);
-    variables.push(`  --color-link: ${colors.link.dark};`);
-    variables.push(`  --color-success: ${colors.success.dark};`);
-    variables.push(`  --color-warning: ${colors.warning.dark};`);
-    variables.push(`  --color-error: ${colors.error.dark};`);
-    variables.push(`  --color-info: ${colors.info.dark};`);
+    // Dark mode variables
+    cssVars.push('');
+    cssVars.push('[data-theme="dark"] {');
+    cssVars.push('  /* Colors - Dark Mode */');
+    cssVars.push(`  --color-primary: ${vars.primaryColorDark};`);
+    cssVars.push(`  --color-secondary: ${vars.secondaryColorDark};`);
+    cssVars.push(`  --color-background: ${vars.backgroundColorDark};`);
+    cssVars.push(`  --color-surface: ${vars.surfaceColorDark};`);
+    cssVars.push(`  --color-text-primary: ${vars.textPrimaryDark};`);
+    cssVars.push(`  --color-text-secondary: ${vars.textSecondaryDark};`);
+    cssVars.push(`  --color-text-disabled: ${vars.textDisabledDark};`);
+    cssVars.push(`  --color-border: ${vars.borderColorDark};`);
+    cssVars.push(`  --color-link: ${vars.linkColorDark};`);
+    cssVars.push(`  --color-success: ${vars.successColorDark};`);
+    cssVars.push(`  --color-warning: ${vars.warningColorDark};`);
+    cssVars.push(`  --color-error: ${vars.errorColorDark};`);
+    cssVars.push(`  --color-info: ${vars.infoColorDark};`);
 
-    // Navigation colors (dark mode)
-    variables.push('');
-    variables.push(`  /* Navigation - Dark Mode */`);
-    variables.push(`  --nav-text-color: ${colors.navigation.text.dark};`);
-    variables.push(`  --nav-hover-color: ${colors.navigation.hover.dark};`);
-    variables.push(`  --nav-active-color: ${colors.navigation.active.dark};`);
+    cssVars.push('');
+    cssVars.push('  /* Navigation - Dark Mode */');
+    cssVars.push(`  --nav-text-color: ${vars.navTextColorDark};`);
+    cssVars.push(`  --nav-hover-color: ${vars.navHoverColorDark};`);
+    cssVars.push(`  --nav-active-color: ${vars.navActiveColorDark};`);
+    cssVars.push('}');
 
-    // Header colors (dark mode)
-    variables.push('');
-    variables.push(`  /* Header - Dark Mode */`);
-    variables.push(`  --header-background: ${colors.header.background.dark};`);
-    variables.push('}');
+    // System preference dark mode
+    cssVars.push('');
+    cssVars.push('@media (prefers-color-scheme: dark) {');
+    cssVars.push('  :root:not([data-theme="light"]) {');
+    cssVars.push(`    --color-primary: ${vars.primaryColorDark};`);
+    cssVars.push(`    --color-secondary: ${vars.secondaryColorDark};`);
+    cssVars.push(`    --color-background: ${vars.backgroundColorDark};`);
+    cssVars.push(`    --color-surface: ${vars.surfaceColorDark};`);
+    cssVars.push(`    --color-text-primary: ${vars.textPrimaryDark};`);
+    cssVars.push(`    --color-text-secondary: ${vars.textSecondaryDark};`);
+    cssVars.push(`    --color-text-disabled: ${vars.textDisabledDark};`);
+    cssVars.push(`    --color-border: ${vars.borderColorDark};`);
+    cssVars.push(`    --color-link: ${vars.linkColorDark};`);
+    cssVars.push(`    --color-success: ${vars.successColorDark};`);
+    cssVars.push(`    --color-warning: ${vars.warningColorDark};`);
+    cssVars.push(`    --color-error: ${vars.errorColorDark};`);
+    cssVars.push(`    --color-info: ${vars.infoColorDark};`);
+    cssVars.push(`    --nav-text-color: ${vars.navTextColorDark};`);
+    cssVars.push(`    --nav-hover-color: ${vars.navHoverColorDark};`);
+    cssVars.push(`    --nav-active-color: ${vars.navActiveColorDark};`);
+    cssVars.push('  }');
+    cssVars.push('}');
 
-    // Prefer dark mode based on system preference
-    variables.push('');
-    variables.push('@media (prefers-color-scheme: dark) {');
-    variables.push('  :root:not([data-theme="light"]) {');
-    variables.push(`    --color-primary: ${colors.primary.dark};`);
-    variables.push(`    --color-secondary: ${colors.secondary.dark};`);
-    variables.push(`    --color-background: ${colors.background.dark};`);
-    variables.push(`    --color-surface: ${colors.surface.dark};`);
-    variables.push(`    --color-text-primary: ${colors.text.primary.dark};`);
-    variables.push(`    --color-text-secondary: ${colors.text.secondary.dark};`);
-    variables.push(`    --color-text-disabled: ${colors.text.disabled.dark};`);
-    variables.push(`    --color-border: ${colors.border.dark};`);
-    variables.push(`    --color-link: ${colors.link.dark};`);
-    variables.push(`    --color-success: ${colors.success.dark};`);
-    variables.push(`    --color-warning: ${colors.warning.dark};`);
-    variables.push(`    --color-error: ${colors.error.dark};`);
-    variables.push(`    --color-info: ${colors.info.dark};`);
-    variables.push(`    --nav-text-color: ${colors.navigation.text.dark};`);
-    variables.push(`    --nav-hover-color: ${colors.navigation.hover.dark};`);
-    variables.push(`    --nav-active-color: ${colors.navigation.active.dark};`);
-    variables.push(`    --header-background: ${colors.header.background.dark};`);
-    variables.push('  }');
-    variables.push('}');
-
-    return variables.join('\n');
-  }
-
-  /**
-   * Format font family with fallbacks
-   */
-  private formatFontFamily(fontConfig: FontConfig): string {
-    const fonts = [fontConfig.family];
-    if (fontConfig.fallbacks) {
-      fonts.push(...fontConfig.fallbacks);
-    }
-    return fonts.join(', ');
+    return cssVars.join('\n');
   }
 }

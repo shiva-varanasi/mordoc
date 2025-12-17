@@ -60,11 +60,29 @@ function SideNavItem({ item, currentPath, depth }: SideNavItemProps) {
     }
   };
 
+  const ChevronIcon = () => (
+    <svg 
+      width="12" 
+      height="12" 
+      viewBox="0 0 8 8" 
+      xmlns="http://www.w3.org/2000/svg"
+      className={`sidenav-chevron ${isExpanded ? 'expanded' : 'collapsed'}`}
+      aria-hidden="true"
+    >
+      <path 
+        fillRule="evenodd" 
+        clipRule="evenodd" 
+        d="M.606 2.334a.75.75 0 0 0-.022 1.06l2.875 3a.75.75 0 0 0 1.082 0L7.416 3.4a.75.75 0 0 0-1.082-1.038L4 4.79 1.667 2.357a.75.75 0 0 0-1.06-.022Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+
   return (
     <li className={`sidenav-item sidenav-item-depth-${depth}`}>
-      <div className="sidenav-item-content">
       {item.path ? (
-          item.external ? (
+        item.external ? (
+          <div className="sidenav-item-wrapper">
             <a
               href={item.path}
               className={`sidenav-link ${isActive ? 'active' : ''}`}
@@ -73,61 +91,61 @@ function SideNavItem({ item, currentPath, depth }: SideNavItemProps) {
             >
               {item.icon && <span className="sidenav-icon">{item.icon}</span>}
               <span className="sidenav-label">{item.label}</span>
+              {hasChildren && <ChevronIcon />}
             </a>
-          ) : (
+            {hasChildren && (
+              <button
+                className="sidenav-toggle-overlay"
+                onClick={handleToggle}
+                aria-label={isExpanded ? 'Collapse' : 'Expand'}
+                aria-expanded={isExpanded}
+              />
+            )}
+          </div>
+        ) : (
+          <div className="sidenav-item-wrapper">
             <Link
               to={item.path}
               className={`sidenav-link ${isActive ? 'active' : ''}`}
             >
               {item.icon && <span className="sidenav-icon">{item.icon}</span>}
               <span className="sidenav-label">{item.label}</span>
+              {hasChildren && <ChevronIcon />}
             </Link>
-          )
-        ) : (
-          <span className={`sidenav-link ${hasActiveChild ? 'has-active-child' : ''}`}>
-            {item.icon && <span className="sidenav-icon">{item.icon}</span>}
-            <span className="sidenav-label">{item.label}</span>
-          </span>
-        )}
-
-        {hasChildren && (
-          <button
-            className={`sidenav-toggle ${isExpanded ? 'expanded' : 'collapsed'}`}
-            onClick={handleToggle}
-            aria-label={isExpanded ? 'Collapse' : 'Expand'}
-          >
-            <span
-              className={`sidenav-toggle-icon ${isExpanded ? 'rotate-down' : 'rotate-right'}`}
-            >
-              <svg
-                width="10"
-                height="10"
-                viewBox="0 0 8 8"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M.606 2.334a.75.75 0 0 0-.022 1.06l2.875 3a.75.75 0 0 0 1.082 0L7.416 3.4a.75.75 0 0 0-1.082-1.038L4 4.79 1.667 2.357a.75.75 0 0 0-1.06-.022Z"
-                />
-              </svg>
-            </span>
-          </button>
-        )}        
-      </div>
-
-      {hasChildren && isExpanded && (
-        <ul className="sidenav-list sidenav-sublist">
-          {item.children!.map((child, index) => (
-            <SideNavItem
-              key={index}
-              item={child}
-              currentPath={currentPath}
-              depth={depth + 1}
-            />
-          ))}
-        </ul>
+            {hasChildren && (
+              <button
+                className="sidenav-toggle-overlay"
+                onClick={handleToggle}
+                aria-label={isExpanded ? 'Collapse' : 'Expand'}
+                aria-expanded={isExpanded}
+              />
+            )}
+          </div>
+        )
+      ) : (
+        <button
+          className={`sidenav-link sidenav-group-label ${hasActiveChild ? 'has-active-child' : ''}`}
+          onClick={handleToggle}
+        >
+          {item.icon && <span className="sidenav-icon">{item.icon}</span>}
+          <span className="sidenav-label">{item.label}</span>
+          {hasChildren && <ChevronIcon />}
+        </button>
+      )}
+  
+      {hasChildren && (
+        <div className={`sidenav-sublist-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}>
+          <ul className="sidenav-sublist">
+            {item.children!.map((child, index) => (
+              <SideNavItem
+                key={index}
+                item={child}
+                currentPath={currentPath}
+                depth={depth + 1}
+              />
+            ))}
+          </ul>
+        </div>
       )}
     </li>
   );

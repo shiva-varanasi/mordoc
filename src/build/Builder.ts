@@ -14,7 +14,8 @@ import { HtmlGenerator } from './HtmlGenerator';
 import { ProcessedContent, ContentDataFile } from '../types/content';
 import { SiteConfig } from '../types/config';
 import { ClientBundler } from './ClientBundler';
-import { StylesGenerator } from '../config/StylesGenerator';
+import { StyleCompiler } from '../config/StyleCompiler';
+import { mergeGlobalOverrides } from '../styles/variables/main';
 import { SearchIndexer } from './SearchIndexer';
 
 export interface BuilderOptions {
@@ -251,23 +252,24 @@ export class Builder {
   }
 
   /**
-   * Generate theme CSS from style config
+   * Generate theme CSS and component styles
    */
   private generateThemeCSS(siteConfig: SiteConfig): void {
     const assetsDir = path.join(this.outputDir, 'assets');
     fs.mkdirSync(assetsDir, { recursive: true });
   
-    // Generate theme.css (CSS variables)
-    const themeGenerator = new ThemeGenerator(siteConfig.style);
+    // Load user style overrides and generate styles
+    const styleCompiler = new StyleCompiler(this.projectRoot);
+    const stylesCss = styleCompiler.generateCSS();
+    const stylesPath = path.join(assetsDir, 'styles.css');
+    fs.writeFileSync(stylesPath, stylesCss, 'utf8');
+    
+    // Generate theme.css (CSS variables) using global defaults
+    const globalVars = mergeGlobalOverrides();
+    const themeGenerator = new ThemeGenerator(globalVars);
     const themeCss = themeGenerator.generateCSSVariables();
     const themePath = path.join(assetsDir, 'theme.css');
     fs.writeFileSync(themePath, themeCss, 'utf8');
-  
-    // Generate styles.css (component styles)
-    const stylesGenerator = new StylesGenerator();
-    const stylesCss = stylesGenerator.generateCSS();
-    const stylesPath = path.join(assetsDir, 'styles.css');
-    fs.writeFileSync(stylesPath, stylesCss, 'utf8');
   }
 
   /**
@@ -288,11 +290,14 @@ export class Builder {
   }
 
   /**
-   * Copy static assets (logo, favicon, public/ folder)
+   * Copy static assets (logo, favicon, public/ folder, and MORDOC fonts)
    */
   private copyStaticAssets(siteConfig: SiteConfig): void {
     const assetsDir = path.join(this.outputDir, 'assets');
     fs.mkdirSync(assetsDir, { recursive: true });
+
+    // Copy MORDOC's built-in fonts
+    this.copyMordocAssets();
 
     // Copy logo
     if (siteConfig.assets.logo) {
@@ -315,6 +320,27 @@ export class Builder {
     // Copy public/ directory
     if (fs.existsSync(this.publicDir)) {
       this.copyDirectory(this.publicDir, this.outputDir);
+    }
+  }
+
+  /**
+   * Copy MORDOC's built-in assets (fonts, etc.)
+   */
+  private copyMordocAssets(): void {
+    const mordocRoot = path.join(__dirname, '../..');
+    const mordocAssetsDir = path.join(mordocRoot, 'src/assets');
+    
+    if (!fs.existsSync(mordocAssetsDir)) {
+      return;
+    }
+
+    const outputAssetsDir = path.join(this.outputDir, 'assets');
+    
+    // Copy fonts
+    const fontsSource = path.join(mordocAssetsDir, 'fonts');
+    if (fs.existsSync(fontsSource)) {
+      const fontsDestination = path.join(outputAssetsDir, 'fonts');
+      this.copyDirectory(fontsSource, fontsDestination);
     }
   }
 

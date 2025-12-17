@@ -8,8 +8,6 @@ import path from 'path';
 import yaml from 'js-yaml';
 import {
   SiteConfig,
-  ProcessedStyleConfig,
-  UserStyleConfig,
   SideNavConfig,
   TopNavConfig,
   NavigationItem,
@@ -32,7 +30,6 @@ export class ConfigLoader {
     // Load individual config components
     const metadata = this.loadMetadata();
     const languages = this.loadLanguages();
-    const style = this.loadStyleConfig();
     const navigation = this.loadNavigationConfig();
     const assets = this.loadAssets();
 
@@ -40,7 +37,6 @@ export class ConfigLoader {
       metadata,
       languages,
       defaultLanguage: languages.find((lang) => lang.default)?.code || 'en',
-      style,
       navigation,
       assets,
       assetsPath: '/assets',
@@ -94,315 +90,6 @@ export class ConfigLoader {
 
     // TODO: Load from languages.json if exists
     return defaultLanguages;
-  }
-
-  /**
-   * Load and transform user style configuration
-   */
-  private loadStyleConfig(): ProcessedStyleConfig {
-    const defaultStyle = this.getDefaultProcessedConfig();
-
-    const styleJsonPath = path.join(this.configDir, 'style.json');
-    if (!fs.existsSync(styleJsonPath)) {
-      return defaultStyle;
-    }
-
-    try {
-      const userStyleJson = fs.readFileSync(styleJsonPath, 'utf8');
-      const userStyle: UserStyleConfig = JSON.parse(userStyleJson);
-      const transformedStyle = this.transformUserStyleToProcessed(userStyle);
-      return this.deepMerge(defaultStyle, transformedStyle) as ProcessedStyleConfig;
-    } catch (error) {
-      throw new Error(`Failed to parse style.json: ${(error as Error).message}`);
-    }
-  }
-
-  /**
-   * Get default processed style configuration
-   */
-  private getDefaultProcessedConfig(): ProcessedStyleConfig {
-    return {
-      colors: {
-        primary: {
-          light: '#000000',
-          dark: '#ffffff',
-        },
-        secondary: {
-          light: '#404040',
-          dark: '#b0b0b0',
-        },
-        background: {
-          light: '#ffffff',
-          dark: '#0a0a0a',
-        },
-        surface: {
-          light: '#f8f8f8',
-          dark: '#1a1a1a',
-        },
-        text: {
-          primary: {
-            light: '#000000',
-            dark: '#ffffff',
-          },
-          secondary: {
-            light: '#666666',
-            dark: '#999999',
-          },
-          disabled: {
-            light: '#cccccc',
-            dark: '#404040',
-          },
-        },
-        border: {
-          light: '#e0e0e0',
-          dark: '#333333',
-        },
-        link: {
-          light: '#000000',
-          dark: '#ffffff',
-        },
-        success: {
-          light: '#2d3436',
-          dark: '#dfe6e9',
-        },
-        warning: {
-          light: '#636e72',
-          dark: '#b2bec3',
-        },
-        error: {
-          light: '#000000',
-          dark: '#ffffff',
-        },
-        info: {
-          light: '#2d3436',
-          dark: '#dfe6e9',
-        },
-        navigation: {
-          text: {
-            light: '#474849',
-            dark: '#999999',
-          },
-          hover: {
-            light: '#000000',
-            dark: '#ffffff',
-          },
-          active: {
-            light: '#000000',
-            dark: '#ffffff',
-          },
-        },
-        header: {
-          background: {
-            light: '#ffffff',
-            dark: '#0a0a0a',
-          },
-        },
-      },
-      typography: {
-        fontFamily: {
-          base: {
-            family: '-apple-system',
-            fallbacks: [
-              'BlinkMacSystemFont',
-              '"Segoe UI"',
-              'Roboto',
-              '"Helvetica Neue"',
-              'Arial',
-              'sans-serif',
-            ],
-          },
-          heading: {
-            family: '-apple-system',
-            fallbacks: [
-              'BlinkMacSystemFont',
-              '"Segoe UI"',
-              'Roboto',
-              '"Helvetica Neue"',
-              'Arial',
-              'sans-serif',
-            ],
-            weight: 600,
-          },
-          mono: {
-            family: '"SF Mono"',
-            fallbacks: [
-              'Monaco',
-              '"Cascadia Code"',
-              '"Roboto Mono"',
-              'Consolas',
-              '"Courier New"',
-              'monospace',
-            ],
-          },
-        },
-        fontSize: {
-          xs: '0.5rem',
-          sm: '0.875rem',
-          base: '1rem',
-          lg: '1.25rem',
-          xl: '1.5rem',
-          '2xl': '2rem',
-          '3xl': '2.25rem',
-          '4xl': '2.75rem',
-        },
-        lineHeight: {
-          tight: 1.25,
-          normal: 1.5,
-          relaxed: 1.75,
-        },
-        fontWeight: {
-          normal: 400,
-          medium: 500,
-          semibold: 600,
-          bold: 700,
-        },
-      },
-      layout: {
-        containerWidth: {
-          sm: '640px',
-          md: '768px',
-          lg: '1024px',
-          xl: '1280px',
-        },
-        spacing: {
-          xs: '0.25rem',
-          sm: '0.5rem',
-          md: '1rem',
-          lg: '1.5rem',
-          xl: '2rem',
-          '2xl': '3rem',
-          '3xl': '4rem',
-        },
-        borderRadius: {
-          sm: '0.125rem',
-          md: '0.25rem',
-          lg: '0.5rem',
-          full: '9999px',
-        },
-        header: {
-          height: '4rem',
-        },
-        sidebar: {
-          width: '16rem',
-          collapsedWidth: '4rem',
-        },
-      },
-    };
-  }
-
-  /**
-   * Transform user-facing config to internal processed config
-   */
-  private transformUserStyleToProcessed(
-    userStyle: UserStyleConfig
-  ): Partial<ProcessedStyleConfig> {
-    const processed: Partial<ProcessedStyleConfig> = {
-      colors: {} as any,
-      typography: {} as any,
-      layout: {} as any,
-    };
-
-    // Type assertion helper - we know colors is initialized
-    const colors = processed.colors!;
-
-    // Handle font family (applies to both base and heading)
-    if (userStyle.fontFamily) {
-      const fontParts = userStyle.fontFamily.split(',').map((f) => f.trim());
-      const primaryFont = fontParts[0];
-      const fallbacks = fontParts.slice(1);
-
-      processed.typography = {
-        fontFamily: {
-          base: {
-            family: primaryFont,
-            fallbacks: fallbacks.length > 0 ? fallbacks : undefined,
-          },
-          heading: {
-            family: primaryFont,
-            fallbacks: fallbacks.length > 0 ? fallbacks : undefined,
-            weight: 600,
-          },
-        },
-      } as any;
-    }
-
-    // Handle light theme colors
-    if (userStyle.light) {
-      const light = userStyle.light;
-
-      if (light.brandColor) {
-        colors.primary = { light: light.brandColor } as any;
-        colors.navigation = {
-          active: { light: light.brandColor },
-        } as any;
-      }
-
-      if (light.navigation) {
-        if (!colors.navigation) colors.navigation = {} as any;
-
-        if (light.navigation.textColor) {
-          colors.navigation.text = {
-            light: light.navigation.textColor,
-          } as any;
-        }
-
-        if (light.navigation.hoverColor) {
-          colors.navigation.hover = {
-            light: light.navigation.hoverColor,
-          } as any;
-        }
-      }
-
-      if (light.header?.background) {
-        colors.header = {
-          background: { light: light.header.background },
-        } as any;
-      }
-    }
-
-    // Handle dark theme colors
-    if (userStyle.dark) {
-      const dark = userStyle.dark;
-
-      if (dark.brandColor) {
-        if (!colors.primary) colors.primary = {} as any;
-        (colors.primary as any).dark = dark.brandColor;
-
-        if (!colors.navigation) colors.navigation = {} as any;
-        if (!colors.navigation.active) {
-          colors.navigation.active = {} as any;
-        }
-        (colors.navigation.active as any).dark = dark.brandColor;
-      }
-
-      if (dark.navigation) {
-        if (!colors.navigation) colors.navigation = {} as any;
-
-        if (dark.navigation.textColor) {
-          if (!colors.navigation.text) {
-            colors.navigation.text = {} as any;
-          }
-          (colors.navigation.text as any).dark = dark.navigation.textColor;
-        }
-
-        if (dark.navigation.hoverColor) {
-          if (!colors.navigation.hover) {
-            colors.navigation.hover = {} as any;
-          }
-          (colors.navigation.hover as any).dark = dark.navigation.hoverColor;
-        }
-      }
-
-      if (dark.header?.background) {
-        if (!colors.header) colors.header = {} as any;
-        if (!colors.header.background) {
-          colors.header.background = {} as any;
-        }
-        (colors.header.background as any).dark = dark.header.background;
-      }
-    }
-
-    return processed;
   }
 
   /**
@@ -501,13 +188,11 @@ export class ConfigLoader {
 
     // Check for logo in different formats (SVG preferred, then PNG, then JPG)
     const logoFormats = ['svg', 'png', 'jpg', 'jpeg'];
-    let logoFound = false;
 
     for (const format of logoFormats) {
       const logoPath = path.join(this.configDir, `logo.${format}`);
       if (fs.existsSync(logoPath)) {
         assets.logo = `logo.${format}`;
-        logoFound = true;
         break;  // Use the first format found
       }
     }
@@ -562,35 +247,5 @@ export class ConfigLoader {
         this.validateNavigationItems(item.children);
       }
     }
-  }
-
-  /**
-   * Deep merge two objects (user config overrides defaults)
-   */
-  private deepMerge(target: any, source: any): any {
-    const output = { ...target };
-
-    if (this.isObject(target) && this.isObject(source)) {
-      Object.keys(source).forEach((key) => {
-        if (this.isObject(source[key])) {
-          if (!(key in target)) {
-            output[key] = source[key];
-          } else {
-            output[key] = this.deepMerge(target[key], source[key]);
-          }
-        } else {
-          output[key] = source[key];
-        }
-      });
-    }
-
-    return output;
-  }
-
-  /**
-   * Check if value is a plain object
-   */
-  private isObject(item: any): boolean {
-    return item && typeof item === 'object' && !Array.isArray(item);
   }
 }

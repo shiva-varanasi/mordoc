@@ -8,11 +8,16 @@ import { useConfig } from '../client/contexts/ConfigContext';
 import { useSearch } from '../client/hooks/useSearch';
 import { useTheme } from '../client/contexts/ThemeContext';
 
+interface HeaderProps {
+  onMobileMenuToggle?: () => void;
+  showMobileMenu?: boolean;
+}
+
 /**
  * Site header component
  * Two-row layout: top row with logo/search/actions, optional bottom row with navigation
  */
-export function Header() {
+export function Header({ onMobileMenuToggle, showMobileMenu = false }: HeaderProps) {
   const { config } = useConfig();
   const { openSearch } = useSearch();
   const { theme, toggleTheme } = useTheme();
@@ -31,6 +36,31 @@ export function Header() {
       {/* Top row: Logo, Search, and Actions */}
       <div className="header-top">
         <div className="header-container">
+          {/* Mobile menu button (hamburger) - only visible on mobile */}
+          {showMobileMenu && onMobileMenuToggle && (
+            <button
+              className="mobile-menu-button"
+              onClick={onMobileMenuToggle}
+              aria-label="Open navigation menu"
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <line x1="4" x2="20" y1="12" y2="12"></line>
+                <line x1="4" x2="20" y1="6" y2="6"></line>
+                <line x1="4" x2="20" y1="18" y2="18"></line>
+              </svg>
+            </button>
+          )}
+
           {/* Logo and site title */}
           <div className="header-brand">
             <Link to="/" className="header-logo-link">
@@ -46,7 +76,7 @@ export function Header() {
             </Link>
           </div>
 
-          {/* Centered search button */}
+          {/* Centered search button (full on desktop, icon-only on mobile) */}
           <div className="header-search">
             <button
               className="header-search-button"

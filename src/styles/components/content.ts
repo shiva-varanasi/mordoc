@@ -207,8 +207,13 @@ ${mediaQuery('lg', `  .content-toc {
     max-width: 720px;
   }`)}
 
+${mediaQuery('lg', `  .content-wrapper {
+    gap: ${this.globalVars.spacing2xl};
+  }`)}
+
 ${mediaQuery('md', `  .content-wrapper {
     flex-direction: column;
+    gap: ${this.globalVars.spacingXl};
   }
 
   .content-article {
@@ -224,7 +229,11 @@ ${mediaQuery('md', `  .content-wrapper {
     font-size: ${this.globalVars.fontSize3xl};
   }`)}
 
-${mediaQuery('sm', `  .content-title {
+${mediaQuery('sm', `  .content-toc {
+    display: none;
+  }
+
+  .content-title {
     font-size: ${this.globalVars.fontSize2xl};
   }
 

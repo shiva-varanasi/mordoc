@@ -15,6 +15,7 @@ import { LayoutStyleGenerator } from '../styles/components/layout';
 import { TypographyStyleGenerator } from '../styles/components/typography';
 import { HeaderStyleGenerator } from '../styles/components/header';
 import { SideNavStyleGenerator } from '../styles/components/sidenav';
+import { MobileMenuStyleGenerator } from '../styles/components/mobilemenu';
 import { ContentStyleGenerator } from '../styles/components/content';
 import { HeadingStyleGenerator } from '../styles/components/heading';
 import { CodeBlockStyleGenerator } from '../styles/components/codeblock';
@@ -86,6 +87,7 @@ export class StyleCompiler {
     const typographyGen = new TypographyStyleGenerator(globalVars);
     const headerGen = new HeaderStyleGenerator(globalVars);
     const sidenavGen = new SideNavStyleGenerator(globalVars);
+    const mobilemenuGen = new MobileMenuStyleGenerator(globalVars);
     const contentGen = new ContentStyleGenerator(globalVars);
     const headingGen = new HeadingStyleGenerator(globalVars);
     const codeblockGen = new CodeBlockStyleGenerator(globalVars);
@@ -103,6 +105,7 @@ export class StyleCompiler {
       typographyGen.generate(userOverrides.components['typography']),
       headerGen.generate(userOverrides.components['header']),
       sidenavGen.generate(userOverrides.components['sidenav']),
+      mobilemenuGen.generate(),
       contentGen.generate(userOverrides.components['content']),
       headingGen.generate(userOverrides.components['heading']),
       codeblockGen.generate(userOverrides.components['codeblock']),

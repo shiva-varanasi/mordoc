@@ -65,18 +65,12 @@ ${mediaQuery('md', `  .layout-sidebar {
     padding: ${this.globalVars.spacingMd};
   }`)}
 
-${mediaQuery('sm', `  .layout-container {
-    flex-direction: column;
-  }
-
-  .layout-sidebar {
-    width: 100%;
-    height: auto;
-    max-height: 300px;
+${mediaQuery('sm', `  .layout-sidebar {
+    display: none;
   }
 
   .layout-main-inner {
-    padding: ${this.globalVars.spacingSm};
+    padding: ${this.globalVars.spacingMd} ${this.globalVars.spacingSm};
   }`)}`;
   }
 }

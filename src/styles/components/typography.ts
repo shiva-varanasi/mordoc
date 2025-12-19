@@ -9,11 +9,21 @@ import { mergeOverrides, darkMode, mediaQuery } from '../utils';
 interface TypographyVariables {
   // Customizable
   headingColor: string;
+  headingColorDark: string;
   linkColor: string;
+  linkColorDark: string;
   linkHoverColor: string;
+  linkHoverColorDark: string;
   codeBackground: string;
+  codeBackgroundDark: string;
   blockquoteColor: string;
+  blockquoteColorDark: string;
   blockquoteBorder: string;
+  blockquoteBorderDark: string;
+  tableHeaderBackground: string;
+  tableHeaderBackgroundDark: string;
+  tableBorder: string;
+  tableBorderDark: string;
 }
 
 export class TypographyStyleGenerator {
@@ -22,17 +32,29 @@ export class TypographyStyleGenerator {
   generate(userOverrides?: Record<string, string>): string {
     const defaults: TypographyVariables = {
       headingColor: this.globalVars.textPrimaryLight,
+      headingColorDark: this.globalVars.textPrimaryDark,
       linkColor: this.globalVars.linkColorLight,
+      linkColorDark: this.globalVars.linkColorDark,
       linkHoverColor: '#000000',
+      linkHoverColorDark: '#ffffff',
       codeBackground: this.globalVars.surfaceColorLight,
+      codeBackgroundDark: this.globalVars.surfaceColorDark,
       blockquoteColor: this.globalVars.textSecondaryLight,
+      blockquoteColorDark: this.globalVars.textSecondaryDark,
       blockquoteBorder: this.globalVars.borderColorLight,
+      blockquoteBorderDark: this.globalVars.borderColorDark,
+      tableHeaderBackground: this.globalVars.surfaceColorLight,
+      tableHeaderBackgroundDark: this.globalVars.surfaceColorDark,
+      tableBorder: this.globalVars.borderColorLight,
+      tableBorderDark: this.globalVars.borderColorDark,
     };
     
     const vars = mergeOverrides(
       defaults,
       userOverrides,
-      ['headingColor', 'linkColor', 'linkHoverColor', 'codeBackground', 'blockquoteColor', 'blockquoteBorder']
+      ['headingColor', 'headingColorDark', 'linkColor', 'linkColorDark', 'linkHoverColor', 'linkHoverColorDark', 
+       'codeBackground', 'codeBackgroundDark', 'blockquoteColor', 'blockquoteColorDark', 'blockquoteBorder', 
+       'blockquoteBorderDark', 'tableHeaderBackground', 'tableHeaderBackgroundDark', 'tableBorder', 'tableBorderDark']
     );
     
     return `/* Typography */
@@ -113,6 +135,18 @@ a:hover {
   color: ${vars.linkHoverColor};
 }
 
+${darkMode(`  h1, h2, h3, h4, h5, h6 {
+    color: ${vars.headingColorDark};
+  }
+
+  a {
+    color: ${vars.linkColorDark};
+  }
+
+  a:hover {
+    color: ${vars.linkHoverColorDark};
+  }`)}
+
 code, pre {
   font-family: ${this.globalVars.fontFamilyMono};
   font-size: ${this.globalVars.fontSizeSm};
@@ -124,6 +158,10 @@ code {
   border-radius: ${this.globalVars.borderRadiusSm};
 }
 
+${darkMode(`  code {
+    background-color: ${vars.codeBackgroundDark};
+  }`)}
+
 pre {
   background-color: ${vars.codeBackground};
   padding: ${this.globalVars.spacingMd};
@@ -131,6 +169,11 @@ pre {
   overflow-x: auto;
   margin-bottom: ${this.globalVars.spacingMd};
 }
+
+${darkMode(`  pre {
+    background-color: ${vars.codeBackgroundDark};
+  }`)}
+
 
 pre code {
   background-color: transparent;
@@ -185,11 +228,20 @@ blockquote {
   color: ${vars.blockquoteColor};
 }
 
+${darkMode(`  blockquote {
+    border-left-color: ${vars.blockquoteBorderDark};
+    color: ${vars.blockquoteColorDark};
+  }`)}
+
 hr {
   border: none;
-  border-top: 1px solid ${this.globalVars.borderColorLight};
+  border-top: 1px solid ${vars.tableBorder};
   margin: ${this.globalVars.spacingLg} 0;
 }
+
+${darkMode(`  hr {
+    border-top-color: ${vars.tableBorderDark};
+  }`)}
 
 table {
   width: 100%;
@@ -200,13 +252,22 @@ table {
 th, td {
   text-align: left;
   padding: ${this.globalVars.spacingSm} ${this.globalVars.spacingMd};
-  border-bottom: 1px solid ${this.globalVars.borderColorLight};
+  border-bottom: 1px solid ${vars.tableBorder};
 }
+
+${darkMode(`  th, td {
+    border-bottom-color: ${vars.tableBorderDark};
+  }`)}
 
 th {
   font-weight: ${this.globalVars.fontWeightSemibold};
-  background-color: ${this.globalVars.surfaceColorLight};
+  background-color: ${vars.tableHeaderBackground};
 }
+
+${darkMode(`  th {
+    background-color: ${vars.tableHeaderBackgroundDark};
+  }`)}
+
 
 img {
   max-width: 100%;

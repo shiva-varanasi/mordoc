@@ -113,7 +113,7 @@ export function ContentPage() {
   
             {/* Site footer info */}
             <div className="content-footer-info">
-              <p className="footer-text">
+              <p className="content-footer-text">
                 © {new Date().getFullYear()} {config.metadata.title}
               </p>
               

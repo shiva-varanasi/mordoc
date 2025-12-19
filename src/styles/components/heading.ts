@@ -4,16 +4,22 @@
  */
 
 import { GlobalVariables } from '../types';
-import { mergeOverrides, mediaQuery } from '../utils';
+import { mergeOverrides, darkMode, mediaQuery } from '../utils';
 
 interface HeadingVariables {
   // Customizable
   anchorLinkColor: string;
+  anchorLinkColorDark: string;
   anchorHoverColor: string;
+  anchorHoverColorDark: string;
   anchorHoverBackground: string;
+  anchorHoverBackgroundDark: string;
   anchorOutlineColor: string;
+  anchorOutlineColorDark: string;
   tooltipBackground: string;
+  tooltipBackgroundDark: string;
   tooltipTextColor: string;
+  tooltipTextColorDark: string;
 }
 
 export class HeadingStyleGenerator {
@@ -22,19 +28,26 @@ export class HeadingStyleGenerator {
   generate(userOverrides?: Record<string, string>): string {
     const defaults: HeadingVariables = {
       anchorLinkColor: this.globalVars.textSecondaryLight,
+      anchorLinkColorDark: this.globalVars.textSecondaryDark,
       anchorHoverColor: this.globalVars.linkColorLight,
+      anchorHoverColorDark: this.globalVars.linkColorDark,
       anchorHoverBackground: this.globalVars.surfaceColorLight,
+      anchorHoverBackgroundDark: this.globalVars.surfaceColorDark,
       anchorOutlineColor: this.globalVars.linkColorLight,
+      anchorOutlineColorDark: this.globalVars.linkColorDark,
       tooltipBackground: this.globalVars.textSecondaryLight,
+      tooltipBackgroundDark: this.globalVars.textSecondaryDark,
       tooltipTextColor: this.globalVars.backgroundColorLight,
+      tooltipTextColorDark: this.globalVars.backgroundColorDark,
     };
     
     const vars = mergeOverrides(
       defaults,
       userOverrides,
       [
-        'anchorLinkColor', 'anchorHoverColor', 'anchorHoverBackground',
-        'anchorOutlineColor', 'tooltipBackground', 'tooltipTextColor'
+        'anchorLinkColor', 'anchorLinkColorDark', 'anchorHoverColor', 'anchorHoverColorDark',
+        'anchorHoverBackground', 'anchorHoverBackgroundDark', 'anchorOutlineColor', 'anchorOutlineColorDark',
+        'tooltipBackground', 'tooltipBackgroundDark', 'tooltipTextColor', 'tooltipTextColorDark'
       ]
     );
     
@@ -60,10 +73,19 @@ export class HeadingStyleGenerator {
   border-radius: ${this.globalVars.borderRadiusSm};
 }
 
+${darkMode(`  .heading-anchor-link {
+    color: ${vars.anchorLinkColorDark};
+  }`)}
+
 .heading-anchor-link:hover {
   color: ${vars.anchorHoverColor};
   background-color: ${vars.anchorHoverBackground};
 }
+
+${darkMode(`  .heading-anchor-link:hover {
+    color: ${vars.anchorHoverColorDark};
+    background-color: ${vars.anchorHoverBackgroundDark};
+  }`)}
 
 .heading-with-anchor:hover .heading-anchor-link {
   opacity: 1;
@@ -74,6 +96,10 @@ export class HeadingStyleGenerator {
   outline: 2px solid ${vars.anchorOutlineColor};
   outline-offset: 2px;
 }
+
+${darkMode(`  .heading-anchor-link:focus-visible {
+    outline-color: ${vars.anchorOutlineColorDark};
+  }`)}
 
 .heading-copied-tooltip {
   position: absolute;
@@ -91,6 +117,12 @@ export class HeadingStyleGenerator {
   font-family: ${this.globalVars.fontFamilyBase};
   font-weight: ${this.globalVars.fontWeightNormal};
 }
+
+${darkMode(`  .heading-copied-tooltip {
+    background-color: ${vars.tooltipBackgroundDark};
+    color: ${vars.tooltipTextColorDark};
+  }`)}
+
 
 @media (hover: none) and (pointer: coarse) {
   .heading-anchor-link {

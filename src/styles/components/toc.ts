@@ -4,15 +4,20 @@
  */
 
 import { GlobalVariables } from '../types';
-import { mergeOverrides, mediaQuery } from '../utils';
+import { mergeOverrides, darkMode, mediaQuery } from '../utils';
 
 interface TOCVariables {
   // Customizable
   tocTitleColor: string;
+  tocTitleColorDark: string;
   tocLinkColor: string;
+  tocLinkColorDark: string;
   tocLinkHoverColor: string;
+  tocLinkHoverColorDark: string;
   tocLinkActiveColor: string;
+  tocLinkActiveColorDark: string;
   tocBorderColor: string;
+  tocBorderColorDark: string;
 }
 
 export class TOCStyleGenerator {
@@ -21,16 +26,22 @@ export class TOCStyleGenerator {
   generate(userOverrides?: Record<string, string>): string {
     const defaults: TOCVariables = {
       tocTitleColor: this.globalVars.textSecondaryLight,
+      tocTitleColorDark: this.globalVars.textSecondaryDark,
       tocLinkColor: this.globalVars.textSecondaryLight,
+      tocLinkColorDark: this.globalVars.textSecondaryDark,
       tocLinkHoverColor: this.globalVars.textPrimaryLight,
+      tocLinkHoverColorDark: this.globalVars.textPrimaryDark,
       tocLinkActiveColor: this.globalVars.navActiveColorLight,
+      tocLinkActiveColorDark: this.globalVars.navActiveColorDark,
       tocBorderColor: this.globalVars.borderColorLight,
+      tocBorderColorDark: this.globalVars.borderColorDark,
     };
     
     const vars = mergeOverrides(
       defaults,
       userOverrides,
-      ['tocTitleColor', 'tocLinkColor', 'tocLinkHoverColor', 'tocLinkActiveColor', 'tocBorderColor']
+      ['tocTitleColor', 'tocTitleColorDark', 'tocLinkColor', 'tocLinkColorDark', 'tocLinkHoverColor', 
+       'tocLinkHoverColorDark', 'tocLinkActiveColor', 'tocLinkActiveColorDark', 'tocBorderColor', 'tocBorderColorDark']
     );
     
     return `/* Table of Contents */
@@ -43,6 +54,10 @@ export class TOCStyleGenerator {
   border-left: 1px solid ${vars.tocBorderColor};
 }
 
+${darkMode(`  .toc {
+    border-left-color: ${vars.tocBorderColorDark};
+  }`)}
+
 .toc-title {
   font-size: ${this.globalVars.fontSizeXs};
   font-weight: ${this.globalVars.fontWeightSemibold};
@@ -51,6 +66,10 @@ export class TOCStyleGenerator {
   letter-spacing: 0.05em;
   color: ${vars.tocTitleColor};
 }
+
+${darkMode(`  .toc-title {
+    color: ${vars.tocTitleColorDark};
+  }`)}
 
 .toc-list {
   list-style: none;
@@ -72,14 +91,27 @@ export class TOCStyleGenerator {
   line-height: 1.6;
 }
 
+${darkMode(`  .toc-link {
+    color: ${vars.tocLinkColorDark};
+  }`)}
+
 .toc-link:hover {
   color: ${vars.tocLinkHoverColor};
 }
+
+${darkMode(`  .toc-link:hover {
+    color: ${vars.tocLinkHoverColorDark};
+  }`)}
 
 .toc-link.active {
   color: ${vars.tocLinkActiveColor};
   font-weight: ${this.globalVars.fontWeightMedium};
 }
+
+${darkMode(`  .toc-link.active {
+    color: ${vars.tocLinkActiveColorDark};
+  }`)}
+
 
 .toc-sublist {
   list-style: none;
@@ -96,6 +128,10 @@ ${mediaQuery('md', `  .toc {
     border-bottom: 1px solid ${vars.tocBorderColor};
     margin-bottom: ${this.globalVars.spacingLg};
   }
+
+  ${darkMode(`    .toc {
+      border-bottom-color: ${vars.tocBorderColorDark};
+    }`)}
 
   .toc-title {
     font-size: ${this.globalVars.fontSizeBase};

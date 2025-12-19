@@ -4,21 +4,33 @@
  */
 
 import { GlobalVariables } from '../types';
-import { mergeOverrides, mediaQuery } from '../utils';
+import { mergeOverrides, darkMode, mediaQuery } from '../utils';
 
 interface SearchModalVariables {
   // Customizable
   backdropBackground: string;
+  backdropBackgroundDark: string;
   modalBackground: string;
+  modalBackgroundDark: string;
   modalBorderColor: string;
+  modalBorderColorDark: string;
   modalBorderRadius: string;
   inputColor: string;
+  inputColorDark: string;
   inputPlaceholderColor: string;
+  inputPlaceholderColorDark: string;
+  resultBackground: string;
+  resultBackgroundDark: string;
   resultHoverBackground: string;
+  resultHoverBackgroundDark: string;
   resultSelectedBorderColor: string;
+  resultSelectedBorderColorDark: string;
   resultTitleColor: string;
+  resultTitleColorDark: string;
   resultExcerptColor: string;
+  resultExcerptColorDark: string;
   resultUrlColor: string;
+  resultUrlColorDark: string;
 }
 
 export class SearchModalStyleGenerator {
@@ -27,25 +39,40 @@ export class SearchModalStyleGenerator {
   generate(userOverrides?: Record<string, string>): string {
     const defaults: SearchModalVariables = {
       backdropBackground: 'rgba(0, 0, 0, 0.6)',
+      backdropBackgroundDark: 'rgba(0, 0, 0, 0.8)',
       modalBackground: this.globalVars.backgroundColorLight,
+      modalBackgroundDark: this.globalVars.backgroundColorDark,
       modalBorderColor: this.globalVars.borderColorLight,
+      modalBorderColorDark: this.globalVars.borderColorDark,
       modalBorderRadius: this.globalVars.borderRadiusLg,
       inputColor: this.globalVars.textPrimaryLight,
+      inputColorDark: this.globalVars.textPrimaryDark,
       inputPlaceholderColor: this.globalVars.textSecondaryLight,
+      inputPlaceholderColorDark: this.globalVars.textSecondaryDark,
+      resultBackground: this.globalVars.surfaceColorLight,
+      resultBackgroundDark: this.globalVars.surfaceColorDark,
       resultHoverBackground: this.globalVars.backgroundColorLight,
+      resultHoverBackgroundDark: this.globalVars.backgroundColorDark,
       resultSelectedBorderColor: this.globalVars.primaryColorLight,
+      resultSelectedBorderColorDark: this.globalVars.primaryColorDark,
       resultTitleColor: this.globalVars.textPrimaryLight,
+      resultTitleColorDark: this.globalVars.textPrimaryDark,
       resultExcerptColor: this.globalVars.textSecondaryLight,
+      resultExcerptColorDark: this.globalVars.textSecondaryDark,
       resultUrlColor: this.globalVars.textSecondaryLight,
+      resultUrlColorDark: this.globalVars.textSecondaryDark,
     };
     
     const vars = mergeOverrides(
       defaults,
       userOverrides,
       [
-        'backdropBackground', 'modalBackground', 'modalBorderColor', 'modalBorderRadius',
-        'inputColor', 'inputPlaceholderColor', 'resultHoverBackground',
-        'resultSelectedBorderColor', 'resultTitleColor', 'resultExcerptColor', 'resultUrlColor'
+        'backdropBackground', 'backdropBackgroundDark', 'modalBackground', 'modalBackgroundDark',
+        'modalBorderColor', 'modalBorderColorDark', 'modalBorderRadius', 'inputColor', 'inputColorDark',
+        'inputPlaceholderColor', 'inputPlaceholderColorDark', 'resultBackground', 'resultBackgroundDark',
+        'resultHoverBackground', 'resultHoverBackgroundDark', 'resultSelectedBorderColor', 'resultSelectedBorderColorDark',
+        'resultTitleColor', 'resultTitleColorDark', 'resultExcerptColor', 'resultExcerptColorDark',
+        'resultUrlColor', 'resultUrlColorDark'
       ]
     );
     
@@ -68,6 +95,11 @@ export class SearchModalStyleGenerator {
   padding-bottom: ${this.globalVars.spacingXl};
   animation: fadeIn 0.15s ease-out;
 }
+
+${darkMode(`  .search-modal-backdrop {
+    background: ${vars.backdropBackgroundDark};
+  }`)}
+
 
 @keyframes fadeIn {
   from {
@@ -103,6 +135,11 @@ export class SearchModalStyleGenerator {
   border: 1px solid ${vars.modalBorderColor};
 }
 
+${darkMode(`  .search-modal {
+    background: ${vars.modalBackgroundDark};
+    border-color: ${vars.modalBorderColorDark};
+  }`)}
+
 .search-input-container {
   display: flex;
   align-items: center;
@@ -112,12 +149,20 @@ export class SearchModalStyleGenerator {
   flex-shrink: 0;
 }
 
+${darkMode(`  .search-input-container {
+    border-bottom-color: ${vars.modalBorderColorDark};
+  }`)}
+
 .search-input-icon {
   width: 20px;
   height: 20px;
   color: ${vars.inputPlaceholderColor};
   flex-shrink: 0;
 }
+
+${darkMode(`  .search-input-icon {
+    color: ${vars.inputPlaceholderColorDark};
+  }`)}
 
 .search-input {
   flex: 1;
@@ -128,10 +173,18 @@ export class SearchModalStyleGenerator {
   outline: none;
 }
 
+${darkMode(`  .search-input {
+    color: ${vars.inputColorDark};
+  }`)}
+
 .search-input::placeholder {
   color: ${vars.inputPlaceholderColor};
   opacity: 0.6;
 }
+
+${darkMode(`  .search-input::placeholder {
+    color: ${vars.inputPlaceholderColorDark};
+  }`)}
 
 .search-close-button {
   background: none;
@@ -146,10 +199,20 @@ export class SearchModalStyleGenerator {
   justify-content: center;
 }
 
+${darkMode(`  .search-close-button {
+    color: ${vars.inputPlaceholderColorDark};
+  }`)}
+
 .search-close-button:hover {
-  background: ${this.globalVars.surfaceColorLight};
+  background: ${vars.resultBackground};
   color: ${vars.inputColor};
 }
+
+${darkMode(`  .search-close-button:hover {
+    background: ${vars.resultBackgroundDark};
+    color: ${vars.inputColorDark};
+  }`)}
+
 
 .search-close-icon {
   font-size: ${this.globalVars.fontSizeXl};
@@ -176,7 +239,7 @@ export class SearchModalStyleGenerator {
 .search-result-link {
   display: block;
   padding: ${this.globalVars.spacingMd};
-  background: ${this.globalVars.surfaceColorLight};
+  background: ${vars.resultBackground};
   border-radius: ${this.globalVars.borderRadiusMd};
   text-decoration: none;
   border: 1px solid transparent;
@@ -186,11 +249,20 @@ export class SearchModalStyleGenerator {
   cursor: pointer;
 }
 
+${darkMode(`  .search-result-link {
+    background: ${vars.resultBackgroundDark};
+  }`)}
+
 .search-result-link.selected {
   border-color: ${vars.resultSelectedBorderColor};
   background: ${vars.resultHoverBackground};
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
+
+${darkMode(`  .search-result-link.selected {
+    border-color: ${vars.resultSelectedBorderColorDark};
+    background: ${vars.resultHoverBackgroundDark};
+  }`)}
 
 .search-result-link:hover,
 .search-result-link:focus {
@@ -200,12 +272,22 @@ export class SearchModalStyleGenerator {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
+${darkMode(`  .search-result-link:hover,
+  .search-result-link:focus {
+    border-color: ${vars.resultSelectedBorderColorDark};
+    background: ${vars.resultHoverBackgroundDark};
+  }`)}
+
 .search-result-title {
   font-weight: ${this.globalVars.fontWeightMedium};
   color: ${vars.resultTitleColor};
   margin-bottom: ${this.globalVars.spacingXs};
   font-size: ${this.globalVars.fontSizeBase};
 }
+
+${darkMode(`  .search-result-title {
+    color: ${vars.resultTitleColorDark};
+  }`)}
 
 .search-result-excerpt {
   font-size: ${this.globalVars.fontSizeSm};
@@ -218,11 +300,19 @@ export class SearchModalStyleGenerator {
   overflow: hidden;
 }
 
+${darkMode(`  .search-result-excerpt {
+    color: ${vars.resultExcerptColorDark};
+  }`)}
+
 .search-result-url {
   font-size: ${this.globalVars.fontSizeSm};
   color: ${vars.resultUrlColor};
   opacity: 0.7;
 }
+
+${darkMode(`  .search-result-url {
+    color: ${vars.resultUrlColorDark};
+  }`)}
 
 .search-loading,
 .search-empty,
@@ -232,6 +322,14 @@ export class SearchModalStyleGenerator {
   padding: ${this.globalVars.spacingMd};
   color: ${vars.resultExcerptColor};
 }
+
+${darkMode(`  .search-loading,
+  .search-empty,
+  .search-no-results,
+  .search-notice {
+    color: ${vars.resultExcerptColorDark};
+  }`)}
+
 
 .search-empty-text,
 .search-help-text,
@@ -249,9 +347,13 @@ export class SearchModalStyleGenerator {
   color: ${vars.resultExcerptColor};
 }
 
+${darkMode(`  .search-shortcuts {
+    color: ${vars.resultExcerptColorDark};
+  }`)}
+
 .search-shortcuts kbd {
   padding: 0.25rem 0.5rem;
-  background: ${this.globalVars.surfaceColorLight};
+  background: ${vars.resultBackground};
   border: 1px solid ${vars.modalBorderColor};
   border-radius: ${this.globalVars.borderRadiusSm};
   font-family: ${this.globalVars.fontFamilyMono};
@@ -259,10 +361,20 @@ export class SearchModalStyleGenerator {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
+${darkMode(`  .search-shortcuts kbd {
+    background: ${vars.resultBackgroundDark};
+    border-color: ${vars.modalBorderColorDark};
+  }`)}
+
 .search-separator {
   color: ${vars.resultExcerptColor};
   opacity: 0.5;
 }
+
+${darkMode(`  .search-separator {
+    color: ${vars.resultExcerptColorDark};
+  }`)}
+
 
 ${mediaQuery('md', `  .search-modal-backdrop {
     padding-top: 5vh;

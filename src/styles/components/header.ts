@@ -133,10 +133,21 @@ ${darkMode(`  .site-header {
   min-width: 300px;
 }
 
+${darkMode(`  .header-search-button {
+    background: ${this.globalVars.surfaceColorDark};
+    border-color: ${this.globalVars.borderColorDark};
+    color: ${this.globalVars.textSecondaryDark};
+  }`)}
+
 .header-search-button:hover {
   border-color: ${this.globalVars.primaryColorLight};
   background: ${this.globalVars.backgroundColorLight};
 }
+
+${darkMode(`  .header-search-button:hover {
+    border-color: ${this.globalVars.primaryColorDark};
+    background: ${this.globalVars.backgroundColorDark};
+  }`)}
 
 .search-icon {
   width: 16px;
@@ -144,6 +155,10 @@ ${darkMode(`  .site-header {
   flex-shrink: 0;
   color: ${this.globalVars.textSecondaryLight};
 }
+
+${darkMode(`  .search-icon {
+    color: ${this.globalVars.textSecondaryDark};
+  }`)}
 
 .search-text {
   flex: 1;
@@ -160,6 +175,12 @@ ${darkMode(`  .site-header {
   color: ${this.globalVars.textSecondaryLight};
   font-weight: ${this.globalVars.fontWeightMedium};
 }
+
+${darkMode(`  .search-shortcut {
+    background: ${this.globalVars.surfaceColorDark};
+    color: ${this.globalVars.textSecondaryDark};
+  }`)}
+
 
 .header-actions {
   display: flex;

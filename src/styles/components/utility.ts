@@ -4,6 +4,7 @@
  */
 
 import { GlobalVariables } from '../types';
+import { darkMode } from '../utils';
 
 export class UtilityStyleGenerator {
   constructor(private globalVars: GlobalVariables) {}
@@ -16,6 +17,10 @@ export class UtilityStyleGenerator {
   color: ${this.globalVars.textSecondaryLight};
 }
 
+${darkMode(`  .loading {
+    color: ${this.globalVars.textSecondaryDark};
+  }`)}
+
 .error {
   color: ${this.globalVars.errorColorLight};
   padding: ${this.globalVars.spacingMd};
@@ -23,6 +28,13 @@ export class UtilityStyleGenerator {
   border-radius: ${this.globalVars.borderRadiusMd};
   border-left: 4px solid ${this.globalVars.errorColorLight};
 }
+
+${darkMode(`  .error {
+    color: ${this.globalVars.errorColorDark};
+    background: ${this.globalVars.surfaceColorDark};
+    border-left-color: ${this.globalVars.errorColorDark};
+  }`)}
+
 
 .table-wrapper {
   overflow-x: auto;
@@ -89,10 +101,20 @@ export class UtilityStyleGenerator {
   transition: all 0.2s ease;
 }
 
+${darkMode(`  .theme-toggle {
+    background: ${this.globalVars.surfaceColorDark};
+    border-color: ${this.globalVars.borderColorDark};
+  }`)}
+
 .theme-toggle:hover {
   background: ${this.globalVars.backgroundColorLight};
   border-color: ${this.globalVars.primaryColorLight};
 }
+
+${darkMode(`  .theme-toggle:hover {
+    background: ${this.globalVars.backgroundColorDark};
+    border-color: ${this.globalVars.primaryColorDark};
+  }`)}
 
 .theme-toggle-icon {
   display: flex;
@@ -106,13 +128,25 @@ export class UtilityStyleGenerator {
   position: relative;
 }
 
+${darkMode(`  .theme-toggle-icon {
+    color: ${this.globalVars.textSecondaryDark};
+  }`)}
+
 .theme-toggle:hover .theme-toggle-icon {
   color: ${this.globalVars.textPrimaryLight};
 }
 
+${darkMode(`  .theme-toggle:hover .theme-toggle-icon {
+    color: ${this.globalVars.textPrimaryDark};
+  }`)}
+
 .theme-toggle-icon.active {
   color: ${this.globalVars.textPrimaryLight};
 }
+
+${darkMode(`  .theme-toggle-icon.active {
+    color: ${this.globalVars.textPrimaryDark};
+  }`)}
 
 .theme-toggle:hover .theme-toggle-icon.active {
   opacity: 0.9;
@@ -129,6 +163,11 @@ export class UtilityStyleGenerator {
 .theme-toggle-icon.active svg {
   fill: ${this.globalVars.textPrimaryLight};
 }
+
+${darkMode(`  .theme-toggle-icon.active svg {
+    fill: ${this.globalVars.textPrimaryDark};
+  }`)}
+
 
 @media (max-width: 480px) {
   .theme-toggle {
@@ -153,6 +192,10 @@ export class UtilityStyleGenerator {
   border-top: 1px solid ${this.globalVars.borderColorLight};
 }
 
+${darkMode(`  .page-navigation {
+    border-top-color: ${this.globalVars.borderColorDark};
+  }`)}
+
 .page-nav-container {
   display: flex;
   justify-content: space-between;
@@ -172,10 +215,19 @@ export class UtilityStyleGenerator {
   max-width: 45%;
 }
 
+${darkMode(`  .page-nav-link {
+    border-color: ${this.globalVars.borderColorDark};
+  }`)}
+
 .page-nav-link:hover {
   background: ${this.globalVars.surfaceColorLight};
   border-color: ${this.globalVars.primaryColorLight};
 }
+
+${darkMode(`  .page-nav-link:hover {
+    background: ${this.globalVars.surfaceColorDark};
+    border-color: ${this.globalVars.primaryColorDark};
+  }`)}
 
 .page-nav-prev {
   text-align: left;
@@ -190,10 +242,19 @@ export class UtilityStyleGenerator {
   color: ${this.globalVars.textSecondaryLight};
 }
 
+${darkMode(`  .page-nav-direction {
+    color: ${this.globalVars.textSecondaryDark};
+  }`)}
+
 .page-nav-label {
   font-weight: ${this.globalVars.fontWeightMedium};
   color: ${this.globalVars.textPrimaryLight};
 }
+
+${darkMode(`  .page-nav-label {
+    color: ${this.globalVars.textPrimaryDark};
+  }`)}
+
 
 .page-nav-spacer {
   flex: 1;

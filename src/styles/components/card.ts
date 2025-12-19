@@ -4,7 +4,7 @@
  */
 
 import { GlobalVariables } from '../types';
-import { mergeOverrides, mediaQuery } from '../utils';
+import { mergeOverrides, darkMode, mediaQuery } from '../utils';
 
 interface CardVariables {
   // Customizable only
@@ -176,8 +176,7 @@ export class CardStyleGenerator {
   margin-bottom: 0.5rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  .card {
+${darkMode(`  .card {
     background-color: ${vars.cardBackgroundColorDark};
     border-color: ${vars.cardBorderColorDark};
   }
@@ -209,7 +208,6 @@ export class CardStyleGenerator {
   
   .card-link:hover .card-arrow {
     color: ${vars.cardTitleColorDark};
-  }
-}`;
+  }`)}`;
   }
 }

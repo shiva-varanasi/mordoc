@@ -10,7 +10,7 @@ interface TypographyVariables {
   // Customizable
   headingColor: string;
   linkColor: string;
-  linkHoverOpacity: string;
+  linkHoverColor: string;
   codeBackground: string;
   blockquoteColor: string;
   blockquoteBorder: string;
@@ -23,7 +23,7 @@ export class TypographyStyleGenerator {
     const defaults: TypographyVariables = {
       headingColor: this.globalVars.textPrimaryLight,
       linkColor: this.globalVars.linkColorLight,
-      linkHoverOpacity: '0.8',
+      linkHoverColor: '#000000',
       codeBackground: this.globalVars.surfaceColorLight,
       blockquoteColor: this.globalVars.textSecondaryLight,
       blockquoteBorder: this.globalVars.borderColorLight,
@@ -32,7 +32,7 @@ export class TypographyStyleGenerator {
     const vars = mergeOverrides(
       defaults,
       userOverrides,
-      ['headingColor', 'linkColor', 'linkHoverOpacity', 'codeBackground', 'blockquoteColor', 'blockquoteBorder']
+      ['headingColor', 'linkColor', 'linkHoverColor', 'codeBackground', 'blockquoteColor', 'blockquoteBorder']
     );
     
     return `/* Typography */
@@ -106,11 +106,11 @@ p {
 a {
   color: ${vars.linkColor};
   text-decoration: underline;
-  transition: opacity 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 a:hover {
-  opacity: ${vars.linkHoverOpacity};
+  color: ${vars.linkHoverColor};
 }
 
 code, pre {
@@ -215,11 +215,11 @@ img {
   margin: ${this.globalVars.spacingMd} 0;
   border-radius: ${this.globalVars.borderRadiusMd};
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 img:hover {
-  opacity: 0.9;
+  transform: scale(1.02);
 }`;
   }
 }

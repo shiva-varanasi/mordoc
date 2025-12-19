@@ -11,20 +11,19 @@ export function Card({ title, href, icon, children }: CardProps) {
   const ArrowIcon = () => (
     <svg
       className="card-arrow"
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path
-        d="M6 3L11 8L6 13"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
     </svg>
   );
 
@@ -38,15 +37,24 @@ export function Card({ title, href, icon, children }: CardProps) {
             className="card-icon-img"
             loading="lazy"
           />
+          <div className="card-content">
+            <h3 className="card-title">
+              <span>{title}</span>
+              {href && <ArrowIcon />}
+            </h3>
+            <div className="card-description">{children}</div>
+          </div>
         </div>
       )}
-      <div className="card-content">
-        <h3 className="card-title">
-          <span>{title}</span>
-          {href && <ArrowIcon />}
-        </h3>
-        <div className="card-description">{children}</div>
-      </div>
+      {!icon && (
+        <div className="card-content">
+          <h3 className="card-title">
+            <span>{title}</span>
+            {href && <ArrowIcon />}
+          </h3>
+          <div className="card-description">{children}</div>
+        </div>
+      )}
     </>
   );
   

@@ -11,11 +11,16 @@ interface CardVariables {
   cardBorderColor: string;
   cardBorderColorDark: string;
   cardBackgroundColor: string;
+  cardBackgroundColorDark: string;
   cardBorderRadius: string;
   cardTitleColor: string;
+  cardTitleColorDark: string;
   cardDescriptionColor: string;
+  cardDescriptionColorDark: string;
   cardHoverShadow: string;
+  cardHoverShadowDark: string;
   cardArrowColor: string;
+  cardArrowColorDark: string;
 }
 
 export class CardStyleGenerator {
@@ -23,23 +28,29 @@ export class CardStyleGenerator {
   
   generate(userOverrides?: Record<string, string>): string {
     const defaults: CardVariables = {
-      cardBorderColor: this.globalVars.borderColorLight,
-      cardBorderColorDark: this.globalVars.borderColorDark,
-      cardBackgroundColor: this.globalVars.surfaceColorLight,
+      cardBorderColor: '#E6E6E6',
+      cardBorderColorDark: '#262626',
+      cardBackgroundColor: '#FFFFFF',
+      cardBackgroundColorDark: '#171717',
       cardBorderRadius: '8px',
-      cardTitleColor: this.globalVars.textPrimaryLight,
-      cardDescriptionColor: '#666666',
-      cardHoverShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-      cardArrowColor: '#999999',
+      cardTitleColor: '#171717',
+      cardTitleColorDark: '#FAFAFA',
+      cardDescriptionColor: '#1C1C1C',
+      cardDescriptionColorDark: '#D9D9D9',
+      cardHoverShadow: '0 10px 15px -3px rgba(23, 23, 23, 0.05)',
+      cardHoverShadowDark: '0 10px 15px -3px rgba(250, 250, 250, 0.05)',
+      cardArrowColor: '#525252',
+      cardArrowColorDark: '#B3B3B3',
     };
     
     const vars = mergeOverrides(
       defaults,
       userOverrides,
       [
-        'cardBorderColor', 'cardBorderColorDark', 'cardBackgroundColor',
-        'cardBorderRadius', 'cardTitleColor', 'cardDescriptionColor', 'cardHoverShadow',
-        'cardArrowColor'
+        'cardBorderColor', 'cardBorderColorDark', 'cardBackgroundColor', 'cardBackgroundColorDark',
+        'cardBorderRadius', 'cardTitleColor', 'cardTitleColorDark', 'cardDescriptionColor', 
+        'cardDescriptionColorDark', 'cardHoverShadow', 'cardHoverShadowDark', 'cardArrowColor',
+        'cardArrowColorDark'
       ]
     );
     
@@ -48,38 +59,29 @@ export class CardStyleGenerator {
   display: grid;
   gap: 1.5rem;
   margin: 2rem 0;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
 }
 
-@media (min-width: 640px) {
-  .card-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.card-grid[data-cols="2"] {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
 }
 
-@media (min-width: 1024px) {
-  .card-grid[data-cols="2"] {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .card-grid[data-cols="3"] {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  .card-grid[data-cols="4"] {
-    grid-template-columns: repeat(4, 1fr);
-  }
+.card-grid[data-cols="3"] {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+
+.card-grid[data-cols="4"] {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
 }
 
 .card {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 1.5rem;
+  padding: 1.25rem;
   border: 1px solid ${vars.cardBorderColor};
   border-radius: ${vars.cardBorderRadius};
   background-color: ${vars.cardBackgroundColor};
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 300ms ease;
   position: relative;
 }
 
@@ -94,85 +96,120 @@ export class CardStyleGenerator {
 .card-link:hover .card {
   box-shadow: ${vars.cardHoverShadow};
   transform: translateY(-4px);
-  border-color: ${vars.cardBorderColor};
+  border-color: rgba(82, 82, 82, 0.5);
+}
+
+.card-link:hover .card-title {
+  color: #000000;
 }
 
 .card-link:hover .card-arrow {
   transform: translateX(4px);
-  opacity: 1;
+  color: ${vars.cardTitleColor};
 }
 
 .card-link:active .card {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .card-icon {
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: 40px;
+  align-items: flex-start;
+  gap: 1rem;
 }
 
 .card-icon-img {
-  width: 36px;
-  height: 36px;
+  width: 2.5rem;
+  height: 2.5rem;
   object-fit: contain;
   flex-shrink: 0;
-  margin: ${this.globalVars.spacingXs} 0;
+  margin: 0 0 1rem 0;
 }
 
 .card-content {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
   flex: 1;
 }
 
 .card-title {
-  margin: 0;
-  font-size: 1.125rem;
+  margin: 0 0 0.25rem 0;
+  font-size: 1.25rem;
   font-weight: ${this.globalVars.fontWeightSemibold};
-  line-height: ${this.globalVars.lineHeightTight};
+  line-height: 1.5;
   color: ${vars.cardTitleColor};
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: ${this.globalVars.spacingSm};
+  gap: 1rem;
+  transition: color 300ms ease;
 }
 
 .card-arrow {
   flex-shrink: 0;
-  opacity: 0.6;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 0.25rem;
   color: ${vars.cardArrowColor};
+  transition: all 300ms ease;
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .card-description {
   margin: 0;
   color: ${vars.cardDescriptionColor};
-  font-size: ${this.globalVars.fontSizeBase};
-  line-height: ${this.globalVars.lineHeightRelaxed};
+  font-size: 0.875rem;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .card-description p {
   margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: inherit;
 }
 
 .card-description p:not(:last-child) {
   margin-bottom: 0.5rem;
 }
 
-${mediaQuery('sm', `  .card {
-    padding: 1.25rem;
+@media (prefers-color-scheme: dark) {
+  .card {
+    background-color: ${vars.cardBackgroundColorDark};
+    border-color: ${vars.cardBorderColorDark};
   }
   
   .card-title {
-    font-size: 1rem;
+    color: ${vars.cardTitleColorDark};
   }
   
   .card-description {
-    font-size: ${this.globalVars.fontSizeSm};
-  }`)}`;
+    color: ${vars.cardDescriptionColorDark};
+  }
+  
+  .card-description p {
+    color: inherit;
+  }
+  
+  .card-arrow {
+    color: ${vars.cardArrowColorDark};
+  }
+  
+  .card-link:hover .card {
+    box-shadow: ${vars.cardHoverShadowDark};
+    border-color: rgba(179, 179, 179, 0.5);
+  }
+  
+  .card-link:hover .card-title {
+    color: #FFFFFF;
+  }
+  
+  .card-link:hover .card-arrow {
+    color: ${vars.cardTitleColorDark};
+  }
+}`;
   }
 }

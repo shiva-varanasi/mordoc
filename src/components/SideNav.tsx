@@ -60,6 +60,20 @@ function SideNavItem({ item, currentPath, depth }: SideNavItemProps) {
     }
   };
 
+  // Handle click for parent items with links
+  const handleLinkClick = (e: React.MouseEvent) => {
+    if (hasChildren) {
+      // If this item is already active, toggle collapse/expand
+      if (isActive) {
+        setIsExpanded(!isExpanded);
+      } else {
+        // If navigating to a new page, ensure children stay expanded
+        setIsExpanded(true);
+      }
+      // Don't prevent default - let the Link navigate
+    }
+  };
+
   const ChevronIcon = () => (
     <svg 
       width="12" 
@@ -82,45 +96,27 @@ function SideNavItem({ item, currentPath, depth }: SideNavItemProps) {
     <li className={`sidenav-item sidenav-item-depth-${depth}`}>
       {item.path ? (
         item.external ? (
-          <div className="sidenav-item-wrapper">
-            <a
-              href={item.path}
-              className={`sidenav-link ${isActive ? 'active' : ''}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {item.icon && <span className="sidenav-icon">{item.icon}</span>}
-              <span className="sidenav-label">{item.label}</span>
-              {hasChildren && <ChevronIcon />}
-            </a>
-            {hasChildren && (
-              <button
-                className="sidenav-toggle-overlay"
-                onClick={handleToggle}
-                aria-label={isExpanded ? 'Collapse' : 'Expand'}
-                aria-expanded={isExpanded}
-              />
-            )}
-          </div>
+          <a
+            href={item.path}
+            className={`sidenav-link ${isActive ? 'active' : ''}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={handleLinkClick}
+          >
+            {item.icon && <span className="sidenav-icon">{item.icon}</span>}
+            <span className="sidenav-label">{item.label}</span>
+            {hasChildren && <ChevronIcon />}
+          </a>
         ) : (
-          <div className="sidenav-item-wrapper">
-            <Link
-              to={item.path}
-              className={`sidenav-link ${isActive ? 'active' : ''}`}
-            >
-              {item.icon && <span className="sidenav-icon">{item.icon}</span>}
-              <span className="sidenav-label">{item.label}</span>
-              {hasChildren && <ChevronIcon />}
-            </Link>
-            {hasChildren && (
-              <button
-                className="sidenav-toggle-overlay"
-                onClick={handleToggle}
-                aria-label={isExpanded ? 'Collapse' : 'Expand'}
-                aria-expanded={isExpanded}
-              />
-            )}
-          </div>
+          <Link
+            to={item.path}
+            className={`sidenav-link ${isActive ? 'active' : ''}`}
+            onClick={handleLinkClick}
+          >
+            {item.icon && <span className="sidenav-icon">{item.icon}</span>}
+            <span className="sidenav-label">{item.label}</span>
+            {hasChildren && <ChevronIcon />}
+          </Link>
         )
       ) : (
         <button

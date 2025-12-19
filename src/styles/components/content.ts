@@ -45,14 +45,14 @@ export class ContentStyleGenerator {
 
 .content-wrapper {
   display: flex;
-  gap: ${this.globalVars.spacing2xl};
+  gap: ${this.globalVars.spacing3xl};
   width: 100%;
 }
 
 .content-article {
   flex: 1;
   min-width: 0;
-  max-width: 48rem;
+  max-width: 60rem;
 }
 
 .content-header {

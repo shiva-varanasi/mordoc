@@ -185,7 +185,6 @@ export class CodeBlockStyleGenerator {
   color: ${vars.codeVariableColor};
 }
 
-.token.important,
 .token.bold {
   font-weight: bold;
 }

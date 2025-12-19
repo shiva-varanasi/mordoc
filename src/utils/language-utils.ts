@@ -52,7 +52,12 @@ export function buildPathWithLanguage(
   defaultLanguage: string
 ): string {
   // Normalize slug (remove leading/trailing slashes)
-  const normalizedSlug = slug.replace(/^\/+|\/+$/g, '');
+  let normalizedSlug = slug.replace(/^\/+|\/+$/g, '');
+
+  // Special case: 'index' at root should map to home page (empty string)
+  if (normalizedSlug === 'index') {
+    normalizedSlug = '';
+  }
   
   // If default language, don't add language prefix
   if (language === defaultLanguage) {

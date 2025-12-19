@@ -85,31 +85,40 @@ export class UtilityStyleGenerator {
   border: 1px solid ${this.globalVars.borderColorLight};
   border-radius: ${this.globalVars.borderRadiusFull};
   padding: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.theme-toggle-button {
+.theme-toggle:hover {
+  background: ${this.globalVars.backgroundColorLight};
+  border-color: ${this.globalVars.primaryColorLight};
+}
+
+.theme-toggle-icon {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 4px;
   background: transparent;
-  border: none;
   border-radius: ${this.globalVars.borderRadiusSm};
-  cursor: pointer;
   color: ${this.globalVars.textSecondaryLight};
   transition: all 0.2s ease;
   position: relative;
 }
 
-.theme-toggle-button:hover {
+.theme-toggle:hover .theme-toggle-icon {
   color: ${this.globalVars.textPrimaryLight};
 }
 
-.theme-toggle-button.active:hover {
+.theme-toggle-icon.active {
+  color: ${this.globalVars.textPrimaryLight};
+}
+
+.theme-toggle:hover .theme-toggle-icon.active {
   opacity: 0.9;
 }
 
-.theme-toggle-button svg {
+.theme-toggle-icon svg {
   width: 12px;
   height: 12px;
   display: block;
@@ -117,7 +126,7 @@ export class UtilityStyleGenerator {
   stroke: currentColor;
 }
 
-.theme-toggle-button.active svg {
+.theme-toggle-icon.active svg {
   fill: ${this.globalVars.textPrimaryLight};
 }
 
@@ -127,11 +136,11 @@ export class UtilityStyleGenerator {
     padding: 3px;
   }
 
-  .theme-toggle-button {
+  .theme-toggle-icon {
     padding: 5px;
   }
 
-  .theme-toggle-button svg {
+  .theme-toggle-icon svg {
     width: 12px;
     height: 12px;
   }

@@ -15,7 +15,7 @@ import { useTheme } from '../client/contexts/ThemeContext';
 export function Header() {
   const { config } = useConfig();
   const { openSearch } = useSearch();
-  const { theme, setTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   
   // Track if component has hydrated to avoid SSR mismatch
   const [isHydrated, setIsHydrated] = useState(false);
@@ -75,14 +75,14 @@ export function Header() {
 
           {/* Right side actions */}
           <div className="header-actions">
-            {/* Theme toggle buttons */}
-            <div className="theme-toggle">
-              <button
-                className={`theme-toggle-button ${isHydrated && theme === 'light' ? 'active' : ''}`}
-                onClick={() => setTheme('light')}
-                aria-label="Switch to light mode"
-                title="Light mode"
-              >
+            {/* Theme toggle */}
+            <button 
+              className="theme-toggle"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+              title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            >
+              <span className={`theme-toggle-icon ${isHydrated && theme === 'light' ? 'active' : ''}`}>
                 <svg 
                   width="16" 
                   height="16" 
@@ -108,14 +108,9 @@ export function Header() {
                     </clipPath>
                   </defs>
                 </svg>
-              </button>
+              </span>
               
-                <button
-                  className={`theme-toggle-button ${isHydrated && theme === 'dark' ? 'active' : ''}`}
-                  onClick={() => setTheme('dark')}
-                  aria-label="Switch to dark mode"
-                  title="Dark mode"
-                >
+              <span className={`theme-toggle-icon ${isHydrated && theme === 'dark' ? 'active' : ''}`}>
                 <svg 
                   width="16" 
                   height="16" 
@@ -133,8 +128,8 @@ export function Header() {
                     </clipPath>
                   </defs>
                 </svg>
-              </button>
-            </div>
+              </span>
+            </button>
           </div>
         </div>
       </div>

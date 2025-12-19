@@ -112,53 +112,45 @@ export function Header({ onMobileMenuToggle, showMobileMenu = false }: HeaderPro
               aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
               title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
             >
-              <span className={`theme-toggle-icon ${isHydrated && theme === 'light' ? 'active' : ''}`}>
+              {theme === 'light' ? (
                 <svg 
-                  width="16" 
-                  height="16" 
-                  viewBox="0 0 16 16" 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="20" 
+                  height="20" 
+                  viewBox="0 0 24 24" 
                   fill="none" 
                   stroke="currentColor" 
-                  xmlns="http://www.w3.org/2000/svg"
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                  className="theme-icon"
                 >
-                  <g clipPath="url(#clip0_light)">
-                    <path d="M8 1.11133V2.00022" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
-                    <path d="M12.8711 3.12891L12.2427 3.75735" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
-                    <path d="M14.8889 8H14" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
-                    <path d="M12.8711 12.8711L12.2427 12.2427" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
-                    <path d="M8 14.8889V14" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
-                    <path d="M3.12891 12.8711L3.75735 12.2427" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
-                    <path d="M1.11133 8H2.00022" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
-                    <path d="M3.12891 3.12891L3.75735 3.75735" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
-                    <path d="M8.00043 11.7782C10.0868 11.7782 11.7782 10.0868 11.7782 8.00043C11.7782 5.91402 10.0868 4.22266 8.00043 4.22266C5.91402 4.22266 4.22266 5.91402 4.22266 8.00043C4.22266 10.0868 5.91402 11.7782 8.00043 11.7782Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_light">
-                      <rect width="16" height="16" fill="white"></rect>
-                    </clipPath>
-                  </defs>
+                  <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
                 </svg>
-              </span>
-              
-              <span className={`theme-toggle-icon ${isHydrated && theme === 'dark' ? 'active' : ''}`}>
+              ) : (
                 <svg 
-                  width="16" 
-                  height="16" 
-                  viewBox="0 0 16 16" 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="20" 
+                  height="20" 
+                  viewBox="0 0 24 24" 
                   fill="none" 
                   stroke="currentColor" 
-                  xmlns="http://www.w3.org/2000/svg"
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                  className="theme-icon"
                 >
-                  <g clipPath="url(#clip0_dark)">
-                    <path d="M11.5556 10.4445C8.48717 10.4445 6.00005 7.95743 6.00005 4.88899C6.00005 3.68721 6.38494 2.57877 7.03294 1.66943C4.04272 2.22766 1.77783 4.84721 1.77783 8.0001C1.77783 11.5592 4.66317 14.4445 8.22228 14.4445C11.2196 14.4445 13.7316 12.3948 14.4525 9.62321C13.6081 10.1414 12.6187 10.4445 11.5556 10.4445Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_dark">
-                      <rect width="16" height="16" fill="white"></rect>
-                    </clipPath>
-                  </defs>
+                  <circle cx="12" cy="12" r="4"></circle>
+                  <path d="M12 2v2"></path>
+                  <path d="M12 20v2"></path>
+                  <path d="m4.93 4.93 1.41 1.41"></path>
+                  <path d="m17.66 17.66 1.41 1.41"></path>
+                  <path d="M2 12h2"></path>
+                  <path d="M20 12h2"></path>
+                  <path d="m6.34 17.66-1.41 1.41"></path>
+                  <path d="m19.07 4.93-1.41 1.41"></path>
                 </svg>
-              </span>
+              )}
             </button>
           </div>
         </div>

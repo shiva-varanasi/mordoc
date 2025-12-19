@@ -92,13 +92,15 @@ ${darkMode(`  .error {
 .theme-toggle {
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
   background: ${this.globalVars.surfaceColorLight};
   border: 1px solid ${this.globalVars.borderColorLight};
-  border-radius: ${this.globalVars.borderRadiusFull};
-  padding: 4px;
+  border-radius: 12px;
+  padding: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  width: 40px;
+  height: 40px;
 }
 
 ${darkMode(`  .theme-toggle {
@@ -116,72 +118,35 @@ ${darkMode(`  .theme-toggle:hover {
     border-color: ${this.globalVars.primaryColorDark};
   }`)}
 
-.theme-toggle-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  background: transparent;
-  border-radius: ${this.globalVars.borderRadiusSm};
+.theme-toggle .theme-icon {
   color: ${this.globalVars.textSecondaryLight};
-  transition: all 0.2s ease;
-  position: relative;
+  transition: color 0.2s ease;
+  display: block;
+  flex-shrink: 0;
 }
 
-${darkMode(`  .theme-toggle-icon {
+${darkMode(`  .theme-toggle .theme-icon {
     color: ${this.globalVars.textSecondaryDark};
   }`)}
 
-.theme-toggle:hover .theme-toggle-icon {
+.theme-toggle:hover .theme-icon {
   color: ${this.globalVars.textPrimaryLight};
 }
 
-${darkMode(`  .theme-toggle:hover .theme-toggle-icon {
+${darkMode(`  .theme-toggle:hover .theme-icon {
     color: ${this.globalVars.textPrimaryDark};
   }`)}
-
-.theme-toggle-icon.active {
-  color: ${this.globalVars.textPrimaryLight};
-}
-
-${darkMode(`  .theme-toggle-icon.active {
-    color: ${this.globalVars.textPrimaryDark};
-  }`)}
-
-.theme-toggle:hover .theme-toggle-icon.active {
-  opacity: 0.9;
-}
-
-.theme-toggle-icon svg {
-  width: 12px;
-  height: 12px;
-  display: block;
-  fill: none;
-  stroke: currentColor;
-}
-
-.theme-toggle-icon.active svg {
-  fill: ${this.globalVars.textPrimaryLight};
-}
-
-${darkMode(`  .theme-toggle-icon.active svg {
-    fill: ${this.globalVars.textPrimaryDark};
-  }`)}
-
 
 @media (max-width: 480px) {
   .theme-toggle {
-    gap: 2px;
-    padding: 3px;
+    width: 36px;
+    height: 36px;
+    padding: 6px;
   }
 
-  .theme-toggle-icon {
-    padding: 5px;
-  }
-
-  .theme-toggle-icon svg {
-    width: 12px;
-    height: 12px;
+  .theme-toggle .theme-icon {
+    width: 18px;
+    height: 18px;
   }
 }
 

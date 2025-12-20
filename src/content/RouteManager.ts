@@ -33,15 +33,12 @@ export class RouteManager {
 
     // Get relative path without language prefix
     const relativePath = removeLanguagePrefix(filePath);
-    console.log('relativePath inside route manager: ', relativePath);
 
     // Generate slug from file path
     const slug = filePathToSlug(relativePath);
-    console.log('slug inside route manager: ', slug);
 
     // Get directory path (excluding language prefix and filename)
     const dirPath = path.dirname(relativePath) === '.' ? '' : path.dirname(relativePath);
-    console.log('dirPath inside route manager: ', dirPath);
 
     // Build URL path with language prefix and directory structure
     const urlPath = buildPathWithLanguage(
@@ -49,7 +46,6 @@ export class RouteManager {
       language, 
       this.defaultLanguage
     );
-    console.log('urlPath inside route manager: ', urlPath);
 
     return {
       path: urlPath,

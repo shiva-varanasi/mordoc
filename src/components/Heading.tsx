@@ -15,7 +15,6 @@ interface HeadingProps {
  * Heading component with copy link icon
  */
 export function Heading({ level, id, children, ...props }: HeadingProps) {
-  console.log('Heading component rendered:', { level, id, children });
   const [showCopied, setShowCopied] = useState(false);
   const Tag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 

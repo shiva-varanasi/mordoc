@@ -39,7 +39,6 @@ export class ContentLoader {
     const files = await fg(['**/*.md'], {
       cwd: this.contentDir,
     });
-    console.log('files inside content loader: ', files);
 
     // Sort files alphabetically for consistent ordering
     return files.sort();

@@ -4,7 +4,6 @@
  */
 
 import Markdoc from '@markdoc/markdoc';
-import util from "node:util"; // for console.log temporary
 
 import {
   ProcessedContent,
@@ -30,33 +29,16 @@ export class ContentProcessor {
    */
   process(rawFile: RawContentFile): ProcessedContent {
     // Parse markdown with Markdoc
-    console.log('rawFile.content', rawFile.content);
     const ast = Markdoc.parse(rawFile.content);
-
-    console.log("=== AST ===");
-
-    console.log(
-      util.inspect(ast, { depth: null, colors: false })
-    );
 
     // Extract frontmatter from AST
     const frontmatter = this.extractFrontmatter(ast);
-
-    console.log("=== FRONTMATTER ===");
-    console.log(
-      util.inspect(frontmatter, { depth: null, colors: false })
-    );
 
     // Validate frontmatter has required fields
     this.validateFrontmatter(frontmatter, rawFile.filePath);
 
     // Generate table of contents from headings
     const toc = this.generateTableOfContents(ast);
-
-    console.log("=== TOC ===");
-    console.log(
-      util.inspect(toc, { depth: null, colors: false })
-    );
 
     // Calculate word count and reading time
     const wordCount = this.calculateWordCount(ast);
@@ -108,11 +90,6 @@ export class ContentProcessor {
     
     // Add heading anchors to renderable for table of contents
     this.addHeadingAnchors(renderable);
-
-    console.log("=== RENDERABLE ===");
-    console.log(
-      util.inspect(renderable, { depth: null, colors: false })
-    );
 
     // Build metadata
     const metadata: ContentMetadata = {

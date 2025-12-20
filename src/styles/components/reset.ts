@@ -85,7 +85,45 @@ h1, h2, h3, h4, h5, h6 {
 
 p {
   margin: 0;
-}`;
+}
+
+/* Scrollbar Styling - Cross-browser support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #999999 transparent;
+}
+
+${darkMode(`  * {
+    scrollbar-color: #515151 transparent;
+  }`)}
+
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: ${this.globalVars.textSecondaryLight};
+  border-radius: 6px;
+  border: 3px solid ${this.globalVars.backgroundColorLight};
+}
+
+${darkMode(`  *::-webkit-scrollbar-thumb {
+    background-color: #6B7280;
+    border-color: ${this.globalVars.backgroundColorDark};
+  }`)}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: ${this.globalVars.textPrimaryLight};
+}
+
+${darkMode(`  *::-webkit-scrollbar-thumb:hover {
+    background-color: #9CA3AF;
+  }`)}`;
   }
 }
 

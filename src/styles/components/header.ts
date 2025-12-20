@@ -19,6 +19,7 @@ interface HeaderVariables {
   navHoverColorDark: string;
   navActiveColorLight: string;
   navActiveColorDark: string;
+  headerBorderColorDark: string;
 }
 
 export class HeaderStyleGenerator {
@@ -29,6 +30,7 @@ export class HeaderStyleGenerator {
       headerBackgroundLight: this.globalVars.backgroundColorLight,
       headerBackgroundDark: this.globalVars.backgroundColorDark,
       headerBorderColor: this.globalVars.borderColorLight,
+      headerBorderColorDark: this.globalVars.borderColorDark,
       headerTextColor: this.globalVars.textPrimaryLight,
       headerLogoHeight: '2.5rem',
       navTextColorLight: this.globalVars.navTextColorLight,
@@ -43,7 +45,8 @@ export class HeaderStyleGenerator {
       defaults,
       userOverrides,
       [
-        'headerBackgroundLight', 'headerBackgroundDark', 'headerBorderColor', 
+        'headerBackgroundLight', 'headerBackgroundDark', 
+        'headerBorderColor', 'headerBorderColorDark',
         'headerTextColor', 'headerLogoHeight',
         'navTextColorLight', 'navTextColorDark',
         'navHoverColorLight', 'navHoverColorDark',
@@ -63,6 +66,7 @@ export class HeaderStyleGenerator {
 
 ${darkMode(`  .site-header {
     background-color: ${vars.headerBackgroundDark};
+    border-bottom-color: ${vars.headerBorderColorDark};
   }`)}
 
 .site-header.has-nav {

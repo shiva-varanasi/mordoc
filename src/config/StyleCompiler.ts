@@ -111,7 +111,7 @@ export class StyleCompiler {
       codeblockGen.generate(),
       cardGen.generate(userOverrides.components['card']),
       tocGen.generate(userOverrides.components['toc']),
-      searchmodalGen.generate(userOverrides.components['searchmodal']),
+      searchmodalGen.generate(),
       utilityGen.generate(),
     ];
 

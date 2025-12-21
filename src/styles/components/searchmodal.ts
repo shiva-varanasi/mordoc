@@ -4,77 +4,12 @@
  */
 
 import { GlobalVariables } from '../types';
-import { mergeOverrides, darkMode, mediaQuery } from '../utils';
-
-interface SearchModalVariables {
-  // Customizable
-  backdropBackground: string;
-  backdropBackgroundDark: string;
-  modalBackground: string;
-  modalBackgroundDark: string;
-  modalBorderColor: string;
-  modalBorderColorDark: string;
-  modalBorderRadius: string;
-  inputColor: string;
-  inputColorDark: string;
-  inputPlaceholderColor: string;
-  inputPlaceholderColorDark: string;
-  resultBackground: string;
-  resultBackgroundDark: string;
-  resultHoverBackground: string;
-  resultHoverBackgroundDark: string;
-  resultSelectedBorderColor: string;
-  resultSelectedBorderColorDark: string;
-  resultTitleColor: string;
-  resultTitleColorDark: string;
-  resultExcerptColor: string;
-  resultExcerptColorDark: string;
-  resultUrlColor: string;
-  resultUrlColorDark: string;
-}
+import { darkMode, mediaQuery } from '../utils';
 
 export class SearchModalStyleGenerator {
   constructor(private globalVars: GlobalVariables) {}
   
-  generate(userOverrides?: Record<string, string>): string {
-    const defaults: SearchModalVariables = {
-      backdropBackground: 'rgba(0, 0, 0, 0.6)',
-      backdropBackgroundDark: 'rgba(0, 0, 0, 0.8)',
-      modalBackground: this.globalVars.backgroundColorLight,
-      modalBackgroundDark: this.globalVars.backgroundColorDark,
-      modalBorderColor: this.globalVars.borderColorLight,
-      modalBorderColorDark: this.globalVars.borderColorDark,
-      modalBorderRadius: this.globalVars.borderRadiusLg,
-      inputColor: this.globalVars.textPrimaryLight,
-      inputColorDark: this.globalVars.textPrimaryDark,
-      inputPlaceholderColor: this.globalVars.textSecondaryLight,
-      inputPlaceholderColorDark: this.globalVars.textSecondaryDark,
-      resultBackground: this.globalVars.surfaceColorLight,
-      resultBackgroundDark: this.globalVars.surfaceColorDark,
-      resultHoverBackground: this.globalVars.backgroundColorLight,
-      resultHoverBackgroundDark: this.globalVars.backgroundColorDark,
-      resultSelectedBorderColor: this.globalVars.primaryColorLight,
-      resultSelectedBorderColorDark: this.globalVars.primaryColorDark,
-      resultTitleColor: this.globalVars.textPrimaryLight,
-      resultTitleColorDark: this.globalVars.textPrimaryDark,
-      resultExcerptColor: this.globalVars.textSecondaryLight,
-      resultExcerptColorDark: this.globalVars.textSecondaryDark,
-      resultUrlColor: this.globalVars.textSecondaryLight,
-      resultUrlColorDark: this.globalVars.textSecondaryDark,
-    };
-    
-    const vars = mergeOverrides(
-      defaults,
-      userOverrides,
-      [
-        'backdropBackground', 'backdropBackgroundDark', 'modalBackground', 'modalBackgroundDark',
-        'modalBorderColor', 'modalBorderColorDark', 'modalBorderRadius', 'inputColor', 'inputColorDark',
-        'inputPlaceholderColor', 'inputPlaceholderColorDark', 'resultBackground', 'resultBackgroundDark',
-        'resultHoverBackground', 'resultHoverBackgroundDark', 'resultSelectedBorderColor', 'resultSelectedBorderColorDark',
-        'resultTitleColor', 'resultTitleColorDark', 'resultExcerptColor', 'resultExcerptColorDark',
-        'resultUrlColor', 'resultUrlColorDark'
-      ]
-    );
+  generate(): string {
     
     return `/* Search Modal */
 .search-modal-backdrop {
@@ -83,7 +18,7 @@ export class SearchModalStyleGenerator {
   left: 0;
   right: 0;
   bottom: 0;
-  background: ${vars.backdropBackground};
+  background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
   z-index: 1000;
   display: flex;
@@ -97,7 +32,7 @@ export class SearchModalStyleGenerator {
 }
 
 ${darkMode(`  .search-modal-backdrop {
-    background: ${vars.backdropBackgroundDark};
+    background: rgba(0, 0, 0, 0.8);
   }`)}
 
 
@@ -122,8 +57,8 @@ ${darkMode(`  .search-modal-backdrop {
 }
 
 .search-modal {
-  background: ${vars.modalBackground};
-  border-radius: ${vars.modalBorderRadius};
+  background: ${this.globalVars.backgroundColorLight};
+  border-radius: ${this.globalVars.borderRadiusLg};
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   width: 90%;
   max-width: 42rem;
@@ -132,12 +67,12 @@ ${darkMode(`  .search-modal-backdrop {
   flex-direction: column;
   overflow: hidden;
   animation: slideDown 0.2s ease-out;
-  border: 1px solid ${vars.modalBorderColor};
+  border: 1px solid ${this.globalVars.borderColorLight};
 }
 
 ${darkMode(`  .search-modal {
-    background: ${vars.modalBackgroundDark};
-    border-color: ${vars.modalBorderColorDark};
+    background: ${this.globalVars.backgroundColorDark};
+    border-color: ${this.globalVars.borderColorDark};
   }`)}
 
 .search-input-container {
@@ -145,23 +80,23 @@ ${darkMode(`  .search-modal {
   align-items: center;
   gap: ${this.globalVars.spacingSm};
   padding: ${this.globalVars.spacingMd};
-  border-bottom: 1px solid ${vars.modalBorderColor};
+  border-bottom: 1px solid ${this.globalVars.borderColorLight};
   flex-shrink: 0;
 }
 
 ${darkMode(`  .search-input-container {
-    border-bottom-color: ${vars.modalBorderColorDark};
+    border-bottom-color: ${this.globalVars.borderColorDark};
   }`)}
 
 .search-input-icon {
   width: 20px;
   height: 20px;
-  color: ${vars.inputPlaceholderColor};
+  color: ${this.globalVars.textSecondaryLight};
   flex-shrink: 0;
 }
 
 ${darkMode(`  .search-input-icon {
-    color: ${vars.inputPlaceholderColorDark};
+    color: ${this.globalVars.textSecondaryDark};
   }`)}
 
 .search-input {
@@ -169,21 +104,21 @@ ${darkMode(`  .search-input-icon {
   border: none;
   background: transparent;
   font-size: ${this.globalVars.fontSizeBase};
-  color: ${vars.inputColor};
+  color: ${this.globalVars.textPrimaryLight};
   outline: none;
 }
 
 ${darkMode(`  .search-input {
-    color: ${vars.inputColorDark};
+    color: ${this.globalVars.textPrimaryDark};
   }`)}
 
 .search-input::placeholder {
-  color: ${vars.inputPlaceholderColor};
+  color: ${this.globalVars.textSecondaryLight};
   opacity: 0.6;
 }
 
 ${darkMode(`  .search-input::placeholder {
-    color: ${vars.inputPlaceholderColorDark};
+    color: ${this.globalVars.textSecondaryDark};
   }`)}
 
 .search-close-button {
@@ -191,7 +126,7 @@ ${darkMode(`  .search-input::placeholder {
   border: none;
   cursor: pointer;
   padding: ${this.globalVars.spacingSm};
-  color: ${vars.inputPlaceholderColor};
+  color: ${this.globalVars.textSecondaryLight};
   border-radius: ${this.globalVars.borderRadiusSm};
   transition: all 0.2s ease;
   display: flex;
@@ -200,17 +135,17 @@ ${darkMode(`  .search-input::placeholder {
 }
 
 ${darkMode(`  .search-close-button {
-    color: ${vars.inputPlaceholderColorDark};
+    color: ${this.globalVars.textSecondaryDark};
   }`)}
 
 .search-close-button:hover {
-  background: ${vars.resultBackground};
-  color: ${vars.inputColor};
+  background: ${this.globalVars.surfaceColorLight};
+  color: ${this.globalVars.textPrimaryLight};
 }
 
 ${darkMode(`  .search-close-button:hover {
-    background: ${vars.resultBackgroundDark};
-    color: ${vars.inputColorDark};
+    background: ${this.globalVars.surfaceColorDark};
+    color: ${this.globalVars.textPrimaryDark};
   }`)}
 
 
@@ -239,7 +174,7 @@ ${darkMode(`  .search-close-button:hover {
 .search-result-link {
   display: block;
   padding: ${this.globalVars.spacingMd};
-  background: ${vars.resultBackground};
+  background: ${this.globalVars.surfaceColorLight};
   border-radius: ${this.globalVars.borderRadiusMd};
   text-decoration: none;
   border: 1px solid transparent;
@@ -250,48 +185,48 @@ ${darkMode(`  .search-close-button:hover {
 }
 
 ${darkMode(`  .search-result-link {
-    background: ${vars.resultBackgroundDark};
+    background: ${this.globalVars.surfaceColorDark};
   }`)}
 
 .search-result-link.selected {
-  border-color: ${vars.resultSelectedBorderColor};
-  background: ${vars.resultHoverBackground};
+  border-color: ${this.globalVars.primaryColorLight};
+  background: ${this.globalVars.backgroundColorLight};
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 ${darkMode(`  .search-result-link.selected {
-    border-color: ${vars.resultSelectedBorderColorDark};
-    background: ${vars.resultHoverBackgroundDark};
+    border-color: ${this.globalVars.primaryColorDark};
+    background: ${this.globalVars.backgroundColorDark};
   }`)}
 
 .search-result-link:hover,
 .search-result-link:focus {
-  border-color: ${vars.resultSelectedBorderColor};
-  background: ${vars.resultHoverBackground};
+  border-color: ${this.globalVars.primaryColorLight};
+  background: ${this.globalVars.backgroundColorLight};
   transform: translateY(-1px);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 ${darkMode(`  .search-result-link:hover,
   .search-result-link:focus {
-    border-color: ${vars.resultSelectedBorderColorDark};
-    background: ${vars.resultHoverBackgroundDark};
+    border-color: ${this.globalVars.primaryColorDark};
+    background: ${this.globalVars.backgroundColorDark};
   }`)}
 
 .search-result-title {
   font-weight: ${this.globalVars.fontWeightMedium};
-  color: ${vars.resultTitleColor};
+  color: ${this.globalVars.textPrimaryLight};
   margin-bottom: ${this.globalVars.spacingXs};
   font-size: ${this.globalVars.fontSizeBase};
 }
 
 ${darkMode(`  .search-result-title {
-    color: ${vars.resultTitleColorDark};
+    color: ${this.globalVars.textPrimaryDark};
   }`)}
 
 .search-result-excerpt {
   font-size: ${this.globalVars.fontSizeSm};
-  color: ${vars.resultExcerptColor};
+  color: ${this.globalVars.textSecondaryLight};
   line-height: 1.5;
   margin-bottom: ${this.globalVars.spacingXs};
   display: -webkit-box;
@@ -301,17 +236,17 @@ ${darkMode(`  .search-result-title {
 }
 
 ${darkMode(`  .search-result-excerpt {
-    color: ${vars.resultExcerptColorDark};
+    color: ${this.globalVars.textSecondaryDark};
   }`)}
 
 .search-result-url {
   font-size: ${this.globalVars.fontSizeSm};
-  color: ${vars.resultUrlColor};
+  color: ${this.globalVars.textSecondaryLight};
   opacity: 0.7;
 }
 
 ${darkMode(`  .search-result-url {
-    color: ${vars.resultUrlColorDark};
+    color: ${this.globalVars.textSecondaryDark};
   }`)}
 
 .search-loading,
@@ -320,14 +255,14 @@ ${darkMode(`  .search-result-url {
 .search-notice {
   text-align: center;
   padding: ${this.globalVars.spacingMd};
-  color: ${vars.resultExcerptColor};
+  color: ${this.globalVars.textSecondaryLight};
 }
 
 ${darkMode(`  .search-loading,
   .search-empty,
   .search-no-results,
   .search-notice {
-    color: ${vars.resultExcerptColorDark};
+    color: ${this.globalVars.textSecondaryDark};
   }`)}
 
 
@@ -344,17 +279,17 @@ ${darkMode(`  .search-loading,
   gap: ${this.globalVars.spacingSm};
   flex-wrap: wrap;
   font-size: ${this.globalVars.fontSizeSm};
-  color: ${vars.resultExcerptColor};
+  color: ${this.globalVars.textSecondaryLight};
 }
 
 ${darkMode(`  .search-shortcuts {
-    color: ${vars.resultExcerptColorDark};
+    color: ${this.globalVars.textSecondaryDark};
   }`)}
 
 .search-shortcuts kbd {
   padding: 0.25rem 0.5rem;
-  background: ${vars.resultBackground};
-  border: 1px solid ${vars.modalBorderColor};
+  background: ${this.globalVars.surfaceColorLight};
+  border: 1px solid ${this.globalVars.borderColorLight};
   border-radius: ${this.globalVars.borderRadiusSm};
   font-family: ${this.globalVars.fontFamilyMono};
   font-size: ${this.globalVars.fontSizeXs};
@@ -362,17 +297,17 @@ ${darkMode(`  .search-shortcuts {
 }
 
 ${darkMode(`  .search-shortcuts kbd {
-    background: ${vars.resultBackgroundDark};
-    border-color: ${vars.modalBorderColorDark};
+    background: ${this.globalVars.surfaceColorDark};
+    border-color: ${this.globalVars.borderColorDark};
   }`)}
 
 .search-separator {
-  color: ${vars.resultExcerptColor};
+  color: ${this.globalVars.textSecondaryLight};
   opacity: 0.5;
 }
 
 ${darkMode(`  .search-separator {
-    color: ${vars.resultExcerptColorDark};
+    color: ${this.globalVars.textSecondaryDark};
   }`)}
 
 

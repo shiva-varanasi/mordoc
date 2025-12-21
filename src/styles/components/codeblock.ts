@@ -4,105 +4,12 @@
  */
 
 import { GlobalVariables } from '../types';
-import { mergeOverrides, darkMode } from '../utils';
-
-interface CodeBlockVariables {
-  // Customizable
-  codeBlockBackground: string;
-  codeBlockBackgroundDark: string;
-  codeBlockBorderColor: string;
-  codeBlockBorderColorDark: string;
-  codeBlockBorderRadius: string;
-  codeHeaderBackground: string;
-  codeHeaderBackgroundDark: string;
-  codeLanguageColor: string;
-  codeLanguageColorDark: string;
-  codeCopyButtonColor: string;
-  codeCopyButtonColorDark: string;
-  codeCopyButtonHoverBg: string;
-  codeCopyButtonHoverBgDark: string;
-  codeCopyButtonHoverColor: string;
-  codeCopyButtonHoverColorDark: string;
-  codeTextColor: string;
-  codeTextColorDark: string;
-  
-  // Syntax highlighting colors (customizable)
-  codeCommentColor: string;
-  codeCommentColorDark: string;
-  codePunctuationColor: string;
-  codePunctuationColorDark: string;
-  codePropertyColor: string;
-  codePropertyColorDark: string;
-  codeSelectorColor: string;
-  codeSelectorColorDark: string;
-  codeOperatorColor: string;
-  codeOperatorColorDark: string;
-  codeFunctionColor: string;
-  codeFunctionColorDark: string;
-  codeKeywordColor: string;
-  codeKeywordColorDark: string;
-  codeVariableColor: string;
-  codeVariableColorDark: string;
-}
+import { darkMode } from '../utils';
 
 export class CodeBlockStyleGenerator {
   constructor(private globalVars: GlobalVariables) {}
   
-  generate(userOverrides?: Record<string, string>): string {
-    const defaults: CodeBlockVariables = {
-      codeBlockBackground: this.globalVars.surfaceColorLight,
-      codeBlockBackgroundDark: this.globalVars.surfaceColorDark,
-      codeBlockBorderColor: this.globalVars.borderColorLight,
-      codeBlockBorderColorDark: this.globalVars.borderColorDark,
-      codeBlockBorderRadius: this.globalVars.borderRadiusMd,
-      codeHeaderBackground: this.globalVars.surfaceColorLight,
-      codeHeaderBackgroundDark: this.globalVars.surfaceColorDark,
-      codeLanguageColor: this.globalVars.textSecondaryLight,
-      codeLanguageColorDark: this.globalVars.textSecondaryDark,
-      codeCopyButtonColor: this.globalVars.textSecondaryLight,
-      codeCopyButtonColorDark: this.globalVars.textSecondaryDark,
-      codeCopyButtonHoverBg: this.globalVars.backgroundColorLight,
-      codeCopyButtonHoverBgDark: this.globalVars.backgroundColorDark,
-      codeCopyButtonHoverColor: this.globalVars.textPrimaryLight,
-      codeCopyButtonHoverColorDark: this.globalVars.textPrimaryDark,
-      codeTextColor: this.globalVars.textPrimaryLight,
-      codeTextColorDark: this.globalVars.textPrimaryDark,
-      
-      // Syntax highlighting - Light mode
-      codeCommentColor: '#6a737d',
-      codeCommentColorDark: '#8b949e',
-      codePunctuationColor: this.globalVars.textPrimaryLight,
-      codePunctuationColorDark: this.globalVars.textPrimaryDark,
-      codePropertyColor: '#0184bc',
-      codePropertyColorDark: '#79c0ff',
-      codeSelectorColor: '#50a14f',
-      codeSelectorColorDark: '#7ee787',
-      codeOperatorColor: '#a626a4',
-      codeOperatorColorDark: '#d2a8ff',
-      codeFunctionColor: '#c18401',
-      codeFunctionColorDark: '#d29922',
-      codeKeywordColor: '#a626a4',
-      codeKeywordColorDark: '#ff7b72',
-      codeVariableColor: '#e45649',
-      codeVariableColorDark: '#ffa657',
-    };
-    
-    const vars = mergeOverrides(
-      defaults,
-      userOverrides,
-      [
-        'codeBlockBackground', 'codeBlockBackgroundDark', 'codeBlockBorderColor', 'codeBlockBorderColorDark',
-        'codeBlockBorderRadius', 'codeHeaderBackground', 'codeHeaderBackgroundDark', 'codeLanguageColor',
-        'codeLanguageColorDark', 'codeCopyButtonColor', 'codeCopyButtonColorDark', 'codeCopyButtonHoverBg',
-        'codeCopyButtonHoverBgDark', 'codeCopyButtonHoverColor', 'codeCopyButtonHoverColorDark',
-        'codeTextColor', 'codeTextColorDark', 'codeCommentColor', 'codeCommentColorDark',
-        'codePunctuationColor', 'codePunctuationColorDark', 'codePropertyColor', 'codePropertyColorDark',
-        'codeSelectorColor', 'codeSelectorColorDark', 'codeOperatorColor', 'codeOperatorColorDark',
-        'codeFunctionColor', 'codeFunctionColorDark', 'codeKeywordColor', 'codeKeywordColorDark',
-        'codeVariableColor', 'codeVariableColorDark'
-      ]
-    );
-    
+  generate(): string {
     return `/* Code Block with Syntax Highlighting */
 .code-block-wrapper {
   position: relative;
@@ -114,27 +21,27 @@ export class CodeBlockStyleGenerator {
   justify-content: space-between;
   align-items: center;
   padding: ${this.globalVars.spacingSm} ${this.globalVars.spacingMd};
-  background-color: ${vars.codeHeaderBackground};
-  border: 1px solid ${vars.codeBlockBorderColor};
+  background-color: ${this.globalVars.surfaceColorLight};
+  border: 1px solid ${this.globalVars.borderColorLight};
   border-bottom: none;
-  border-radius: ${vars.codeBlockBorderRadius} ${vars.codeBlockBorderRadius} 0 0;
+  border-radius: ${this.globalVars.borderRadiusMd} ${this.globalVars.borderRadiusMd} 0 0;
 }
 
 ${darkMode(`  .code-block-header {
-    background-color: ${vars.codeHeaderBackgroundDark};
-    border-color: ${vars.codeBlockBorderColorDark};
+    background-color: ${this.globalVars.surfaceColorDark};
+    border-color: ${this.globalVars.borderColorDark};
   }`)}
 
 .code-block-language {
   font-size: ${this.globalVars.fontSizeSm};
   font-weight: ${this.globalVars.fontWeightSemibold};
-  color: ${vars.codeLanguageColor};
+  color: ${this.globalVars.textSecondaryLight};
   text-transform: capitalize;
   font-family: ${this.globalVars.fontFamilyBase};
 }
 
 ${darkMode(`  .code-block-language {
-    color: ${vars.codeLanguageColorDark};
+    color: ${this.globalVars.textSecondaryDark};
   }`)}
 
 .code-block-copy {
@@ -144,24 +51,24 @@ ${darkMode(`  .code-block-language {
   padding: 0.25rem;
   background: transparent;
   border: none;
-  color: ${vars.codeCopyButtonColor};
+  color: ${this.globalVars.textSecondaryLight};
   cursor: pointer;
   border-radius: ${this.globalVars.borderRadiusSm};
   transition: all 0.2s ease;
 }
 
 ${darkMode(`  .code-block-copy {
-    color: ${vars.codeCopyButtonColorDark};
+    color: ${this.globalVars.textSecondaryDark};
   }`)}
 
 .code-block-copy:hover {
-  background-color: ${vars.codeCopyButtonHoverBg};
-  color: ${vars.codeCopyButtonHoverColor};
+  background-color: ${this.globalVars.backgroundColorLight};
+  color: ${this.globalVars.textPrimaryLight};
 }
 
 ${darkMode(`  .code-block-copy:hover {
-    background-color: ${vars.codeCopyButtonHoverBgDark};
-    color: ${vars.codeCopyButtonHoverColorDark};
+    background-color: ${this.globalVars.backgroundColorDark};
+    color: ${this.globalVars.textPrimaryDark};
   }`)}
 
 
@@ -177,12 +84,12 @@ ${darkMode(`  .code-block-copy:hover {
 .code-block-wrapper pre {
   margin-top: 0;
   margin-bottom: 0;
-  border: 1px solid ${vars.codeBlockBorderColor};
-  border-radius: 0 0 ${vars.codeBlockBorderRadius} ${vars.codeBlockBorderRadius};
+  border: 1px solid ${this.globalVars.borderColorLight};
+  border-radius: 0 0 ${this.globalVars.borderRadiusMd} ${this.globalVars.borderRadiusMd};
 }
 
 ${darkMode(`  .code-block-wrapper pre {
-    border-color: ${vars.codeBlockBorderColorDark};
+    border-color: ${this.globalVars.borderColorDark};
   }`)}
 
 /* Prism Token Colors */
@@ -190,22 +97,22 @@ ${darkMode(`  .code-block-wrapper pre {
 .token.prolog,
 .token.doctype,
 .token.cdata {
-  color: ${vars.codeCommentColor};
+  color: #6a737d;
 }
 
 ${darkMode(`  .token.comment,
   .token.prolog,
   .token.doctype,
   .token.cdata {
-    color: ${vars.codeCommentColorDark};
+    color: #8b949e;
   }`)}
 
 .token.punctuation {
-  color: ${vars.codePunctuationColor};
+  color: ${this.globalVars.textPrimaryLight};
 }
 
 ${darkMode(`  .token.punctuation {
-    color: ${vars.codePunctuationColorDark};
+    color: ${this.globalVars.textPrimaryDark};
   }`)}
 
 
@@ -220,7 +127,7 @@ ${darkMode(`  .token.punctuation {
 .token.constant,
 .token.symbol,
 .token.deleted {
-  color: ${vars.codePropertyColor};
+  color: #0184bc;
 }
 
 ${darkMode(`  .token.property,
@@ -230,7 +137,7 @@ ${darkMode(`  .token.property,
   .token.constant,
   .token.symbol,
   .token.deleted {
-    color: ${vars.codePropertyColorDark};
+    color: #79c0ff;
   }`)}
 
 .token.selector,
@@ -239,7 +146,7 @@ ${darkMode(`  .token.property,
 .token.char,
 .token.builtin,
 .token.inserted {
-  color: ${vars.codeSelectorColor};
+  color: #50a14f;
 }
 
 ${darkMode(`  .token.selector,
@@ -248,7 +155,7 @@ ${darkMode(`  .token.selector,
   .token.char,
   .token.builtin,
   .token.inserted {
-    color: ${vars.codeSelectorColorDark};
+    color: #7ee787;
   }`)}
 
 .token.operator,
@@ -256,7 +163,7 @@ ${darkMode(`  .token.selector,
 .token.url,
 .language-css .token.string,
 .style .token.string {
-  color: ${vars.codeOperatorColor};
+  color: #a626a4;
 }
 
 ${darkMode(`  .token.operator,
@@ -264,41 +171,41 @@ ${darkMode(`  .token.operator,
   .token.url,
   .language-css .token.string,
   .style .token.string {
-    color: ${vars.codeOperatorColorDark};
+    color: #d2a8ff;
   }`)}
 
 .token.atrule,
 .token.attr-value,
 .token.keyword {
-  color: ${vars.codeKeywordColor};
+  color: #a626a4;
 }
 
 ${darkMode(`  .token.atrule,
   .token.attr-value,
   .token.keyword {
-    color: ${vars.codeKeywordColorDark};
+    color: #ff7b72;
   }`)}
 
 .token.function,
 .token.class-name {
-  color: ${vars.codeFunctionColor};
+  color: #c18401;
 }
 
 ${darkMode(`  .token.function,
   .token.class-name {
-    color: ${vars.codeFunctionColorDark};
+    color: #d29922;
   }`)}
 
 .token.regex,
 .token.important,
 .token.variable {
-  color: ${vars.codeVariableColor};
+  color: #e45649;
 }
 
 ${darkMode(`  .token.regex,
   .token.important,
   .token.variable {
-    color: ${vars.codeVariableColorDark};
+    color: #ffa657;
   }`)}
 
 
@@ -321,7 +228,7 @@ pre[class*="language-"] {
 
 code[class*="language-"],
 pre[class*="language-"] {
-  color: ${vars.codeTextColor};
+  color: ${this.globalVars.textPrimaryLight};
   text-align: left;
   white-space: pre;
   word-spacing: normal;
@@ -333,7 +240,7 @@ pre[class*="language-"] {
 
 ${darkMode(`  code[class*="language-"],
   pre[class*="language-"] {
-    color: ${vars.codeTextColorDark};
+    color: ${this.globalVars.textPrimaryDark};
   }`)}`;
   }
 }

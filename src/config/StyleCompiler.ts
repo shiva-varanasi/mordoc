@@ -108,7 +108,7 @@ export class StyleCompiler {
       mobilemenuGen.generate(),
       contentGen.generate(userOverrides.components['content']),
       headingGen.generate(userOverrides.components['heading']),
-      codeblockGen.generate(userOverrides.components['codeblock']),
+      codeblockGen.generate(),
       cardGen.generate(userOverrides.components['card']),
       tocGen.generate(userOverrides.components['toc']),
       searchmodalGen.generate(userOverrides.components['searchmodal']),

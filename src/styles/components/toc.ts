@@ -7,10 +7,8 @@ import { GlobalVariables } from '../types';
 import { mergeOverrides, darkMode } from '../utils';
 
 interface TOCVariables {
-  tocForeground: string;
-  tocForegroundDark: string;
-  tocMutedForeground: string;
-  tocMutedForegroundDark: string;
+  tocLinkActiveColor: string;
+  tocLinkActiveColorDark: string;
 }
 
 export class TOCStyleGenerator {
@@ -18,16 +16,14 @@ export class TOCStyleGenerator {
   
   generate(userOverrides?: Record<string, string>): string {
     const defaults: TOCVariables = {
-      tocForeground: '#171717',
-      tocForegroundDark: '#fafafa',
-      tocMutedForeground: '#737373',
-      tocMutedForegroundDark: '#a3a3a3',
+      tocLinkActiveColor: this.globalVars.navActiveColorLight,
+      tocLinkActiveColorDark: this.globalVars.navActiveColorDark,
     };
     
     const vars = mergeOverrides(
       defaults,
       userOverrides,
-      ['tocForeground', 'tocForegroundDark', 'tocMutedForeground', 'tocMutedForegroundDark']
+      ['tocLinkActiveColor', 'tocLinkActiveColorDark']
     );
     
     return `/* Table of Contents */
@@ -47,12 +43,12 @@ export class TOCStyleGenerator {
 .toc-title {
   font-size: 0.875rem;
   font-weight: ${this.globalVars.fontWeightSemibold};
-  color: ${vars.tocForeground};
+  color: ${this.globalVars.textPrimaryLight};
   margin: 0 0 1rem 0;
 }
 
 ${darkMode(`  .toc-title {
-    color: ${vars.tocForegroundDark};
+    color: ${this.globalVars.textPrimaryDark};
   }`)}
 
 .toc-list {
@@ -76,33 +72,33 @@ ${darkMode(`  .toc-title {
   border: none;
   border-left: 2px solid transparent;
   background: transparent;
-  color: ${vars.tocMutedForeground};
+  color: ${this.globalVars.textSecondaryLight};
   font-weight: ${this.globalVars.fontWeightNormal};
   cursor: pointer;
   transition: color 200ms ease;
 }
 
 ${darkMode(`  .toc-link {
-    color: ${vars.tocMutedForegroundDark};
+    color: ${this.globalVars.textSecondaryDark};
   }`)}
 
 .toc-link:hover {
-  color: ${vars.tocForeground};
+  color: ${vars.tocLinkActiveColor};
 }
 
 ${darkMode(`  .toc-link:hover {
-    color: ${vars.tocForegroundDark};
+    color: ${vars.tocLinkActiveColorDark};
   }`)}
 
 .toc-link.active {
-  color: ${vars.tocForeground};
+  color: ${vars.tocLinkActiveColor};
   font-weight: ${this.globalVars.fontWeightMedium};
-  border-left-color: ${vars.tocForeground};
+  border-left-color: ${vars.tocLinkActiveColor};
 }
 
 ${darkMode(`  .toc-link.active {
-    color: ${vars.tocForegroundDark};
-    border-left-color: ${vars.tocForegroundDark};
+    color: ${vars.tocLinkActiveColorDark};
+    border-left-color: ${vars.tocLinkActiveColorDark};
   }`)}
 
 .toc-link[data-level="3"] {

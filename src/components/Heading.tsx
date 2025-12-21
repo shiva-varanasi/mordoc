@@ -18,9 +18,7 @@ export function Heading({ level, id, children, ...props }: HeadingProps) {
   const [showCopied, setShowCopied] = useState(false);
   const Tag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
-  const handleCopyLink = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    
+  const handleCopyLink = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!id) return;
 
     const url = `${window.location.origin}${window.location.pathname}#${id}`;
@@ -38,11 +36,12 @@ export function Heading({ level, id, children, ...props }: HeadingProps) {
     <Tag id={id} className="heading-with-anchor" {...props}>
       {children}
       {id && (
-        <button
+        <a
+          href={`#${id}`}
           className="heading-anchor-link"
           onClick={handleCopyLink}
-          aria-label="Copy link to heading"
-          title="Copy link"
+          aria-label="Link to this heading"
+          title="Copy link to heading"
         >
           <svg
             width="16"
@@ -58,7 +57,7 @@ export function Heading({ level, id, children, ...props }: HeadingProps) {
             />
           </svg>
           {showCopied && <span className="heading-copied-tooltip">Copied!</span>}
-        </button>
+        </a>
       )}
     </Tag>
   );

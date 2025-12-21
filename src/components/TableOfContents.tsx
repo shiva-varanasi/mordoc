@@ -9,13 +9,10 @@ interface TableOfContentsProps {
   toc: TocType;
 }
 
-/**
- * Table of contents component
- */
 export function TableOfContents({ toc }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>('');
+  const [isScrolling, setIsScrolling] = useState(false);
   
-  // Handle initial hash navigation on page load
   useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
@@ -23,114 +20,81 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
       const element = document.getElementById(id);
       if (element) {
         setTimeout(() => {
-          const headerHeightRem = parseFloat(
-            getComputedStyle(document.documentElement).getPropertyValue('--header-height')
-          );
-          const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-          const headerHeightPx = headerHeightRem * rootFontSize;
-
-          const scrollContainer = document.querySelector('.layout-main') as HTMLElement | null;
-
-          if (scrollContainer) {
-            const containerTop = scrollContainer.getBoundingClientRect().top;
-            const elementTop = element.getBoundingClientRect().top;
-            const offset = scrollContainer.scrollTop + (elementTop - containerTop) - headerHeightPx;
-
-            scrollContainer.scrollTo({
-              top: offset,
-              behavior: 'smooth',
-            });
-          } else {
-            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-            const offsetPosition = elementPosition - headerHeightPx;
-
-            window.scrollTo({
-              top: offsetPosition,
-              behavior: 'smooth',
-            });
-          }
-
+          setIsScrolling(true);
           setActiveId(id);
+          scrollToElement(element);
+          
+          setTimeout(() => {
+            setIsScrolling(false);
+          }, 1000);
         }, 100);
       }
     }
   }, []);
 
   useEffect(() => {
-    // Get header height from CSS variable for consistent spacing
-    const headerHeightRem = parseFloat(
-      getComputedStyle(document.documentElement).getPropertyValue('--header-height')
-    );
-    // Get actual root font size instead of assuming 16px
-    const rootFontSize = parseFloat(
-      getComputedStyle(document.documentElement).fontSize
-    );
-    const headerHeightPx = headerHeightRem * rootFontSize;
-    
-    // Track which heading is currently visible
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
+        if (!isScrolling) {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setActiveId(entry.target.id);
+            }
+          });
+        }
       },
       {
-        // Adjust viewport to account for fixed header and focus on content area
-        rootMargin: `-${headerHeightPx}px 0px -80% 0px`,
+        rootMargin: '-80px 0px -80% 0px',
       }
     );
 
-    // Observe all headings
     const headings = document.querySelectorAll('h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]');
-    console.log('headings inside table of contents: ', headings);
     headings.forEach((heading) => observer.observe(heading));
-    console.log('toc inside table of contents: ', toc);
 
     return () => {
       headings.forEach((heading) => observer.unobserve(heading));
     };
-  }, [toc]);
+  }, [toc, isScrolling]);
 
-  const handleClick = (id: string) => {
-    const element = document.getElementById(id);
-    console.log('element inside table of contents: ', element);
-    if (!element) return;
-
+  const scrollToElement = (element: HTMLElement) => {
     const scrollContainer = document.querySelector('.layout-main') as HTMLElement | null;
-
-    const headerHeightRem = parseFloat(
-      getComputedStyle(document.documentElement).getPropertyValue('--header-height')
-    );
-    const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-    const headerHeightPx = headerHeightRem * rootFontSize;
+    const offset = 100;
 
     if (scrollContainer) {
       const containerTop = scrollContainer.getBoundingClientRect().top;
       const elementTop = element.getBoundingClientRect().top;
-      const offset =
-        scrollContainer.scrollTop + (elementTop - containerTop) - headerHeightPx;
+      const scrollOffset = scrollContainer.scrollTop + (elementTop - containerTop) - offset;
 
       scrollContainer.scrollTo({
-        top: offset,
+        top: scrollOffset,
         behavior: 'smooth',
       });
     } else {
       const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-      const offsetPosition = elementPosition - headerHeightPx;
+      const offsetPosition = elementPosition - offset;
 
       window.scrollTo({
         top: offsetPosition,
         behavior: 'smooth',
       });
     }
-
-    window.history.pushState(null, '', `#${id}`);
-    setActiveId(id);
   };
 
-  // Listen for hash changes (browser back/forward)
+  const handleClick = (id: string) => {
+    const element = document.getElementById(id);
+    if (!element) return;
+
+    setIsScrolling(true);
+    setActiveId(id);
+    
+    scrollToElement(element);
+    window.history.pushState(null, '', `#${id}`);
+    
+    setTimeout(() => {
+      setIsScrolling(false);
+    }, 1000);
+  };
+
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
@@ -147,62 +111,39 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
     };
   }, []);
 
+  const flattenToc = (entries: TocEntry[]): TocEntry[] => {
+    const result: TocEntry[] = [];
+    const flatten = (items: TocEntry[]) => {
+      items.forEach((item) => {
+        result.push(item);
+        if (item.children && item.children.length > 0) {
+          flatten(item.children);
+        }
+      });
+    };
+    flatten(entries);
+    return result;
+  };
+
+  const flatToc = flattenToc(toc);
+
   return (
     <nav className="toc">
-      <h4 className="toc-title">On this page</h4>
+      <p className="toc-title">On this page</p>
       <ul className="toc-list">
-        {toc.map((entry) => (
-          <TocItem
-            key={entry.id}
-            entry={entry}
-            activeId={activeId}
-            onItemClick={handleClick}
-          />
+        {flatToc.map((entry) => (
+          <li key={entry.id}>
+            <button
+              className={`toc-link ${entry.id === activeId ? 'active' : ''}`}
+              data-level={entry.level}
+              onClick={() => handleClick(entry.id)}
+            >
+              {entry.text}
+            </button>
+          </li>
         ))}
       </ul>
     </nav>
-  );
-}
-
-interface TocItemProps {
-  entry: TocEntry;
-  activeId: string;
-  onItemClick: (id: string) => void;
-}
-
-/**
- * Individual TOC item (recursive for nested headings)
- */
-function TocItem({ entry, activeId, onItemClick }: TocItemProps) {
-  const isActive = entry.id === activeId;
-  const hasChildren = entry.children && entry.children.length > 0;
-
-  return (
-    <li className={`toc-item toc-item-level-${entry.level}`}>
-      <a
-        href={`#${entry.id}`}
-        className={`toc-link ${isActive ? 'active' : ''}`}
-        onClick={(e) => {
-          e.preventDefault();
-          onItemClick(entry.id);
-        }}
-      >
-        {entry.text}
-      </a>
-
-      {hasChildren && (
-        <ul className="toc-sublist">
-          {entry.children!.map((child) => (
-            <TocItem
-              key={child.id}
-              entry={child}
-              activeId={activeId}
-              onItemClick={onItemClick}
-            />
-          ))}
-        </ul>
-      )}
-    </li>
   );
 }
 

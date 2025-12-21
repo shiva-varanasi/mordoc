@@ -65,11 +65,18 @@ export function Header({ onMobileMenuToggle, showMobileMenu = false }: HeaderPro
           <div className="header-brand">
             <Link to="/" className="header-logo-link">
               {config.assets.logo ? (
-                <img
-                  src={`/assets/${config.assets.logo}`}
-                  alt={config.metadata.title}
-                  className="header-logo"
-                />
+                <>
+                  <img
+                    src={`/assets/${config.assets.logo}`}
+                    alt={config.metadata.title}
+                    className="header-logo header-logo-light"
+                  />
+                  <img
+                    src={`/assets/${config.assets.logoDark || config.assets.logo}`}
+                    alt={config.metadata.title}
+                    className="header-logo header-logo-dark"
+                  />
+                </>
               ) : (
                 <span className="header-title">{config.metadata.title}</span>
               )}

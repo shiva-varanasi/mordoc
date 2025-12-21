@@ -35,6 +35,7 @@ export interface SiteMetadata {
 // Asset paths
 export interface AssetConfig {
   logo?: string;
+  logoDark?: string;
   favicon?: string;
 }
 

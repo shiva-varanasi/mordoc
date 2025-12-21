@@ -308,6 +308,15 @@ export class Builder {
       }
     }
 
+    // Copy dark mode logo
+    if (siteConfig.assets.logoDark) {
+      const logoDarkSrc = path.join(this.configDir, siteConfig.assets.logoDark);
+      if (fs.existsSync(logoDarkSrc)) {
+        const logoDarkDest = path.join(assetsDir, siteConfig.assets.logoDark);
+        fs.copyFileSync(logoDarkSrc, logoDarkDest);
+      }
+    }
+
     // Copy favicon
     if (siteConfig.assets.favicon) {
       const faviconSrc = path.join(this.configDir, siteConfig.assets.favicon);

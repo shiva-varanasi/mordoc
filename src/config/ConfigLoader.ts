@@ -197,6 +197,15 @@ export class ConfigLoader {
       }
     }
 
+    // Check for dark mode logo
+    for (const format of logoFormats) {
+      const logoDarkPath = path.join(this.configDir, `logo-dark.${format}`);
+      if (fs.existsSync(logoDarkPath)) {
+        assets.logoDark = `logo-dark.${format}`;
+        break;  // Use the first format found
+      }
+    }
+
     // Check for favicon
     const faviconPath = path.join(this.configDir, 'favicon.ico');
     if (fs.existsSync(faviconPath)) {

@@ -95,7 +95,7 @@ ${darkMode(`  .site-header {
   height: 100%;
   display: flex;
   align-items: center;
-  padding: 0 ${this.globalVars.spacingSm} 0 ${this.globalVars.spacingXl};
+  padding: 0 ${this.globalVars.spacingSm} 0 ${this.globalVars.spacingMd};
 }
 
 .mobile-menu-button {
@@ -144,6 +144,22 @@ ${darkMode(`  .mobile-menu-button:hover {
   max-width: 200px;
   object-fit: contain;
 }
+
+.header-logo-light {
+  display: block;
+}
+
+.header-logo-dark {
+  display: none;
+}
+
+${darkMode(`  .header-logo-light {
+    display: none;
+  }
+  
+  .header-logo-dark {
+    display: block;
+  }`)}
 
 .header-search {
   flex: 1;

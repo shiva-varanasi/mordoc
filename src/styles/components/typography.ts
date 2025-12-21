@@ -7,23 +7,10 @@ import { GlobalVariables } from '../types';
 import { mergeOverrides, darkMode, mediaQuery } from '../utils';
 
 interface TypographyVariables {
-  // Customizable
-  headingColor: string;
-  headingColorDark: string;
   linkColor: string;
   linkColorDark: string;
   linkHoverColor: string;
   linkHoverColorDark: string;
-  codeBackground: string;
-  codeBackgroundDark: string;
-  blockquoteColor: string;
-  blockquoteColorDark: string;
-  blockquoteBorder: string;
-  blockquoteBorderDark: string;
-  tableHeaderBackground: string;
-  tableHeaderBackgroundDark: string;
-  tableBorder: string;
-  tableBorderDark: string;
 }
 
 export class TypographyStyleGenerator {
@@ -31,36 +18,22 @@ export class TypographyStyleGenerator {
   
   generate(userOverrides?: Record<string, string>): string {
     const defaults: TypographyVariables = {
-      headingColor: this.globalVars.textPrimaryLight,
-      headingColorDark: this.globalVars.textPrimaryDark,
       linkColor: this.globalVars.linkColorLight,
       linkColorDark: this.globalVars.linkColorDark,
-      linkHoverColor: '#0989E8',
-      linkHoverColorDark: '#096BFF',
-      codeBackground: this.globalVars.surfaceColorLight,
-      codeBackgroundDark: this.globalVars.surfaceColorDark,
-      blockquoteColor: this.globalVars.textSecondaryLight,
-      blockquoteColorDark: this.globalVars.textSecondaryDark,
-      blockquoteBorder: this.globalVars.borderColorLight,
-      blockquoteBorderDark: this.globalVars.borderColorDark,
-      tableHeaderBackground: this.globalVars.surfaceColorLight,
-      tableHeaderBackgroundDark: this.globalVars.surfaceColorDark,
-      tableBorder: this.globalVars.borderColorLight,
-      tableBorderDark: this.globalVars.borderColorDark,
+      linkHoverColor: '#000000',
+      linkHoverColorDark: '#FFFFFF',
     };
     
     const vars = mergeOverrides(
       defaults,
       userOverrides,
-      ['headingColor', 'headingColorDark', 'linkColor', 'linkColorDark', 'linkHoverColor', 'linkHoverColorDark', 
-       'codeBackground', 'codeBackgroundDark', 'blockquoteColor', 'blockquoteColorDark', 'blockquoteBorder', 
-       'blockquoteBorderDark', 'tableHeaderBackground', 'tableHeaderBackgroundDark', 'tableBorder', 'tableBorderDark']
+      ['linkColor', 'linkColorDark', 'linkHoverColor', 'linkHoverColorDark']
     );
     
     return `/* Typography */
 h1, h2, h3, h4, h5, h6 {
   font-family: ${this.globalVars.fontFamilyHeading};
-  color: ${vars.headingColor};
+  color: ${this.globalVars.textPrimaryLight};
 }
 
 h1 {
@@ -127,16 +100,18 @@ p {
 
 a {
   color: ${vars.linkColor};
+  font-weight: ${this.globalVars.fontWeightMedium};
   text-decoration: underline;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 a:hover {
   color: ${vars.linkHoverColor};
+  font-weight: ${this.globalVars.fontWeightMedium};
 }
 
 ${darkMode(`  h1, h2, h3, h4, h5, h6 {
-    color: ${vars.headingColorDark};
+    color: ${this.globalVars.textPrimaryDark};
   }
 
   a {
@@ -153,17 +128,17 @@ code, pre {
 }
 
 code {
-  background-color: ${vars.codeBackground};
+  background-color: ${this.globalVars.surfaceColorLight};
   padding: 0.125rem 0.375rem;
   border-radius: ${this.globalVars.borderRadiusSm};
 }
 
 ${darkMode(`  code {
-    background-color: ${vars.codeBackgroundDark};
+    background-color: ${this.globalVars.surfaceColorDark};
   }`)}
 
 pre {
-  background-color: ${vars.codeBackground};
+  background-color: ${this.globalVars.surfaceColorLight};
   padding: ${this.globalVars.spacingMd};
   border-radius: ${this.globalVars.borderRadiusMd};
   overflow-x: auto;
@@ -171,7 +146,7 @@ pre {
 }
 
 ${darkMode(`  pre {
-    background-color: ${vars.codeBackgroundDark};
+    background-color: ${this.globalVars.surfaceColorDark};
   }`)}
 
 
@@ -224,23 +199,23 @@ li p {
 blockquote {
   margin: ${this.globalVars.spacingMd} 0;
   padding-left: ${this.globalVars.spacingMd};
-  border-left: 4px solid ${vars.blockquoteBorder};
-  color: ${vars.blockquoteColor};
+  border-left: 4px solid ${this.globalVars.borderColorLight};
+  color: ${this.globalVars.textSecondaryLight};
 }
 
 ${darkMode(`  blockquote {
-    border-left-color: ${vars.blockquoteBorderDark};
-    color: ${vars.blockquoteColorDark};
+    border-left-color: ${this.globalVars.borderColorDark};
+    color: ${this.globalVars.textSecondaryDark};
   }`)}
 
 hr {
   border: none;
-  border-top: 1px solid ${vars.tableBorder};
+  border-top: 1px solid ${this.globalVars.borderColorLight};
   margin: ${this.globalVars.spacingLg} 0;
 }
 
 ${darkMode(`  hr {
-    border-top-color: ${vars.tableBorderDark};
+    border-top-color: ${this.globalVars.borderColorDark};
   }`)}
 
 table {
@@ -252,20 +227,20 @@ table {
 th, td {
   text-align: left;
   padding: ${this.globalVars.spacingSm} ${this.globalVars.spacingMd};
-  border-bottom: 1px solid ${vars.tableBorder};
+  border-bottom: 1px solid ${this.globalVars.borderColorLight};
 }
 
 ${darkMode(`  th, td {
-    border-bottom-color: ${vars.tableBorderDark};
+    border-bottom-color: ${this.globalVars.borderColorDark};
   }`)}
 
 th {
   font-weight: ${this.globalVars.fontWeightSemibold};
-  background-color: ${vars.tableHeaderBackground};
+  background-color: ${this.globalVars.surfaceColorLight};
 }
 
 ${darkMode(`  th {
-    background-color: ${vars.tableHeaderBackgroundDark};
+    background-color: ${this.globalVars.surfaceColorDark};
   }`)}
 
 

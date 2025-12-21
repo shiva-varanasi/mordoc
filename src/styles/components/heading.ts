@@ -7,19 +7,8 @@ import { GlobalVariables } from '../types';
 import { mergeOverrides, darkMode, mediaQuery } from '../utils';
 
 interface HeadingVariables {
-  // Customizable
   anchorLinkColor: string;
   anchorLinkColorDark: string;
-  anchorHoverColor: string;
-  anchorHoverColorDark: string;
-  anchorHoverBackground: string;
-  anchorHoverBackgroundDark: string;
-  anchorOutlineColor: string;
-  anchorOutlineColorDark: string;
-  tooltipBackground: string;
-  tooltipBackgroundDark: string;
-  tooltipTextColor: string;
-  tooltipTextColorDark: string;
 }
 
 export class HeadingStyleGenerator {
@@ -29,26 +18,12 @@ export class HeadingStyleGenerator {
     const defaults: HeadingVariables = {
       anchorLinkColor: this.globalVars.textSecondaryLight,
       anchorLinkColorDark: this.globalVars.textSecondaryDark,
-      anchorHoverColor: this.globalVars.linkColorLight,
-      anchorHoverColorDark: this.globalVars.linkColorDark,
-      anchorHoverBackground: this.globalVars.surfaceColorLight,
-      anchorHoverBackgroundDark: this.globalVars.surfaceColorDark,
-      anchorOutlineColor: this.globalVars.linkColorLight,
-      anchorOutlineColorDark: this.globalVars.linkColorDark,
-      tooltipBackground: this.globalVars.textSecondaryLight,
-      tooltipBackgroundDark: this.globalVars.textSecondaryDark,
-      tooltipTextColor: this.globalVars.backgroundColorLight,
-      tooltipTextColorDark: this.globalVars.backgroundColorDark,
     };
     
     const vars = mergeOverrides(
       defaults,
       userOverrides,
-      [
-        'anchorLinkColor', 'anchorLinkColorDark', 'anchorHoverColor', 'anchorHoverColorDark',
-        'anchorHoverBackground', 'anchorHoverBackgroundDark', 'anchorOutlineColor', 'anchorOutlineColorDark',
-        'tooltipBackground', 'tooltipBackgroundDark', 'tooltipTextColor', 'tooltipTextColorDark'
-      ]
+      ['anchorLinkColor', 'anchorLinkColorDark']
     );
     
     return `/* Heading with Anchor Link */
@@ -66,7 +41,7 @@ export class HeadingStyleGenerator {
   border: none;
   color: ${vars.anchorLinkColor};
   cursor: pointer;
-  transition: opacity 0.2s ease, color 0.2s ease;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -78,27 +53,30 @@ ${darkMode(`  .heading-anchor-link {
   }`)}
 
 .heading-anchor-link:hover {
-  color: ${vars.anchorHoverColor};
-  background-color: ${vars.anchorHoverBackground};
+  opacity: 1;
+  background-color: ${this.globalVars.surfaceColorLight};
 }
 
 ${darkMode(`  .heading-anchor-link:hover {
-    color: ${vars.anchorHoverColorDark};
-    background-color: ${vars.anchorHoverBackgroundDark};
+    background-color: ${this.globalVars.surfaceColorDark};
   }`)}
 
 .heading-with-anchor:hover .heading-anchor-link {
+  opacity: 0.7;
+}
+
+.heading-with-anchor:hover .heading-anchor-link:hover {
   opacity: 1;
 }
 
 .heading-anchor-link:focus-visible {
   opacity: 1;
-  outline: 2px solid ${vars.anchorOutlineColor};
+  outline: 2px solid ${vars.anchorLinkColor};
   outline-offset: 2px;
 }
 
 ${darkMode(`  .heading-anchor-link:focus-visible {
-    outline-color: ${vars.anchorOutlineColorDark};
+    outline-color: ${vars.anchorLinkColorDark};
   }`)}
 
 .heading-copied-tooltip {
@@ -108,8 +86,8 @@ ${darkMode(`  .heading-anchor-link:focus-visible {
   transform: translateX(-50%);
   margin-top: 0.5rem;
   padding: 0.25rem 0.5rem;
-  background-color: ${vars.tooltipBackground};
-  color: ${vars.tooltipTextColor};
+  background-color: ${this.globalVars.textSecondaryLight};
+  color: ${this.globalVars.backgroundColorLight};
   font-size: ${this.globalVars.fontSizeSm};
   border-radius: ${this.globalVars.borderRadiusMd};
   white-space: nowrap;
@@ -119,8 +97,8 @@ ${darkMode(`  .heading-anchor-link:focus-visible {
 }
 
 ${darkMode(`  .heading-copied-tooltip {
-    background-color: ${vars.tooltipBackgroundDark};
-    color: ${vars.tooltipTextColorDark};
+    background-color: ${this.globalVars.textSecondaryDark};
+    color: ${this.globalVars.backgroundColorDark};
   }`)}
 
 

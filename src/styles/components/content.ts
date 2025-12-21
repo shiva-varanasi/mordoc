@@ -4,62 +4,12 @@
  */
 
 import { GlobalVariables } from '../types';
-import { mergeOverrides, darkMode, mediaQuery } from '../utils';
-
-interface ContentVariables {
-  // Customizable
-  contentBorderColor: string;
-  contentBorderColorDark: string;
-  contentTitleColor: string;
-  contentTitleColorDark: string;
-  contentDescriptionColor: string;
-  contentDescriptionColorDark: string;
-  contentMetaColor: string;
-  contentMetaColorDark: string;
-  contentTagBackground: string;
-  contentTagBackgroundDark: string;
-  contentTagColor: string;
-  contentTagColorDark: string;
-  contentFooterColor: string;
-  contentFooterColorDark: string;
-  contentFooterLinkColor: string;
-  contentFooterLinkColorDark: string;
-}
+import { darkMode, mediaQuery } from '../utils';
 
 export class ContentStyleGenerator {
   constructor(private globalVars: GlobalVariables) {}
   
-  generate(userOverrides?: Record<string, string>): string {
-    const defaults: ContentVariables = {
-      contentBorderColor: this.globalVars.borderColorLight,
-      contentBorderColorDark: this.globalVars.borderColorDark,
-      contentTitleColor: this.globalVars.primaryColorLight,
-      contentTitleColorDark: this.globalVars.primaryColorDark,
-      contentDescriptionColor: this.globalVars.textPrimaryLight,
-      contentDescriptionColorDark: this.globalVars.textPrimaryDark,
-      contentMetaColor: this.globalVars.textSecondaryLight,
-      contentMetaColorDark: this.globalVars.textSecondaryDark,
-      contentTagBackground: this.globalVars.surfaceColorLight,
-      contentTagBackgroundDark: this.globalVars.surfaceColorDark,
-      contentTagColor: this.globalVars.textPrimaryLight,
-      contentTagColorDark: this.globalVars.textPrimaryDark,
-      contentFooterColor: this.globalVars.textSecondaryLight,
-      contentFooterColorDark: this.globalVars.textSecondaryDark,
-      contentFooterLinkColor: this.globalVars.linkColorLight,
-      contentFooterLinkColorDark: this.globalVars.linkColorDark,
-    };
-    
-    const vars = mergeOverrides(
-      defaults,
-      userOverrides,
-      [
-        'contentBorderColor', 'contentBorderColorDark', 'contentTitleColor', 'contentTitleColorDark',
-        'contentDescriptionColor', 'contentDescriptionColorDark', 'contentMetaColor', 'contentMetaColorDark',
-        'contentTagBackground', 'contentTagBackgroundDark', 'contentTagColor', 'contentTagColorDark',
-        'contentFooterColor', 'contentFooterColorDark', 'contentFooterLinkColor', 'contentFooterLinkColorDark'
-      ]
-    );
-    
+  generate(): string {
     return `/* Content Page */
 .content-page {
   width: 100%;
@@ -79,11 +29,11 @@ export class ContentStyleGenerator {
 
 .content-header {
   margin-bottom: ${this.globalVars.spacingXl};
-  border-bottom: 1px solid ${vars.contentBorderColor};
+  border-bottom: 1px solid ${this.globalVars.borderColorLight};
 }
 
 ${darkMode(`  .content-header {
-    border-bottom-color: ${vars.contentBorderColorDark};
+    border-bottom-color: ${this.globalVars.borderColorDark};
   }`)}
 
 .content-title {
@@ -93,35 +43,35 @@ ${darkMode(`  .content-header {
   line-height: 1.2;
   letter-spacing: -0.02em;
   margin-bottom: 1rem;
-  color: ${vars.contentTitleColor};
+  color: ${this.globalVars.primaryColorLight};
 }
 
 ${darkMode(`  .content-title {
-    color: ${vars.contentTitleColorDark};
+    color: ${this.globalVars.primaryColorDark};
   }`)}
 
 .content-description {
   font-size: 1rem;
   line-height: 1.7;
   font-weight: 400;
-  color: ${vars.contentDescriptionColor};
+  color: ${this.globalVars.textPrimaryLight};
   margin-bottom: 1rem;
   max-width: 42rem;
 }
 
 ${darkMode(`  .content-description {
-    color: ${vars.contentDescriptionColorDark};
+    color: ${this.globalVars.textPrimaryDark};
   }`)}
 
 .content-meta {
   display: flex;
   font-size: 0.875rem;
-  color: ${vars.contentMetaColor};
+  color: ${this.globalVars.textSecondaryLight};
   margin-bottom: 1rem;
 }
 
 ${darkMode(`  .content-meta {
-    color: ${vars.contentMetaColorDark};
+    color: ${this.globalVars.textSecondaryDark};
   }`)}
 
 .content-tags {
@@ -132,15 +82,15 @@ ${darkMode(`  .content-meta {
 
 .content-tag {
   padding: ${this.globalVars.spacingXs} ${this.globalVars.spacingSm};
-  background: ${vars.contentTagBackground};
-  color: ${vars.contentTagColor};
+  background: ${this.globalVars.surfaceColorLight};
+  color: ${this.globalVars.textPrimaryLight};
   border-radius: ${this.globalVars.borderRadiusSm};
   font-size: ${this.globalVars.fontSizeSm};
 }
 
 ${darkMode(`  .content-tag {
-    background: ${vars.contentTagBackgroundDark};
-    color: ${vars.contentTagColorDark};
+    background: ${this.globalVars.surfaceColorDark};
+    color: ${this.globalVars.textPrimaryDark};
   }`)}
 
 
@@ -157,21 +107,21 @@ ${darkMode(`  .content-tag {
   margin-top: ${this.globalVars.spacing3xl};
   margin-bottom: ${this.globalVars.spacing2xl};
   padding-top: ${this.globalVars.spacingXl};
-  border-top: 1px solid ${vars.contentBorderColor};
+  border-top: 1px solid ${this.globalVars.borderColorLight};
 }
 
 ${darkMode(`  .content-footer {
-    border-top-color: ${vars.contentBorderColorDark};
+    border-top-color: ${this.globalVars.borderColorDark};
   }`)}
 
 .content-footer-info p {
   text-align: center;
-  color: ${vars.contentFooterColor};
+  color: ${this.globalVars.textSecondaryLight};
   font-size: ${this.globalVars.fontSizeSm};
 }
 
 ${darkMode(`  .content-footer-info p {
-    color: ${vars.contentFooterColorDark};
+    color: ${this.globalVars.textSecondaryDark};
   }`)}
 
 .content-footer-text {
@@ -183,12 +133,12 @@ ${darkMode(`  .content-footer-info p {
 }
 
 .content-footer-powered a {
-  color: ${vars.contentFooterLinkColor};
+  color: ${this.globalVars.linkColorLight};
   text-decoration: none;
 }
 
 ${darkMode(`  .content-footer-powered a {
-    color: ${vars.contentFooterLinkColorDark};
+    color: ${this.globalVars.linkColorDark};
   }`)}
 
 .content-footer-powered a:hover {

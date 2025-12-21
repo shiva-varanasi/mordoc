@@ -106,7 +106,7 @@ export class StyleCompiler {
       headerGen.generate(userOverrides.components['header']),
       sidenavGen.generate(userOverrides.components['sidenav']),
       mobilemenuGen.generate(),
-      contentGen.generate(userOverrides.components['content']),
+      contentGen.generate(),
       headingGen.generate(userOverrides.components['heading']),
       codeblockGen.generate(),
       cardGen.generate(userOverrides.components['card']),

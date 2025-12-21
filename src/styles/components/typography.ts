@@ -277,10 +277,6 @@ img {
   border-radius: ${this.globalVars.borderRadiusMd};
   cursor: pointer;
   transition: transform 0.2s ease;
-}
-
-img:hover {
-  transform: scale(1.02);
 }`;
   }
 }

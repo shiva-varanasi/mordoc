@@ -7,18 +7,10 @@ import { GlobalVariables } from '../types';
 import { mergeOverrides, darkMode, mediaQuery } from '../utils';
 
 interface CardVariables {
-  // Customizable only
   cardBorderColor: string;
   cardBorderColorDark: string;
-  cardBackgroundColor: string;
-  cardBackgroundColorDark: string;
-  cardBorderRadius: string;
   cardTitleColor: string;
   cardTitleColorDark: string;
-  cardDescriptionColor: string;
-  cardDescriptionColorDark: string;
-  cardHoverShadow: string;
-  cardHoverShadowDark: string;
   cardArrowColor: string;
   cardArrowColorDark: string;
 }
@@ -30,15 +22,8 @@ export class CardStyleGenerator {
     const defaults: CardVariables = {
       cardBorderColor: '#E6E6E6',
       cardBorderColorDark: '#262626',
-      cardBackgroundColor: '#FFFFFF',
-      cardBackgroundColorDark: '#171717',
-      cardBorderRadius: '8px',
       cardTitleColor: '#171717',
       cardTitleColorDark: '#FAFAFA',
-      cardDescriptionColor: '#1C1C1C',
-      cardDescriptionColorDark: '#D9D9D9',
-      cardHoverShadow: '0 10px 15px -3px rgba(23, 23, 23, 0.05)',
-      cardHoverShadowDark: '0 10px 15px -3px rgba(250, 250, 250, 0.05)',
       cardArrowColor: '#525252',
       cardArrowColorDark: '#B3B3B3',
     };
@@ -47,10 +32,8 @@ export class CardStyleGenerator {
       defaults,
       userOverrides,
       [
-        'cardBorderColor', 'cardBorderColorDark', 'cardBackgroundColor', 'cardBackgroundColorDark',
-        'cardBorderRadius', 'cardTitleColor', 'cardTitleColorDark', 'cardDescriptionColor', 
-        'cardDescriptionColorDark', 'cardHoverShadow', 'cardHoverShadowDark', 'cardArrowColor',
-        'cardArrowColorDark'
+        'cardBorderColor', 'cardBorderColorDark', 'cardTitleColor', 
+        'cardTitleColorDark', 'cardArrowColor', 'cardArrowColorDark'
       ]
     );
     
@@ -79,8 +62,8 @@ export class CardStyleGenerator {
   flex-direction: column;
   padding: 1.25rem;
   border: 1px solid ${vars.cardBorderColor};
-  border-radius: ${vars.cardBorderRadius};
-  background-color: ${vars.cardBackgroundColor};
+  border-radius: 8px;
+  background-color: #FFFFFF;
   transition: all 300ms ease;
   position: relative;
 }
@@ -93,14 +76,9 @@ export class CardStyleGenerator {
   height: 100%;
 }
 
-.card-link:hover .card {
-  box-shadow: ${vars.cardHoverShadow};
+.card-link:hover {
+  box-shadow: 4px 10px 15px -3px rgba(23, 23, 23, 0.06);
   transform: translateY(-4px);
-  border-color: rgba(82, 82, 82, 0.5);
-}
-
-.card-link:hover .card-title {
-  color: #000000;
 }
 
 .card-link:hover .card-arrow {
@@ -108,7 +86,7 @@ export class CardStyleGenerator {
   color: ${vars.cardTitleColor};
 }
 
-.card-link:active .card {
+.card-link:active {
   transform: translateY(-2px);
 }
 
@@ -156,7 +134,7 @@ export class CardStyleGenerator {
 
 .card-description {
   margin: 0;
-  color: ${vars.cardDescriptionColor};
+  color: #1C1C1C;
   font-size: 0.875rem;
   line-height: 1.5;
   display: -webkit-box;
@@ -177,7 +155,7 @@ export class CardStyleGenerator {
 }
 
 ${darkMode(`  .card {
-    background-color: ${vars.cardBackgroundColorDark};
+    background-color: #171717;
     border-color: ${vars.cardBorderColorDark};
   }
   
@@ -186,7 +164,7 @@ ${darkMode(`  .card {
   }
   
   .card-description {
-    color: ${vars.cardDescriptionColorDark};
+    color: #D9D9D9;
   }
   
   .card-description p {
@@ -198,7 +176,7 @@ ${darkMode(`  .card {
   }
   
   .card-link:hover .card {
-    box-shadow: ${vars.cardHoverShadowDark};
+    box-shadow: 0 10px 15px -3px rgba(250, 250, 250, 0.05);
     border-color: rgba(179, 179, 179, 0.5);
   }
   

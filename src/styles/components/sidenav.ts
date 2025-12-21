@@ -7,24 +7,10 @@ import { GlobalVariables } from '../types';
 import { mergeOverrides } from '../utils';
 
 interface SideNavVariables {
-  // Customizable
-  navBackgroundLight: string;
-  navBackgroundDark: string;
-  navTextColorLight: string;
-  navTextColorDark: string;
-  navHoverColorLight: string;
-  navHoverColorDark: string;
   navHoverBackgroundLight: string;
   navHoverBackgroundDark: string;
-  navActiveColorLight: string;
-  navActiveColorDark: string;
   navActiveBackgroundLight: string;
   navActiveBackgroundDark: string;
-  navGroupLabelColorLight: string;
-  navGroupLabelColorDark: string;
-  navBorderColorLight: string;
-  navBorderColorDark: string;
-  navBorderRadius: string;
 }
 
 export class SideNavStyleGenerator {
@@ -32,45 +18,25 @@ export class SideNavStyleGenerator {
   
   generate(userOverrides?: Record<string, string>): string {
     const defaults: SideNavVariables = {
-      navBackgroundLight: '#FAFAFA',
-      navBackgroundDark: '#0F0F0F',
-      navTextColorLight: '#1C1C1C',
-      navTextColorDark: '#F2F2F2',
-      navHoverColorLight: '#1C1C1C',
-      navHoverColorDark: '#F2F2F2',
       navHoverBackgroundLight: '#E5E5E5',
       navHoverBackgroundDark: '#1F1F1F',
-      navActiveColorLight: '#171717',
-      navActiveColorDark: '#FAFAFA',
       navActiveBackgroundLight: '#E5E5E5',
       navActiveBackgroundDark: '#1F1F1F',
-      navGroupLabelColorLight: 'rgba(28, 28, 28, 0.7)',
-      navGroupLabelColorDark: 'rgba(242, 242, 242, 0.7)',
-      navBorderColorLight: '#E8E8E8',
-      navBorderColorDark: '#1F1F1F',
-      navBorderRadius: '6px',
     };
     
     const vars = mergeOverrides(
       defaults,
       userOverrides,
       [
-        'navBackgroundLight', 'navBackgroundDark',
-        'navTextColorLight', 'navTextColorDark',
-        'navHoverColorLight', 'navHoverColorDark',
         'navHoverBackgroundLight', 'navHoverBackgroundDark',
-        'navActiveColorLight', 'navActiveColorDark',
-        'navActiveBackgroundLight', 'navActiveBackgroundDark',
-        'navGroupLabelColorLight', 'navGroupLabelColorDark',
-        'navBorderColorLight', 'navBorderColorDark',
-        'navBorderRadius'
+        'navActiveBackgroundLight', 'navActiveBackgroundDark'
       ]
     );
     
     return `/* SideNav */
 .sidenav {
-  background-color: ${vars.navBackgroundLight};
-  border-right: 1px solid ${vars.navBorderColorLight};
+  background-color: #FAFAFA;
+  border-right: 1px solid #E8E8E8;
   padding: 1rem 0.75rem 1rem 0.5rem;
   height: 100%;
   min-height: 100%;
@@ -79,8 +45,8 @@ export class SideNavStyleGenerator {
 }
 
 [data-theme="dark"] .sidenav {
-  background-color: ${vars.navBackgroundDark};
-  border-right-color: ${vars.navBorderColorDark};
+  background-color: #0F0F0F;
+  border-right-color: #1F1F1F;
 }
 
 .sidenav-list {
@@ -141,8 +107,8 @@ export class SideNavStyleGenerator {
   align-items: center;
   gap: 0.5rem;
   padding: 0.375rem 0.5rem;
-  border-radius: ${vars.navBorderRadius};
-  color: ${vars.navTextColorLight};
+  border-radius: 6px;
+  color: #1C1C1C;
   text-decoration: none;
   font-size: ${this.globalVars.fontSizeSm};
   line-height: 1.25;
@@ -157,36 +123,36 @@ export class SideNavStyleGenerator {
 }
 
 [data-theme="dark"] .sidenav-link {
-  color: ${vars.navTextColorDark};
+  color: #F2F2F2;
 }
 
 .sidenav-link:hover {
-  color: ${vars.navHoverColorLight};
+  color: #1C1C1C;
   background-color: ${vars.navHoverBackgroundLight};
 }
 
 [data-theme="dark"] .sidenav-link:hover {
-  color: ${vars.navHoverColorDark};
+  color: #F2F2F2;
   background-color: ${vars.navHoverBackgroundDark};
 }
 
 .sidenav-link:focus-visible {
-  outline: 2px solid ${vars.navActiveColorLight};
+  outline: 2px solid #171717;
   outline-offset: 2px;
 }
 
 [data-theme="dark"] .sidenav-link:focus-visible {
-  outline-color: ${vars.navActiveColorDark};
+  outline-color: #FAFAFA;
 }
 
 .sidenav-link.active {
-  color: ${vars.navActiveColorLight};
+  color: #171717;
   background-color: ${vars.navActiveBackgroundLight};
   font-weight: ${this.globalVars.fontWeightMedium};
 }
 
 [data-theme="dark"] .sidenav-link.active {
-  color: ${vars.navActiveColorDark};
+  color: #FAFAFA;
   background-color: ${vars.navActiveBackgroundDark};
 }
 
@@ -196,13 +162,13 @@ export class SideNavStyleGenerator {
   font-weight: ${this.globalVars.fontWeightMedium};
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: ${vars.navGroupLabelColorLight};
+  color: rgba(28, 28, 28, 0.7);
   padding: 0.375rem 0.5rem;
   min-height: 2rem;
 }
 
 [data-theme="dark"] .sidenav-link.sidenav-group-label {
-  color: ${vars.navGroupLabelColorDark};
+  color: rgba(242, 242, 242, 0.7);
 }
 
 .sidenav-link.sidenav-group-label:hover {

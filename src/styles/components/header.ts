@@ -7,19 +7,8 @@ import { GlobalVariables } from '../types';
 import { mergeOverrides, darkMode, mediaQuery } from '../utils';
 
 interface HeaderVariables {
-  // Customizable
-  headerBackgroundLight: string;
-  headerBackgroundDark: string;
-  headerBorderColor: string;
-  headerTextColor: string;
-  headerLogoHeight: string;
-  navTextColorLight: string;
-  navTextColorDark: string;
-  navHoverColorLight: string;
-  navHoverColorDark: string;
-  navActiveColorLight: string;
-  navActiveColorDark: string;
-  headerBorderColorDark: string;
+  searchHoverBorderColorLight: string;
+  searchHoverBorderColorDark: string;
 }
 
 export class HeaderStyleGenerator {
@@ -27,37 +16,20 @@ export class HeaderStyleGenerator {
   
   generate(userOverrides?: Record<string, string>): string {
     const defaults: HeaderVariables = {
-      headerBackgroundLight: this.globalVars.backgroundColorLight,
-      headerBackgroundDark: this.globalVars.backgroundColorDark,
-      headerBorderColor: this.globalVars.borderColorLight,
-      headerBorderColorDark: this.globalVars.borderColorDark,
-      headerTextColor: this.globalVars.textPrimaryLight,
-      headerLogoHeight: '2.5rem',
-      navTextColorLight: this.globalVars.navTextColorLight,
-      navTextColorDark: this.globalVars.navTextColorDark,
-      navHoverColorLight: this.globalVars.navHoverColorLight,
-      navHoverColorDark: this.globalVars.navHoverColorDark,
-      navActiveColorLight: this.globalVars.navActiveColorLight,
-      navActiveColorDark: this.globalVars.navActiveColorDark,
+      searchHoverBorderColorLight: this.globalVars.primaryColorLight,
+      searchHoverBorderColorDark: this.globalVars.primaryColorDark,
     };
     
     const vars = mergeOverrides(
       defaults,
       userOverrides,
-      [
-        'headerBackgroundLight', 'headerBackgroundDark', 
-        'headerBorderColor', 'headerBorderColorDark',
-        'headerTextColor', 'headerLogoHeight',
-        'navTextColorLight', 'navTextColorDark',
-        'navHoverColorLight', 'navHoverColorDark',
-        'navActiveColorLight', 'navActiveColorDark'
-      ]
+      ['searchHoverBorderColorLight', 'searchHoverBorderColorDark']
     );
     
     return `/* Header */
 .site-header {
-  background-color: ${vars.headerBackgroundLight};
-  border-bottom: 1px solid ${vars.headerBorderColor};
+  background-color: ${this.globalVars.backgroundColorLight};
+  border-bottom: 1px solid ${this.globalVars.borderColorLight};
   position: sticky;
   top: 0;
   z-index: 100;
@@ -65,8 +37,8 @@ export class HeaderStyleGenerator {
 }
 
 ${darkMode(`  .site-header {
-    background-color: ${vars.headerBackgroundDark};
-    border-bottom-color: ${vars.headerBorderColorDark};
+    background-color: ${this.globalVars.backgroundColorDark};
+    border-bottom-color: ${this.globalVars.borderColorDark};
   }`)}
 
 .site-header.has-nav {
@@ -82,7 +54,7 @@ ${darkMode(`  .site-header {
 }
 
 .site-header.has-nav .header-top {
-  border-bottom: 1px solid ${vars.headerBorderColor};
+  border-bottom: 1px solid ${this.globalVars.borderColorLight};
 }
 
 .header-bottom {
@@ -134,13 +106,13 @@ ${darkMode(`  .mobile-menu-button:hover {
 
 .header-logo-link {
   text-decoration: none;
-  color: ${vars.headerTextColor};
+  color: ${this.globalVars.textPrimaryLight};
   font-weight: ${this.globalVars.fontWeightSemibold};
   font-size: ${this.globalVars.fontSizeLg};
 }
 
 .header-logo {
-  height: ${vars.headerLogoHeight};
+  height: 2.5rem;
   max-width: 200px;
   object-fit: contain;
 }
@@ -190,12 +162,12 @@ ${darkMode(`  .header-search-button {
   }`)}
 
 .header-search-button:hover {
-  border-color: ${this.globalVars.primaryColorLight};
+  border-color: ${vars.searchHoverBorderColorLight};
   background: ${this.globalVars.backgroundColorLight};
 }
 
 ${darkMode(`  .header-search-button:hover {
-    border-color: ${this.globalVars.primaryColorDark};
+    border-color: ${vars.searchHoverBorderColorDark};
     background: ${this.globalVars.backgroundColorDark};
   }`)}
 
@@ -258,7 +230,7 @@ ${darkMode(`  .search-shortcut {
 
 .header-nav-link {
   text-decoration: none;
-  color: ${vars.navTextColorLight};
+  color: ${this.globalVars.navTextColorLight};
   padding: ${this.globalVars.spacingSm} 0;
   transition: color 0.2s ease;
   font-size: ${this.globalVars.fontSizeSm};
@@ -266,24 +238,24 @@ ${darkMode(`  .search-shortcut {
 }
 
 .header-nav-link:hover {
-  color: ${vars.navHoverColorLight};
+  color: ${this.globalVars.navHoverColorLight};
 }
 
 .header-nav-link.active {
-  color: ${vars.navActiveColorLight};
+  color: ${this.globalVars.navActiveColorLight};
   border-bottom: 2px solid ${this.globalVars.primaryColorLight};
 }
 
 ${darkMode(`  .header-nav-link {
-    color: ${vars.navTextColorDark};
+    color: ${this.globalVars.navTextColorDark};
   }
 
   .header-nav-link:hover {
-    color: ${vars.navHoverColorDark};
+    color: ${this.globalVars.navHoverColorDark};
   }
 
   .header-nav-link.active {
-    color: ${vars.navActiveColorDark};
+    color: ${this.globalVars.navActiveColorDark};
   }`)}
 
 ${mediaQuery('md', `  .header-search {

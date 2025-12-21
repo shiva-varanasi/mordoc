@@ -2,7 +2,7 @@
  * TableOfContents - Displays page headings for quick navigation
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { TableOfContents as TocType, TocEntry } from '../types/content';
 
 interface TableOfContentsProps {
@@ -12,29 +12,31 @@ interface TableOfContentsProps {
 export function TableOfContents({ toc }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>('');
   const [isScrolling, setIsScrolling] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
+  // Handle initial page load with hash in URL
   useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
       const id = hash.slice(1);
       const element = document.getElementById(id);
       if (element) {
+        // Delay to ensure DOM is fully rendered
         setTimeout(() => {
           setIsScrolling(true);
           setActiveId(id);
           scrollToElement(element);
-          
-          setTimeout(() => {
-            setIsScrolling(false);
-          }, 1000);
+          startScrollEndDetection();
         }, 100);
       }
     }
   }, []);
 
+  // Track which heading is currently visible using IntersectionObserver
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
+        // Only update during manual scrolling, not programmatic scrolling
         if (!isScrolling) {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
@@ -44,6 +46,7 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
         }
       },
       {
+        // Focus on viewport area below header and above bottom 80%
         rootMargin: '-80px 0px -80% 0px',
       }
     );
@@ -80,21 +83,57 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
     }
   };
 
+  /**
+   * Detects when smooth scrolling completes using debounced scroll events.
+   * Re-enables IntersectionObserver 150ms after the last scroll event.
+   * This approach works for any scroll distance, unlike fixed timeouts.
+   */
+  const startScrollEndDetection = () => {
+    const scrollContainer = document.querySelector('.layout-main') as HTMLElement | null;
+    
+    const handleScrollEnd = () => {
+      // Clear previous timeout on each scroll event (debouncing)
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      
+      // Wait 150ms after last scroll event to consider scrolling complete
+      scrollTimeoutRef.current = setTimeout(() => {
+        setIsScrolling(false);
+        
+        // Clean up event listener
+        if (scrollContainer) {
+          scrollContainer.removeEventListener('scroll', handleScrollEnd);
+        } else {
+          window.removeEventListener('scroll', handleScrollEnd);
+        }
+      }, 150);
+    };
+    
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleScrollEnd);
+    } else {
+      window.addEventListener('scroll', handleScrollEnd);
+    }
+  };
+
   const handleClick = (id: string) => {
     const element = document.getElementById(id);
     if (!element) return;
 
+    // Disable IntersectionObserver to prevent TOC from animating through sections
     setIsScrolling(true);
+    // Set active immediately so TOC highlights the target section right away
     setActiveId(id);
     
     scrollToElement(element);
     window.history.pushState(null, '', `#${id}`);
     
-    setTimeout(() => {
-      setIsScrolling(false);
-    }, 1000);
+    // Start listening for scroll completion
+    startScrollEndDetection();
   };
 
+  // Handle browser back/forward navigation
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
@@ -108,6 +147,10 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
     
     return () => {
       window.removeEventListener('hashchange', handleHashChange);
+      // Cleanup timeout on unmount to prevent memory leaks
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
     };
   }, []);
 

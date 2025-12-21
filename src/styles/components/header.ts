@@ -141,6 +141,8 @@ ${darkMode(`  .mobile-menu-button:hover {
 
 .header-logo {
   height: ${vars.headerLogoHeight};
+  max-width: 200px;
+  object-fit: contain;
 }
 
 .header-search {

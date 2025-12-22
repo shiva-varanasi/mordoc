@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="Photoniuum Warning icon">
+  <defs>
+    <linearGradient id="g4" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbbf24"/>
+      <stop offset="1" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="104" height="104" rx="24" fill="#0b1020"/>
+  <path d="M64 24 110 104H18L64 24Z" fill="url(#g4)"/>
+  <path d="M64 46v30" stroke="#0b1020" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="64" cy="88" r="6" fill="#0b1020"/>
+</svg>
+
+

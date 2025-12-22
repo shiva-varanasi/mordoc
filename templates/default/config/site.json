@@ -1,6 +1,16 @@
 {
-  "title": "Documentation",
-  "description": "Product documentation",
-  "keywords": [],
+  "title": "Photoniuum Flight Notes",
+  "description": "Fantasy documentation for lightspeed travel, photonic engines, and the etiquette of outrunning causality.",
+  "keywords": [
+    "photoniuum",
+    "lightspeed",
+    "ftl",
+    "photonic drive",
+    "navigation",
+    "field manual",
+    "fictional docs"
+  ],
   "baseUrl": ""
 }
+
+

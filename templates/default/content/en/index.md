@@ -1,57 +1,73 @@
 ---
-title: Welcome to Your Documentation
-description: Get started with your new documentation site powered by Mordoc
-order: 1
+title: Photoniuum Flight Notes
+description: Photoniuum corporate guidance for lightspeed travel: what we do, what it costs, and what it can’t promise.
+author: Photoniuum Navigation Office
+date: 2025-12-22
 ---
 
-# Welcome to Your Documentation
+# Welcome to Photoniuum
 
-This is your new documentation site built with **Mordoc** - a modern static site generator designed specifically for documentation.
+Photoniuum builds craft that **treat distance as a suggestion**.
 
-## What is Mordoc?
+We help passengers travel to the edge of the observable universe.
 
-Mordoc combines the best of static site generation (SSG) and single-page applications (SPA) to deliver fast, SEO-friendly documentation sites with smooth client-side navigation.
+> **Important (Time & Return):** Our drives preserve **you**. They do not preserve **your era**.  
+> Return journeys are offered on a *best-effort* basis. Photoniuum makes **no guarantee that Earth will still be present** (or recognizable) at the time of return.
 
-## Key Features
+![A stylized “starwake” trail](/images/starwake.svg "Photoniuum starwake")
 
-- **Fast & SEO-Friendly**: Pre-rendered HTML for every page
-- **Smooth Navigation**: Client-side routing after initial load
-- **Multi-Language Support**: Built-in internationalization
-- **Powerful Search**: Instant search powered by Pagefind
-- **Customizable**: Easy theming with simple JSON configuration
-- **Markdown + Markdoc**: Write in Markdown with powerful custom components
+## Start here
 
-## Quick Start
+{% cardGrid cols="3" %}
+{% card title="Flight School" href="/flight-school" icon="/icons/academy.svg" %}
+How to read a jump window, plot a line through vacuum, and keep your hands inside causality.
+{% /card %}
 
-Get started by editing the content in the `content/` directory:
+{% card title="Field Manual" href="/field-manual" icon="/icons/manual.svg" %}
+Engines, relativity, and safety rules we wrote in ink because pencil drifts at \(0.97c\).
+{% /card %}
 
-1. Edit this page: `content/en/index.md`
-2. Customize navigation: `config/sidenav.yaml`
-3. Adjust theme colors: `config/style.json`
-4. Run `npm run build` to rebuild
-5. Run `npm run dev` to preview
+{% card title="Ship Systems" href="/ship-systems" icon="/icons/systems.svg" %}
+Photonic cores, flux sails, and the tiny etiquette daemon that keeps the crew polite at lightspeed.
+{% /card %}
+{% /cardGrid %}
 
-## Project Structure
+## Mission brief
 
-```
-your-project/
-├── content/        # Your markdown files
-│   └── en/         # English content
-├── config/         # Configuration files
-│   ├── sidenav.yaml
-│   └── style.json
-├── public/         # Static assets
-└── dist/           # Generated site (after build)
-```
+Photoniuum travel is a trade:
 
-## Next Steps
-
-- Read the [Getting Started](getting-started) guide
-- Explore [advanced features](guides/first-steps)
-- Customize your site's appearance
-- Add more content pages
+- **Passengers**: age almost not at all.
+- **Home**: continues aging at full speed.
+- **Maps**: change while you’re not looking.
+- **Language**: struggles to describe what you’re doing.
 
 ---
 
-**Ready to build something amazing?** Start editing the files in `content/` and watch your documentation come to life!
+## Passenger-facing overview
+
+### What you’ll feel
+
+- The cabin stays calm.
+- Outside the viewport, starfields become **threads**.
+- Your stomach insists you are still.
+- Your logbook insists you are not.
+
+### What we disclose (table)
+
+| Disclosure | What it means |
+|---|---|
+| “Edgeward” itinerary | You may not return to the same sky |
+| “Chronal offset” | Your calendar and Earth’s calendar diverge |
+| “Starwake visibility” | Your passage may be detectable for a very long time |
+
+### A typical itinerary (example)
+
+```yaml
+voyage: "EDGEWARD-ALBIREO"
+duration_ship_time: "11 days"
+estimated_home_time: "≈ 3,200 years"
+return_clause: "Earth not guaranteed to exist"
+comfort: "high"
+```
+
 

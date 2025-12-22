@@ -1,7 +1,7 @@
 {
   "name": "my-documentation",
   "version": "1.0.0",
-  "description": "Documentation site powered by Mordoc",
+  "description": "Photoniuum Flight Notes — corporate documentation for lightspeed travel (fictional starter site)",
   "private": true,
   "scripts": {
     "dev": "mordoc dev",
@@ -10,8 +10,10 @@
     "build:drafts": "mordoc build --drafts"
   },
   "keywords": [
-    "documentation",
-    "docs"
+    "photoniuum",
+    "lightspeed",
+    "ftl",
+    "documentation"
   ],
   "author": "",
   "dependencies": {

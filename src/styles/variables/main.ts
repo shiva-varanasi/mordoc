@@ -104,7 +104,7 @@ export function getGlobalDefaults(): GlobalVariables {
 
 /**
  * Merge user overrides with global defaults
- * Only allows customization of colors and typography
+ * Only allows customization of typography (font families)
  */
 export function mergeGlobalOverrides(
   userOverrides?: Record<string, string>
@@ -117,22 +117,6 @@ export function mergeGlobalOverrides(
   
   // Whitelist of customizable global variables
   const customizableKeys: (keyof GlobalVariables)[] = [
-    'primaryColorLight', 'primaryColorDark',
-    'secondaryColorLight', 'secondaryColorDark',
-    'backgroundColorLight', 'backgroundColorDark',
-    'surfaceColorLight', 'surfaceColorDark',
-    'textPrimaryLight', 'textPrimaryDark',
-    'textSecondaryLight', 'textSecondaryDark',
-    'textDisabledLight', 'textDisabledDark',
-    'borderColorLight', 'borderColorDark',
-    'linkColorLight', 'linkColorDark',
-    'successColorLight', 'successColorDark',
-    'warningColorLight', 'warningColorDark',
-    'errorColorLight', 'errorColorDark',
-    'infoColorLight', 'infoColorDark',
-    'navTextColorLight', 'navTextColorDark',
-    'navHoverColorLight', 'navHoverColorDark',
-    'navActiveColorLight', 'navActiveColorDark',
     'fontFamilyBase', 'fontFamilyHeading', 'fontFamilyMono',
   ];
   

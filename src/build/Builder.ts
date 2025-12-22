@@ -321,7 +321,7 @@ export class Builder {
     if (siteConfig.assets.favicon) {
       const faviconSrc = path.join(this.configDir, siteConfig.assets.favicon);
       if (fs.existsSync(faviconSrc)) {
-        const faviconDest = path.join(this.outputDir, siteConfig.assets.favicon);
+        const faviconDest = path.join(assetsDir, siteConfig.assets.favicon);
         fs.copyFileSync(faviconSrc, faviconDest);
       }
     }

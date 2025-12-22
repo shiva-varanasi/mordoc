@@ -114,7 +114,7 @@ ${darkMode(`  .mobile-menu-button:hover {
 
 .header-logo {
   height: 2.5rem;
-  max-width: 200px;
+  max-width: 250px;
   object-fit: contain;
 }
 

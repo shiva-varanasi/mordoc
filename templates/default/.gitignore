@@ -6,7 +6,6 @@ dist/
 
 # Logs
 *.log
-npm-debug.log*
 
 # Environment
 .env

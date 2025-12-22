@@ -34,8 +34,9 @@ export function useNavigation() {
         const content = await fetchContent(path);
 
         if (content) {
-          // Navigate to the path
-          navigate(path);
+          // Navigate to the NORMALIZED path (same as what fetchContent uses)
+          const normalizedPath = path === '/' ? '/' : path.replace(/\/$/, '');
+          navigate(normalizedPath);
           
           // Scroll to top
           window.scrollTo(0, 0);

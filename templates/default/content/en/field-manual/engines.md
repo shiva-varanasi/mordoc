@@ -1,8 +1,6 @@
 ---
 title: Engines — The Photoniuum Core
 description: The heart of lightspeed travel: how it spools, what it wants, and what it refuses to forgive.
-author: Photoniuum Engineering Guild
-date: 2025-12-22
 ---
 
 # Engines — The Photoniuum Core

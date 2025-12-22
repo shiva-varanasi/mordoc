@@ -15,7 +15,6 @@
     "ftl",
     "documentation"
   ],
-  "author": "",
   "dependencies": {
     "mordoc": "^0.1.0"
   }

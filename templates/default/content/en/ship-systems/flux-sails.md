@@ -1,8 +1,6 @@
 ---
 title: Flux Sails
 description: How Photoniuum shapes starwake: the sails that turn turbulence into a signature.
-author: Photoniuum Hullwrights
-date: 2025-12-22
 ---
 
 # Flux Sails

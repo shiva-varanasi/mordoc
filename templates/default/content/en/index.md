@@ -1,8 +1,6 @@
 ---
 title: Photoniuum Flight Notes
 description: Photoniuum corporate guidance for lightspeed travel: what we do, what it costs, and what it can’t promise.
-author: Photoniuum Navigation Office
-date: 2025-12-22
 ---
 
 # Welcome to Photoniuum

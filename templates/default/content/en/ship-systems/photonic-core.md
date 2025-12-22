@@ -1,8 +1,6 @@
 ---
 title: Photonic Core
 description: A deeper look at Photoniuum’s core: channels, limiters, and the “choir” effect.
-author: Photoniuum Engineering Guild
-date: 2025-12-22
 ---
 
 # Photonic Core

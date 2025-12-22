@@ -1,8 +1,6 @@
 ---
 title: Flight School
 description: Orientation for new pilots and curious readers. We teach theory, etiquette, and survivable shortcuts.
-author: Photoniuum Academy
-date: 2025-12-22
 ---
 
 # Flight School

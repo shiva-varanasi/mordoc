@@ -1,8 +1,6 @@
 ---
 title: Changelog
 description: Drive bulletins and public notices from Photoniuum (fictional, but written like real releases).
-author: Photoniuum Release Engineering
-date: 2025-12-22
 ---
 
 # Drive Bulletins

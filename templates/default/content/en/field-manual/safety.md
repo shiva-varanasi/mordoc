@@ -1,8 +1,6 @@
 ---
 title: Safety — The Ten-Meter Rule
 description: Safety practices for spooling, jumping, and living near things that glow with intent.
-author: Photoniuum Safety Board
-date: 2025-12-22
 ---
 
 # Safety — The Ten-Meter Rule

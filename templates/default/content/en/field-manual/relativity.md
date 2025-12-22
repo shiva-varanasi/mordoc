@@ -1,8 +1,6 @@
 ---
 title: Relativity — A Friendly Lie
 description: A practical guide to time dilation, instrument disagreement, and why your tea tastes “later.”
-author: Photoniuum Navigation Office
-date: 2025-12-22
 ---
 
 # Relativity — A Friendly Lie

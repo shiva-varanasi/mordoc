@@ -1,8 +1,6 @@
 ---
 title: Navigation — Folding a Straight Line
 description: How Photoniuum charts a jump: constraints, windows, and the ritual of the last checkpoint.
-author: Photoniuum Navigation Office
-date: 2025-12-22
 ---
 
 # Navigation — Folding a Straight Line

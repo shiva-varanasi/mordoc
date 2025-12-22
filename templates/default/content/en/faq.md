@@ -1,8 +1,6 @@
 ---
 title: FAQ
 description: Common questions about Photoniuum lightspeed travel — answered with alarming honesty.
-author: Photoniuum Support
-date: 2025-12-22
 ---
 
 # FAQ

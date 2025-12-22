@@ -1,8 +1,6 @@
 ---
 title: Ship Systems
 description: A tour of Photoniuum ship subsystems — what they do, how they fail, and how to talk to them.
-author: Photoniuum Engineering Guild
-date: 2025-12-22
 ---
 
 # Ship Systems

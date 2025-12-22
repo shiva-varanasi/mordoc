@@ -1,8 +1,6 @@
 ---
 title: Primer — What “Lightspeed” Means Here
 description: Photoniuum’s plain-language definition of lightspeed travel, driftspace, and the price of coming home late.
-author: Photoniuum Academy
-date: 2025-12-22
 ---
 
 # Primer — What “Lightspeed” Means Here

@@ -68,4 +68,16 @@ return_clause: "Earth not guaranteed to exist"
 comfort: "high"
 ```
 
+{% callout type="note" title="Navigation Tip" %}
+Always verify your coordinates before engaging the drive. Time dilation effects are non-refundable.
+{% /callout %}
+
+{% callout type="warning" %}
+Temporal paradoxes may occur if you attempt to return before you left.
+{% /callout %}
+
+{% callout type="danger" title="Critical Safety Notice" %}
+Do not attempt to exit the vessel during a jump. The vacuum of causality is not forgiving.
+{% /callout %}
+
 

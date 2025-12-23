@@ -85,6 +85,13 @@ export class ContentProcessor {
             cols: { type: Number, default: 2 },
           },
         },
+        callout: {
+          render: 'Callout',
+          attributes: {
+            type: { type: String, required: true, matches: ['note', 'warning', 'danger'] },
+            title: { type: String },
+          },
+        },
       },
     });
     

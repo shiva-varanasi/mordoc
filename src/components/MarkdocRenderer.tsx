@@ -10,6 +10,7 @@ import Heading from './Heading';
 import { Image } from './Image';
 import Card from './Card';
 import CardGrid from './CardGrid';
+import Callout from './Callout';
 
 interface MarkdocRendererProps {
   content: MarkdocRenderableNode;
@@ -89,6 +90,9 @@ function getDefaultComponents(): Record<string, React.ComponentType<any>> {
     // Cards and card grid containers
     Card: Card,
     CardGrid: CardGrid,
+
+    // Callout boxes
+    Callout: Callout,
 
   };
 }

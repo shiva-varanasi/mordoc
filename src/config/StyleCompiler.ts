@@ -23,6 +23,7 @@ import { CardStyleGenerator } from '../styles/components/card';
 import { TOCStyleGenerator } from '../styles/components/toc';
 import { SearchModalStyleGenerator } from '../styles/components/searchmodal';
 import { UtilityStyleGenerator } from '../styles/components/utility';
+import { CalloutStyleGenerator } from '../styles/components/callout';
 
 export class StyleCompiler {
   private projectRoot: string;
@@ -92,6 +93,7 @@ export class StyleCompiler {
     const headingGen = new HeadingStyleGenerator(globalVars);
     const codeblockGen = new CodeBlockStyleGenerator(globalVars);
     const cardGen = new CardStyleGenerator(globalVars);
+    const calloutGen = new CalloutStyleGenerator(globalVars);
     const tocGen = new TOCStyleGenerator(globalVars);
     const searchmodalGen = new SearchModalStyleGenerator(globalVars);
     const utilityGen = new UtilityStyleGenerator(globalVars);
@@ -110,6 +112,7 @@ export class StyleCompiler {
       headingGen.generate(userOverrides.components['heading']),
       codeblockGen.generate(),
       cardGen.generate(userOverrides.components['card']),
+      calloutGen.generate(),
       tocGen.generate(userOverrides.components['toc']),
       searchmodalGen.generate(),
       utilityGen.generate(),

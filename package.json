@@ -26,7 +26,7 @@
         "markdoc",
         "react"
     ],
-    "author": "",
+    "author": "Shiva Varanasi",
     "license": "MIT",
     "dependencies": {
         "@markdoc/markdoc": "^0.5.4",

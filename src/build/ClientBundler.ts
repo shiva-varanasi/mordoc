@@ -28,6 +28,7 @@ export class ClientBundler {
 
   /**
    * Bundle the client application
+   * Uses pre-bundled file if available, otherwise bundles from source
    */
   async bundle(): Promise<void> {
     const assetsDir = path.join(this.outputDir, 'assets');
@@ -37,12 +38,51 @@ export class ClientBundler {
       fs.mkdirSync(assetsDir, { recursive: true });
     }
 
-    // Entry point for client app
+    // Check for pre-bundled client (created during package build)
+    const preBundledClient = path.join(this.projectRoot, 'dist/bundles/client.js');
+    
+    if (fs.existsSync(preBundledClient)) {
+      // Use pre-bundled file (fast path for installed package)
+      await this.copyPreBundled(preBundledClient, assetsDir);
+    } else {
+      // Fallback to bundling from source (for development)
+      await this.bundleFromSource(assetsDir);
+    }
+  }
+
+  /**
+   * Copy pre-bundled client file to output directory
+   * This is the fast path used when running from an installed package
+   */
+  private async copyPreBundled(sourcePath: string, assetsDir: string): Promise<void> {
+    const outputFile = path.join(assetsDir, 'main.js');
+    
+    try {
+      fs.copyFileSync(sourcePath, outputFile);
+      
+      // Log bundle size
+      const stats = fs.statSync(outputFile);
+      const sizeInKB = (stats.size / 1024).toFixed(2);
+      console.log(`  Client bundle: ${sizeInKB} KB (pre-bundled)`);
+    } catch (error) {
+      throw new Error(`Failed to copy pre-bundled client: ${(error as Error).message}`);
+    }
+  }
+
+  /**
+   * Bundle client from source files
+   * This is the fallback path used during development
+   */
+  private async bundleFromSource(assetsDir: string): Promise<void> {
+    // Entry point for client app (source files)
     const entryPoint = path.join(this.projectRoot, 'src/client/main.tsx');
 
     // Check if entry point exists
     if (!fs.existsSync(entryPoint)) {
-      throw new Error(`Client entry point not found: ${entryPoint}`);
+      throw new Error(
+        `Client entry point not found: ${entryPoint}\n` +
+        'Hint: Pre-bundled client not found. Run "npm run build" to create it.'
+      );
     }
 
     try {
@@ -77,7 +117,7 @@ export class ClientBundler {
         if (outputs.length > 0) {
           const totalSize = outputs.reduce((sum, output) => sum + output.bytes, 0);
           const sizeInKB = (totalSize / 1024).toFixed(2);
-          console.log(`  Client bundle: ${sizeInKB} KB`);
+          console.log(`  Client bundle: ${sizeInKB} KB (bundled from source)`);
         }
       }
     } catch (error) {
@@ -96,9 +136,12 @@ export class ClientBundler {
 
   /**
    * Watch mode for development (future enhancement)
+   * Always bundles from source in watch mode
    */
   async watch(): Promise<void> {
     const assetsDir = path.join(this.outputDir, 'assets');
+    
+    // Entry point for client app (source files)
     const entryPoint = path.join(this.projectRoot, 'src/client/main.tsx');
 
     if (!fs.existsSync(assetsDir)) {

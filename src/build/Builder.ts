@@ -334,11 +334,15 @@ export class Builder {
 
   /**
    * Copy MORDOC's built-in assets (fonts, etc.)
+   * Uses pre-copied assets from dist/ in installed package
    */
   private copyMordocAssets(): void {
     const mordocRoot = path.join(__dirname, '../..');
-    const mordocAssetsDir = path.join(mordocRoot, 'src/assets');
     
+    // Use dist/assets (created during package build)
+    const mordocAssetsDir = path.join(mordocRoot, 'dist/assets');
+    
+    // Gracefully skip if assets directory doesn't exist
     if (!fs.existsSync(mordocAssetsDir)) {
       return;
     }

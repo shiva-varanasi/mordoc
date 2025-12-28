@@ -101,20 +101,28 @@ ${darkMode(`  .toc-link.active {
     border-left-color: ${vars.tocLinkActiveColorDark};
   }`)}
 
+.toc-link[data-level="1"] {
+  padding-left: 0.75rem;
+}
+
+.toc-link[data-level="2"] {
+  padding-left: 1.25rem;
+}
+
 .toc-link[data-level="3"] {
-  padding-left: 1rem;
+  padding-left: 1.75rem;
 }
 
 .toc-link[data-level="4"] {
-  padding-left: 1.5rem;
+  padding-left: 2.25rem;
 }
 
 .toc-link[data-level="5"] {
-  padding-left: 2rem;
+  padding-left: 2.75rem;
 }
 
 .toc-link[data-level="6"] {
-  padding-left: 2.5rem;
+  padding-left: 3.25rem;
 }`;
   }
 }

@@ -56,7 +56,6 @@ ${darkMode(`  .content-title {
   font-weight: 400;
   color: ${this.globalVars.textPrimaryLight};
   margin-bottom: 1rem;
-  max-width: 42rem;
 }
 
 ${darkMode(`  .content-description {

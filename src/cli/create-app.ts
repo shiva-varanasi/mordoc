@@ -168,17 +168,6 @@ function initGitRepo(projectDir: string): void {
       cwd: projectDir,
       stdio: 'ignore',
     });
-
-    // Create initial commit
-    execSync('git add .', {
-      cwd: projectDir,
-      stdio: 'ignore',
-    });
-
-    execSync('git commit -m "Initial commit"', {
-      cwd: projectDir,
-      stdio: 'ignore',
-    });
   } catch (error) {
     console.warn('Warning: Failed to initialize git repository');
     console.warn('You can initialize it manually later with: git init');

@@ -46,6 +46,9 @@ export async function createApp(
     const templateName = options.template || 'default';
     await copyTemplate(projectDir, templateName);
 
+    // Create .gitignore file (npm excludes it from published packages)
+    createGitignore(projectDir);
+
     // Update package.json with project name
     console.log('Configuring package.json...');
     updatePackageJson(projectDir, projectName);
@@ -137,6 +140,40 @@ function copyDirectory(src: string, dest: string): void {
       fs.copyFileSync(srcPath, destPath);
     }
   }
+}
+
+/**
+ * Create .gitignore file in project directory
+ */
+function createGitignore(projectDir: string): void {
+  const gitignoreContent = `# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Mordoc cache
+.mordoc-cache/
+`;
+
+  const gitignorePath = path.join(projectDir, '.gitignore');
+  fs.writeFileSync(gitignorePath, gitignoreContent, 'utf8');
 }
 
 /**

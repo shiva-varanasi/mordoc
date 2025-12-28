@@ -16,6 +16,6 @@
     "documentation"
   ],
   "dependencies": {
-    "mordoc": "^0.1.4"
+    "mordoc": "^0.1.5"
   }
 }

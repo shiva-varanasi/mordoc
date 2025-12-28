@@ -11,6 +11,8 @@ interface SideNavVariables {
   navHoverBackgroundDark: string;
   navActiveBackgroundLight: string;
   navActiveBackgroundDark: string;
+  navActiveTextColorLight: string;
+  navActiveTextColorDark: string;
 }
 
 export class SideNavStyleGenerator {
@@ -22,6 +24,8 @@ export class SideNavStyleGenerator {
       navHoverBackgroundDark: '#1F1F1F',
       navActiveBackgroundLight: '#E5E5E5',
       navActiveBackgroundDark: '#1F1F1F',
+      navActiveTextColorLight: '#171717',
+      navActiveTextColorDark: '#FAFAFA',
     };
     
     const vars = mergeOverrides(
@@ -29,7 +33,8 @@ export class SideNavStyleGenerator {
       userOverrides,
       [
         'navHoverBackgroundLight', 'navHoverBackgroundDark',
-        'navActiveBackgroundLight', 'navActiveBackgroundDark'
+        'navActiveBackgroundLight', 'navActiveBackgroundDark',
+        'navActiveTextColorLight', 'navActiveTextColorDark'
       ]
     );
     
@@ -146,13 +151,13 @@ export class SideNavStyleGenerator {
 }
 
 .sidenav-link.active {
-  color: #171717;
+  color: ${vars.navActiveTextColorLight};
   background-color: ${vars.navActiveBackgroundLight};
   font-weight: ${this.globalVars.fontWeightMedium};
 }
 
 [data-theme="dark"] .sidenav-link.active {
-  color: #FAFAFA;
+  color: ${vars.navActiveTextColorDark};
   background-color: ${vars.navActiveBackgroundDark};
 }
 

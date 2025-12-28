@@ -1,10 +1,10 @@
 {
     "name": "mordoc",
-    "repoitory" :{
+    "repoitory": {
         "type": "git",
         "url": "https://github.com/shiva-varanasi/mordoc.git"
     },
-    "version": "0.1.4",
+    "version": "0.1.5",
     "description": "A static site generator for documentation with SSG + SPA capabilities",
     "bin": {
         "mordoc": "./bin/cli.js"
@@ -42,7 +42,7 @@
         "react-dom": "^19.2.3",
         "react-router-dom": "^7.9.3",
         "sirv-cli": "^2.0.2",
-        "ws": "^8.18.3",       
+        "ws": "^8.18.3",
         "esbuild": "^0.25.10"
     },
     "devDependencies": {

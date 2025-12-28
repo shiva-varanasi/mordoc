@@ -7,11 +7,11 @@ import { GlobalVariables } from '../types';
 import { mergeOverrides } from '../utils';
 
 interface SideNavVariables {
-  navHoverBackgroundLight: string;
+  navHoverBackground: string;
   navHoverBackgroundDark: string;
-  navActiveBackgroundLight: string;
+  navActiveBackground: string;
   navActiveBackgroundDark: string;
-  navActiveTextColorLight: string;
+  navActiveTextColor: string;
   navActiveTextColorDark: string;
 }
 
@@ -20,11 +20,11 @@ export class SideNavStyleGenerator {
   
   generate(userOverrides?: Record<string, string>): string {
     const defaults: SideNavVariables = {
-      navHoverBackgroundLight: '#E5E5E5',
+      navHoverBackground: '#E5E5E5',
       navHoverBackgroundDark: '#1F1F1F',
-      navActiveBackgroundLight: '#E5E5E5',
+      navActiveBackground: '#E5E5E5',
       navActiveBackgroundDark: '#1F1F1F',
-      navActiveTextColorLight: '#171717',
+      navActiveTextColor: '#171717',
       navActiveTextColorDark: '#FAFAFA',
     };
     
@@ -32,9 +32,9 @@ export class SideNavStyleGenerator {
       defaults,
       userOverrides,
       [
-        'navHoverBackgroundLight', 'navHoverBackgroundDark',
-        'navActiveBackgroundLight', 'navActiveBackgroundDark',
-        'navActiveTextColorLight', 'navActiveTextColorDark'
+        'navHoverBackground', 'navHoverBackgroundDark',
+        'navActiveBackground', 'navActiveBackgroundDark',
+        'navActiveTextColor', 'navActiveTextColorDark'
       ]
     );
     
@@ -133,7 +133,7 @@ export class SideNavStyleGenerator {
 
 .sidenav-link:hover {
   color: #1C1C1C;
-  background-color: ${vars.navHoverBackgroundLight};
+  background-color: ${vars.navHoverBackground};
 }
 
 [data-theme="dark"] .sidenav-link:hover {
@@ -151,8 +151,8 @@ export class SideNavStyleGenerator {
 }
 
 .sidenav-link.active {
-  color: ${vars.navActiveTextColorLight};
-  background-color: ${vars.navActiveBackgroundLight};
+  color: ${vars.navActiveTextColor};
+  background-color: ${vars.navActiveBackground};
   font-weight: ${this.globalVars.fontWeightMedium};
 }
 

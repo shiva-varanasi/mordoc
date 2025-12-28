@@ -118,7 +118,7 @@ export function ContentPage() {
               </p>
               
               <p className="content-footer-powered">
-                Powered by <a href="https://github.com/yourusername/mordoc" target="_blank" rel="noopener noreferrer">Mordoc</a>
+                Powered by <a href="https://www.mordoc.dev/" target="_blank" rel="noopener noreferrer">Mordoc</a>
               </p>
             </div>
           </footer>

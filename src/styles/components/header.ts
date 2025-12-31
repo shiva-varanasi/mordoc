@@ -7,7 +7,7 @@ import { GlobalVariables } from '../types';
 import { mergeOverrides, darkMode, mediaQuery } from '../utils';
 
 interface HeaderVariables {
-  searchHoverBorderColorLight: string;
+  searchHoverBorderColor: string;
   searchHoverBorderColorDark: string;
 }
 
@@ -16,14 +16,14 @@ export class HeaderStyleGenerator {
   
   generate(userOverrides?: Record<string, string>): string {
     const defaults: HeaderVariables = {
-      searchHoverBorderColorLight: this.globalVars.primaryColorLight,
+      searchHoverBorderColor: this.globalVars.primaryColorLight,
       searchHoverBorderColorDark: this.globalVars.primaryColorDark,
     };
     
     const vars = mergeOverrides(
       defaults,
       userOverrides,
-      ['searchHoverBorderColorLight', 'searchHoverBorderColorDark']
+      ['searchHoverBorderColor', 'searchHoverBorderColorDark']
     );
     
     return `/* Header */
@@ -162,7 +162,7 @@ ${darkMode(`  .header-search-button {
   }`)}
 
 .header-search-button:hover {
-  border-color: ${vars.searchHoverBorderColorLight};
+  border-color: ${vars.searchHoverBorderColor};
   background: ${this.globalVars.backgroundColorLight};
 }
 

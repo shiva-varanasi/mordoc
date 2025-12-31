@@ -2,7 +2,7 @@
  * ContentPage - Main content page component
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useContent } from '../client/contexts/ContentContext';
 import MarkdocRenderer from './MarkdocRenderer';
 import TableOfContents from './TableOfContents';
@@ -15,6 +15,78 @@ import { useConfig } from '../client/contexts/ConfigContext';
 export function ContentPage() {
   const { currentContent, isLoading, error } = useContent();
   const { config } = useConfig();
+
+  // Update document title and meta tags when content changes
+  useEffect(() => {
+    if (currentContent) {
+      const { frontmatter } = currentContent.metadata;
+      const title = `${frontmatter.title} | ${config.metadata.title}`;
+      const description = frontmatter.description || config.metadata.description || '';
+      const currentUrl = window.location.href;
+
+      // Update document title
+      document.title = title;
+
+      // Helper to update or create a meta tag
+      const updateMetaTag = (selector: string, attribute: string, content: string) => {
+        let metaTag = document.querySelector(selector);
+        if (!metaTag) {
+          metaTag = document.createElement('meta');
+          const match = selector.match(/\[(.+?)="(.+?)"\]/);
+          if (match) {
+            const [, attrName, attrValue] = match;
+            metaTag.setAttribute(attrName, attrValue);
+          }
+          document.head.appendChild(metaTag);
+        }
+        metaTag.setAttribute(attribute, content);
+      };
+
+      // Helper to update or create a link tag
+      const updateLinkTag = (rel: string, href: string) => {
+        let linkTag = document.querySelector(`link[rel="${rel}"]`) as HTMLLinkElement;
+        if (!linkTag) {
+          linkTag = document.createElement('link');
+          linkTag.rel = rel;
+          document.head.appendChild(linkTag);
+        }
+        linkTag.href = href;
+      };
+
+      // Update description
+      if (description) {
+        updateMetaTag('meta[name="description"]', 'content', description);
+      }
+
+      // Update author
+      if (frontmatter.author) {
+        updateMetaTag('meta[name="author"]', 'content', frontmatter.author);
+      }
+
+      // Update keywords
+      const keywords = frontmatter.tags || config.metadata.keywords;
+      if (keywords && keywords.length > 0) {
+        const keywordsString = Array.isArray(keywords) ? keywords.join(', ') : keywords;
+        updateMetaTag('meta[name="keywords"]', 'content', keywordsString);
+      }
+
+      // Update Open Graph tags
+      updateMetaTag('meta[property="og:title"]', 'content', frontmatter.title);
+      if (description) {
+        updateMetaTag('meta[property="og:description"]', 'content', description);
+      }
+      updateMetaTag('meta[property="og:url"]', 'content', currentUrl);
+
+      // Update Twitter Card tags
+      updateMetaTag('meta[name="twitter:title"]', 'content', frontmatter.title);
+      if (description) {
+        updateMetaTag('meta[name="twitter:description"]', 'content', description);
+      }
+
+      // Update canonical URL
+      updateLinkTag('canonical', currentUrl);
+    }
+  }, [currentContent, config.metadata.title, config.metadata.description, config.metadata.keywords]);
 
   // Loading state
   if (isLoading) {

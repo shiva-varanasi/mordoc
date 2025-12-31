@@ -157,7 +157,8 @@ pre code {
 
 ul, ol {
   padding-left: ${this.globalVars.spacingXl};
-  margin-bottom: 1.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
   line-height: 1.7;
 }
 

@@ -52,6 +52,10 @@ export class CalloutStyleGenerator {
   color: #576375;
 }
 
+.callout-body p {
+  margin-bottom: 0;
+}
+
 /* Icon Styling */
 .callout-icon {
   width: 20px;

@@ -41,7 +41,7 @@ h1 {
   line-height: 1.3;
   letter-spacing: -0.01em;
   font-weight: 600;
-  margin-top: 0;
+  margin-top: 1.5rem;
   margin-bottom: 1rem;
 }
 
@@ -50,7 +50,7 @@ h2 {
   line-height: 1.4;
   letter-spacing: -0.01em;
   font-weight: 600;
-  margin-top: 2rem;
+  margin-top: 1rem;
   margin-bottom: 0.75rem;
 }
 

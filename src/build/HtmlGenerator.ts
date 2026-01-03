@@ -144,26 +144,11 @@ export class HtmlGenerator {
       React.createElement(
         StaticRouter,
         { location: pagePath },
-        React.createElement(
-          ConfigProvider,
-          { config: this.siteConfig, children: 
-            React.createElement(
-              ContentProvider,
-              { initialContent: content, children:
-                React.createElement(
-                  SearchProvider,
-                  { children:
-                    React.createElement(App, {
-                      siteConfig: this.siteConfig,
-                      initialContent: content,
-                      isServerRender: true
-                    })
-                  }
-                )
-              }
-            )
-          }
-        )
+        React.createElement(App, {
+          siteConfig: this.siteConfig,
+          initialContent: content,
+          isServerRender: true
+        })
       )
     );
 

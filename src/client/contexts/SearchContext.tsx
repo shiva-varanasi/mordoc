@@ -191,17 +191,17 @@ export function SearchProvider({ children }: SearchProviderProps) {
   }, []);
 
   /**
-   * Perform search using Pagefind with two-tier approach
+   * Perform search using Pagefind
    */
   const search = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) {
       setResults([]);
       return;
     }
-
+  
     setIsSearching(true);
     setQuery(searchQuery);
-
+  
     try {
       const pagefind = await loadPagefind();
       
@@ -209,23 +209,16 @@ export function SearchProvider({ children }: SearchProviderProps) {
         setResults([]);
         return;
       }
-
+  
       const trimmedQuery = searchQuery.trim();
-      const exactQuery = `"${trimmedQuery}"`;
-      const broadQuery = trimmedQuery;
-
-      // Perform both searches in parallel
-      const [exactResults, broadResults] = await Promise.all([
-        pagefind.search(exactQuery),
-        pagefind.search(broadQuery),
-      ]);
-
-      // Track exact match IDs for deduplication
-      const exactIds = new Set(exactResults.results.map(r => r.id));
-
-      // Process exact matches first
-      const exactProcessed = await Promise.all(
-        exactResults.results.map(async (result) => {
+  
+      // Use only broad search - it has proper scoring
+      // Pagefind's exact phrase matching returns score=1 for all matches (binary)
+      const searchResults = await pagefind.search(trimmedQuery);
+  
+      // Process results
+      const processed = await Promise.all(
+        searchResults.results.map(async (result) => {
           const data = await result.data();
           return {
             id: result.id,
@@ -236,30 +229,11 @@ export function SearchProvider({ children }: SearchProviderProps) {
           };
         })
       );
-
-      // Process broad matches, excluding those already in exact results
-      const broadProcessed = await Promise.all(
-        broadResults.results
-          .filter(result => !exactIds.has(result.id))
-          .map(async (result) => {
-            const data = await result.data();
-            return {
-              id: result.id,
-              url: data.url,
-              title: data.meta.title || 'Untitled',
-              excerpt: data.excerpt || '',
-              score: result.score,
-            };
-          })
-      );
-
-      // Combine: exact matches first (sorted by score), then broad matches (sorted by score)
-      const combinedResults = [
-        ...exactProcessed.sort((a, b) => b.score - a.score),
-        ...broadProcessed.sort((a, b) => b.score - a.score),
-      ];
-
-      setResults(combinedResults);
+  
+      // Pagefind already sorts by score, but ensure it's sorted descending
+      const sortedResults = processed.sort((a, b) => b.score - a.score);
+  
+      setResults(sortedResults);
     } catch (error) {
       console.error('Search error:', error);
       setResults([]);

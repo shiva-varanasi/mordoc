@@ -63,8 +63,6 @@ function AppContent({ isServerRender }: { isServerRender: boolean }) {
 
   // Fetch content when route changes (for SPA navigation)
   useEffect(() => {
-    // Skip on server render
-    if (isServerRender) return;
 
     if (!hasHydratedRef.current) {
       hasHydratedRef.current = true; // skip only the initial hydration run
@@ -72,7 +70,7 @@ function AppContent({ isServerRender }: { isServerRender: boolean }) {
     }
 
     fetchContent(location.pathname);
-  }, [location.pathname, fetchContent, isServerRender]);
+  }, [location.pathname, fetchContent]);
 
   return (
     <>

@@ -33,17 +33,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     if (currentTheme === 'light' || currentTheme === 'dark') {
       return currentTheme;
     }
-    
-    // Fallback: Check localStorage
-    const stored = localStorage.getItem('theme') as Theme | null;
-    if (stored === 'light' || stored === 'dark') {
-      return stored;
-    }
-
-    // Fall back to system preference
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
-    }
 
     return 'light';
   });

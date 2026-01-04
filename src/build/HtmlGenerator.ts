@@ -111,9 +111,6 @@ export class HtmlGenerator {
     headParts.push(`<link rel="stylesheet" href="${this.siteConfig.assetsPath}/theme.css">`);
     headParts.push(`<link rel="stylesheet" href="${this.siteConfig.assetsPath}/styles.css">`);
 
-    // Pagefind CSS (for search)
-    headParts.push(`<link rel="stylesheet" href="/pagefind/pagefind-ui.css">`);
-
     return headParts.map(part => `  ${part}`).join('\n');
   }
 
@@ -147,26 +144,11 @@ export class HtmlGenerator {
       React.createElement(
         StaticRouter,
         { location: pagePath },
-        React.createElement(
-          ConfigProvider,
-          { config: this.siteConfig, children: 
-            React.createElement(
-              ContentProvider,
-              { initialContent: content, children:
-                React.createElement(
-                  SearchProvider,
-                  { children:
-                    React.createElement(App, {
-                      siteConfig: this.siteConfig,
-                      initialContent: content,
-                      isServerRender: true
-                    })
-                  }
-                )
-              }
-            )
-          }
-        )
+        React.createElement(App, {
+          siteConfig: this.siteConfig,
+          initialContent: content,
+          isServerRender: true
+        })
       )
     );
 
@@ -196,9 +178,6 @@ export class HtmlGenerator {
 
     // Client-side React bundle
     scripts.push(`  <script src="${this.siteConfig.assetsPath}/main.js" defer></script>`);
-
-    // Pagefind search script
-    scripts.push(`  <script src="/pagefind/pagefind-ui.js" defer></script>`);
 
     return scripts.join('\n');
   }

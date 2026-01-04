@@ -107,11 +107,13 @@ ${darkMode(`  .token.comment,
     color: #8b949e;
   }`)}
 
+.token.content,
 .token.punctuation {
   color: ${this.globalVars.textPrimaryLight};
 }
 
-${darkMode(`  .token.punctuation {
+${darkMode(`  .token.content,
+  .token.punctuation {
     color: ${this.globalVars.textPrimaryDark};
   }`)}
 

@@ -15,6 +15,10 @@ import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-yaml';
 import 'prismjs/components/prism-bash';
 import 'prismjs/components/prism-markdown';
+import 'prismjs/components/prism-jsx';
+import 'prismjs/components/prism-tsx';
+import 'prismjs/components/prism-diff';
+import 'prismjs/components/prism-sql';
 
 interface CodeBlockProps {
   language?: string;

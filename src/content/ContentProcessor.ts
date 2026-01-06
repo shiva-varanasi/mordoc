@@ -69,6 +69,13 @@ export class ContentProcessor {
             title: { type: String },
           },
         },
+        //links
+        link: {
+          render: 'Link',  // This will use the 'Link' component from MarkdocRenderer
+          attributes: {
+            href: { type: String, required: true },
+          },
+        },
       },
       tags: {
         card: {

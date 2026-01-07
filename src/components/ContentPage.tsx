@@ -151,11 +151,16 @@ export function ContentPage() {
 
   // Error state
   if (error) {
+    const isNotFound = error.message === 'NOT_FOUND';
     return (
       <div className="content-page">
         <div className="content-error">
-          <h1>Error</h1>
-          <p>{error.message}</p>
+          <h1>{isNotFound ? 'Page Not Found' : 'Error'}</h1>
+          <p>
+            {isNotFound 
+              ? "The page you're looking for doesn't exist."
+              : error.message || 'An error occurred while loading the page.'}
+          </p>
         </div>
       </div>
     );

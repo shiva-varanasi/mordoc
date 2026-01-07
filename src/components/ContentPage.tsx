@@ -93,7 +93,57 @@ export function ContentPage() {
     return (
       <div className="content-page">
         <div className="content-loading">
-          <p>Loading...</p>
+          <div className="skeleton-container">
+            {/* Title skeleton */}
+            <div className="skeleton-title-group">
+              <div className="skeleton shimmer title"></div>
+              <div className="skeleton shimmer subtitle"></div>
+            </div>
+
+            {/* Content sections */}
+            <div className="skeleton-content">
+              {/* Paragraph block 1 */}
+              <div className="skeleton-paragraph">
+                <div className="skeleton shimmer line full"></div>
+                <div className="skeleton shimmer line full"></div>
+                <div className="skeleton shimmer line w-80"></div>
+              </div>
+
+              {/* Subheading */}
+              <div className="skeleton shimmer subheading w-48"></div>
+
+              {/* Paragraph block 2 */}
+              <div className="skeleton-paragraph">
+                <div className="skeleton shimmer line full"></div>
+                <div className="skeleton shimmer line w-83"></div>
+                <div className="skeleton shimmer line full"></div>
+                <div className="skeleton shimmer line w-75"></div>
+              </div>
+
+              {/* Subheading */}
+              <div className="skeleton shimmer subheading w-36"></div>
+
+              {/* Paragraph block 3 */}
+              <div className="skeleton-paragraph">
+                <div className="skeleton shimmer line full"></div>
+                <div className="skeleton shimmer line w-66"></div>
+              </div>
+
+              {/* Subheading */}
+              <div className="skeleton shimmer subheading w-56"></div>
+
+              {/* Paragraph block 4 */}
+              <div className="skeleton-paragraph">
+                <div className="skeleton shimmer line full"></div>
+                <div className="skeleton shimmer line full"></div>
+                <div className="skeleton shimmer line w-50"></div>
+                <div className="skeleton shimmer line full"></div>
+                <div className="skeleton shimmer line w-83"></div>
+                <div className="skeleton shimmer line full"></div>
+                <div className="skeleton shimmer line w-75"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );

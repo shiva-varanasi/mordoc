@@ -48,7 +48,7 @@ function getDefaultComponents(): Record<string, React.ComponentType<any>> {
     h6: (props: any) => <Heading level={6} {...props} />,
     
     //links
-    a: (props: any) => {
+    Link: (props: any) => {
       const { href, children, ...rest } = props;
       const isExternal = href?.startsWith('http://') || href?.startsWith('https://');
 

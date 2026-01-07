@@ -144,6 +144,117 @@ ${darkMode(`  .content-footer-powered a {
   text-decoration: underline;
 }
 
+.content-loading {
+  width: 100%;
+}
+
+.skeleton-container {
+  display: flex;
+  flex-direction: column;
+  gap: ${this.globalVars.spacingXl};
+  animation: fadeIn 0.3s ease-out;
+}
+
+.skeleton {
+  border-radius: ${this.globalVars.borderRadiusSm};
+}
+
+.shimmer {
+  position: relative;
+  overflow: hidden;
+  background: hsl(215 15% 40% / 0.15);
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(0 0% 100% / 0.4),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+${darkMode(`  .shimmer {
+    background: hsl(210 15% 60% / 0.15);
+  }
+
+  .shimmer::after {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(0 0% 100% / 0.08),
+      transparent
+    );
+  }`)}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.skeleton-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: ${this.globalVars.spacingLg};
+}
+
+.skeleton.title {
+  height: 2.5rem;
+  width: 30%;
+}
+
+.skeleton.subtitle {
+  height: 1.25rem;
+  width: 75%;
+}
+
+.skeleton-content {
+  display: flex;
+  flex-direction: column;
+  gap: ${this.globalVars.spacingLg};
+}
+
+.skeleton-paragraph {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.skeleton.line {
+  height: 1rem;
+}
+
+.skeleton.subheading {
+  height: 1.75rem;
+}
+
+.full { width: 100%; }
+.w-83 { width: 83.333%; }
+.w-80 { width: 80%; }
+.w-75 { width: 75%; }
+.w-66 { width: 66.666%; }
+.w-56 { width: 14rem; }
+.w-50 { width: 50%; }
+.w-48 { width: 12rem; }
+.w-36 { width: 9rem; }
+
 ${mediaQuery('xl', `  .content-toc {
     width: 240px;
   }`)}
@@ -189,6 +300,31 @@ ${mediaQuery('sm', `  .content-toc {
   .content-meta {
     flex-direction: column;
     gap: ${this.globalVars.spacingSm};
+  }`)}
+
+${mediaQuery('md', `  .skeleton.title {
+    width: 85%;
+  }
+
+  .skeleton.subtitle {
+    max-width: 100%;
+  }`)}
+
+${mediaQuery('sm', `  .skeleton.title {
+    width: 90%;
+    height: 2rem;
+  }
+
+  .skeleton.subtitle {
+    height: 1rem;
+  }
+
+  .skeleton-container {
+    gap: ${this.globalVars.spacingLg};
+  }
+
+  .skeleton-content {
+    gap: ${this.globalVars.spacingMd};
   }`)}`;
   }
 }

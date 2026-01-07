@@ -32,6 +32,10 @@ export function useContentData() {
         const response = await fetch(contentDataPath);
 
         if (!response.ok) {
+          // Special handling for 404
+          if (response.status === 404) {
+            throw new Error('NOT_FOUND');
+          }
           throw new Error(`Failed to fetch content: ${response.status}`);
         }
 

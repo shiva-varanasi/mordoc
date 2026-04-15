@@ -1,63 +1,28 @@
 {
-    "name": "mordoc",
-    "repoitory": {
-        "type": "git",
-        "url": "https://github.com/shiva-varanasi/mordoc.git"
-    },
-    "version": "0.1.14",
-    "description": "A static site generator for documentation with SSG + SPA capabilities",
-    "bin": {
-        "mordoc": "./bin/cli.js"
-    },
-    "files": [
-        "dist",
-        "templates"
-    ],
-    "scripts": {
-        "compile": "tsc",
-        "prebundle": "node scripts/prebundle.js",
-        "copy-assets": "node scripts/copy-assets.js",
-        "build": "tsc && npm run prebundle && npm run copy-assets",
-        "dev": "node bin/cli.js dev",
-        "test-build": "node bin/cli.js build",
-        "prepublishOnly": "npm run build"
-    },
-    "keywords": [
-        "documentation",
-        "static-site-generator",
-        "ssg",
-        "markdown",
-        "markdoc",
-        "react"
-    ],
-    "author": "Shiva Varanasi",
-    "license": "MIT",
-    "dependencies": {
-        "@markdoc/markdoc": "^0.5.4",
-        "fast-glob": "^3.3.3",
-        "js-yaml": "^4.1.0",
-        "pagefind": "^1.4.0",
-        "prismjs": "^1.30.0",
-        "react": "^19.2.3",
-        "react-dom": "^19.2.3",
-        "react-router-dom": "^7.9.3",
-        "sirv-cli": "^2.0.2",
-        "ws": "^8.18.3",
-        "esbuild": "^0.25.10"
-    },
-    "devDependencies": {
-        "@types/js-yaml": "^4.0.9",
-        "@types/node": "^24.6.2",
-        "@types/react": "^19.2.3",
-        "@types/react-dom": "^19.2.3",
-        "@types/prismjs": "^1.26.5",
-        "@types/ws": "^8.18.1",
-        "esbuild": "^0.25.10",
-        "eslint": "^9.36.0",
-        "prettier": "^3.6.2",
-        "typescript": "^5.9.3"
-    },
-    "engines": {
-        "node": ">=18.0.0"
-    }
+  "name": "mordoc",
+  "version": "0.1.0",
+  "description": "A modern documentation site generator powered by Vite, React, and Markdoc.",
+  "type": "module",
+  "bin": {
+    "mordoc": "./bin/cli.js"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "documentation",
+    "static-site-generator",
+    "markdoc",
+    "vite",
+    "react"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^25.6.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.1"
+  }
 }

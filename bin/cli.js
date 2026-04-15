@@ -1,81 +1,76 @@
 #!/usr/bin/env node
 
-const path = require('path');
-const fs = require('fs');
+// Entry point for the Mordoc CLI. This file is intentionally plain JS (not TS)
+// so it can be executed directly by Node without a build step.
+// The actual logic lives in compiled output under dist/.
 
-// Get the command from arguments
-const args = process.argv.slice(2);
-const command = args[0];
-const commandArgs = args.slice(1); // Arguments after the command
+import { loadSiteConfig } from '../dist/config/site-loader.js';
+import { loadLanguageConfig } from '../dist/config/language-loader.js';
+import { loadSidenavConfig } from '../dist/config/sidenav-loader.js';
+import { loadTopnavConfig } from '../dist/config/topnav-loader.js';
+import { loadAssets } from '../dist/config/assets-loader.js';
+import { loadContent } from '../dist/content/content-loader.js';
 
-// Display help text
-function showHelp() {
-  console.log(`
-Mordoc - Static Site Generator for Documentation
+const command = process.argv[2];
 
-Usage:
-  mordoc <command> [options]
-
-Commands:
-  build      Build the documentation site
-  dev        Start the development server
-  
-Options:
-  --help     Show this help message
-
-Examples:
-  mordoc build
-  mordoc build --verbose --drafts
-  mordoc dev
-  mordoc dev --port 8080
-  `);
-}
-
-// Main CLI logic
-async function main() {
-  // Show help if no command or --help flag
-  if (!command || command === '--help' || command === '-h') {
-    showHelp();
-    process.exit(0);
-  }
-
-  // Check if dist folder exists (TypeScript must be compiled first)
-  const distPath = path.join(__dirname, '../dist/cli');
-  if (!fs.existsSync(distPath)) {
-    console.error('Error: Mordoc is not built. Please run "tsc" first to compile TypeScript.');
-    process.exit(1);
-  }
-
-  // Route to appropriate command handler
+if (command === 'validate') {
   try {
-    switch (command) {
-      case 'build': {
-        const buildHandler = require('../dist/cli/build.js');
-        const options = buildHandler.parseBuildArgs(commandArgs);
-        await buildHandler.build(options);
-        break;
-      }
-      
-      case 'dev': {
-        const devHandler = require('../dist/cli/dev.js');
-        const options = devHandler.parseDevArgs(commandArgs);
-        await devHandler.dev(options);
-        break;
-      }
-      
-      default:
-        console.error(`Unknown command: ${command}`);
-        showHelp();
-        process.exit(1);
+    const projectRoot = process.cwd();
+
+    // 1. Site config (required)
+    const siteConfig = await loadSiteConfig(projectRoot);
+    console.log('\n✔ site.json loaded successfully\n');
+    console.log(JSON.stringify(siteConfig, null, 2));
+
+    // 2. Language config (optional)
+    const languageConfig = await loadLanguageConfig(projectRoot, siteConfig.defaultLanguage);
+    if (languageConfig) {
+      console.log('\n✔ language.json loaded successfully\n');
+      console.log(JSON.stringify(languageConfig, null, 2));
+    } else {
+      console.log('\n— language.json not found (single-language project)');
     }
-  } catch (error) {
-    console.error('Error:', error.message);
-    if (process.env.DEBUG) {
-      console.error(error.stack);
+
+    // 3. Navigation
+    const topnavConfig = await loadTopnavConfig(projectRoot);
+    if (topnavConfig) {
+      console.log('\n✔ topnav.yaml loaded successfully (with resolved sidenavs)\n');
+      console.log(JSON.stringify(topnavConfig, null, 2));
+    } else {
+      console.log('\n— topnav.yaml not found (single-sidenav project)');
+      const sidenavConfig = await loadSidenavConfig(projectRoot);
+      console.log('\n✔ sidenav.yaml loaded successfully\n');
+      console.log(JSON.stringify(sidenavConfig, null, 2));
     }
+
+    // 4. Assets
+    const assets = await loadAssets(projectRoot);
+    console.log('\n✔ assets resolved successfully\n');
+    console.log(JSON.stringify(assets, null, 2));
+
+    // 5. Content
+    const content = await loadContent(
+      projectRoot,
+      siteConfig.defaultLanguage,
+      languageConfig?.languages ?? null,
+    );
+
+    console.log(`\n✔ Content discovery complete — ${content.entries.length} page(s) found\n`);
+    console.log(`Languages with content: ${content.languages.join(', ')}\n`);
+
+    for (const entry of content.entries) {
+      const flags = entry.isIndex ? ' (index)' : '';
+      console.log(`  ${entry.routePath}${flags}`);
+      console.log(`    └─ ${entry.filePath}\n`);
+    }
+  } catch (err) {
+    console.error('\n✘ Validation failed:\n');
+    console.error(err.message);
     process.exit(1);
   }
+} else {
+  console.log('Usage: mordoc <command>');
+  console.log('\nCommands:');
+  console.log('  validate   Load all config and content, then print the results');
+  process.exit(1);
 }
-
-// Run the CLI
-main();

@@ -23,6 +23,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@markdoc/markdoc": "^0.5.7",
     "js-yaml": "^4.1.1"
   }
 }

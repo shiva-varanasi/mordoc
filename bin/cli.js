@@ -10,6 +10,7 @@ import { loadSidenavConfig } from '../dist/config/sidenav-loader.js';
 import { loadTopnavConfig } from '../dist/config/topnav-loader.js';
 import { loadAssets } from '../dist/config/assets-loader.js';
 import { loadContent } from '../dist/content/content-loader.js';
+import { parseContent } from '../dist/content/content-parser.js';
 
 const command = process.argv[2];
 
@@ -55,14 +56,25 @@ if (command === 'validate') {
       languageConfig?.languages ?? null,
     );
 
-    console.log(`\n✔ Content discovery complete — ${content.entries.length} page(s) found\n`);
-    console.log(`Languages with content: ${content.languages.join(', ')}\n`);
+    console.log(`\n✔ Content discovery complete — ${content.entries.length} page(s) found`);
+    console.log(`  Languages with content: ${content.languages.join(', ')}`);
 
-    for (const entry of content.entries) {
-      const flags = entry.isIndex ? ' (index)' : '';
-      console.log(`  ${entry.routePath}${flags}`);
-      console.log(`    └─ ${entry.filePath}\n`);
+    // 6. Parse content — frontmatter, TOC, Markdoc AST
+    const pages = await parseContent(content);
+
+    console.log(`\n✔ Content parsed — ${pages.length} page(s)\n`);
+
+    for (const page of pages) {
+      const flags = page.entry.isIndex ? ' (index)' : '';
+      console.log(`  ${page.entry.routePath}${flags} — "${page.frontmatter.title}"`);
+      if (page.toc.length > 0) {
+        for (const heading of page.toc) {
+          const indent = '  '.repeat(heading.level - 2);
+          console.log(`    ${indent}└─ #${heading.id} ${heading.title}`);
+        }
+      }
     }
+    console.log();
   } catch (err) {
     console.error('\n✘ Validation failed:\n');
     console.error(err.message);

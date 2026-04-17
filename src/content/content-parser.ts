@@ -3,14 +3,7 @@ import Markdoc from '@markdoc/markdoc';
 import yaml from 'js-yaml';
 import type { Node } from '@markdoc/markdoc';
 import type { ContentMap, Frontmatter, TocEntry, ParsedPage } from '../types/content.js';
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
+import { createSlugger } from './slug.js';
 
 /**
  * Parses the raw frontmatter YAML string extracted by Markdoc.
@@ -62,9 +55,14 @@ function collectText(node: Node): string {
 /**
  * Walks the Markdoc AST and extracts heading nodes into TocEntry items.
  * Only includes h2–h6 to keep the table of contents navigable.
+ *
+ * A fresh slugger is created per call so IDs are unique within a single
+ * page but reset between pages (two pages may each have their own
+ * `#overview` anchor).
  */
 function extractToc(ast: Node): TocEntry[] {
   const entries: TocEntry[] = [];
+  const slug = createSlugger();
 
   for (const node of ast.walk()) {
     if (node.type !== 'heading') continue;
@@ -75,7 +73,7 @@ function extractToc(ast: Node): TocEntry[] {
     const title = collectText(node).trim();
     if (title === '') continue;
 
-    entries.push({ id: slugify(title), title, level });
+    entries.push({ id: slug(title), title, level });
   }
 
   return entries;

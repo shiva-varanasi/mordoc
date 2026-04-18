@@ -1,9 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import Markdoc from '@markdoc/markdoc';
 import yaml from 'js-yaml';
-import type { Node } from '@markdoc/markdoc';
-import type { ContentMap, Frontmatter, TocEntry, ParsedPage } from '../types/content.js';
-import { createSlugger } from './slug.js';
+import type { ContentMap, Frontmatter, ParsedPage } from '../types/content.js';
 
 /**
  * Parses the raw frontmatter YAML string extracted by Markdoc.
@@ -38,50 +36,10 @@ function parseFrontmatter(raw: string | undefined, filePath: string): Frontmatte
 }
 
 /**
- * Collects the text content of a Markdoc node by walking its children.
- * Heading nodes contain inline text as child nodes rather than a single string.
- */
-function collectText(node: Node): string {
-  let text = '';
-  if (node.type === 'text' && typeof node.attributes['content'] === 'string') {
-    text += node.attributes['content'];
-  }
-  for (const child of node.children) {
-    text += collectText(child);
-  }
-  return text;
-}
-
-/**
- * Walks the Markdoc AST and extracts heading nodes into TocEntry items.
- * Only includes h2–h6 to keep the table of contents navigable.
- *
- * A fresh slugger is created per call so IDs are unique within a single
- * page but reset between pages (two pages may each have their own
- * `#overview` anchor).
- */
-function extractToc(ast: Node): TocEntry[] {
-  const entries: TocEntry[] = [];
-  const slug = createSlugger();
-
-  for (const node of ast.walk()) {
-    if (node.type !== 'heading') continue;
-
-    const level = node.attributes['level'] as number;
-    if (level < 2 || level > 6) continue;
-
-    const title = collectText(node).trim();
-    if (title === '') continue;
-
-    entries.push({ id: slug(title), title, level });
-  }
-
-  return entries;
-}
-
-/**
- * Parses all content files from a ContentMap into fully resolved pages.
- * Reads each file, runs it through Markdoc, extracts frontmatter and TOC.
+ * Parses all content files from a ContentMap into ASTs plus frontmatter.
+ * The TOC and the renderable tree are produced in a later stage
+ * (see `content-transformer.ts`) so that anchor IDs stay in sync with
+ * what the renderer emits.
  *
  * @param contentMap - The content discovery result from loadContent().
  * @returns An array of parsed pages, one per content entry.
@@ -101,9 +59,8 @@ export async function parseContent(contentMap: ContentMap): Promise<ParsedPage[]
 
     const ast = Markdoc.parse(raw);
     const frontmatter = parseFrontmatter(ast.attributes['frontmatter'] as string | undefined, entry.filePath);
-    const toc = extractToc(ast);
 
-    pages.push({ entry, frontmatter, toc, ast });
+    pages.push({ entry, frontmatter, ast });
   }
 
   return pages;

@@ -11,6 +11,7 @@ import { loadTopnavConfig } from '../dist/config/topnav-loader.js';
 import { loadAssets } from '../dist/config/assets-loader.js';
 import { loadContent } from '../dist/content/content-loader.js';
 import { parseContent } from '../dist/content/content-parser.js';
+import { transformContent } from '../dist/content/content-transformer.js';
 
 const command = process.argv[2];
 
@@ -59,12 +60,20 @@ if (command === 'validate') {
     console.log(`\n✔ Content discovery complete — ${content.entries.length} page(s) found`);
     console.log(`  Languages with content: ${content.languages.join(', ')}`);
 
-    // 6. Parse content — frontmatter, TOC, Markdoc AST
+    // 6. Parse content — frontmatter + Markdoc AST
     const pages = await parseContent(content);
 
-    console.log(`\n✔ Content parsed — ${pages.length} page(s)\n`);
-
+    console.log(`\n✔ Content parsed — ${pages.length} page(s)`);
     for (const page of pages) {
+      const flags = page.entry.isIndex ? ' (index)' : '';
+      console.log(`  ${page.entry.routePath}${flags} — "${page.frontmatter.title}"`);
+    }
+
+    // 7. Transform content — renderable trees + TOCs
+    const transformed = transformContent(pages);
+
+    console.log(`\n✔ Content transformed — ${transformed.length} page(s)\n`);
+    for (const page of transformed) {
       const flags = page.entry.isIndex ? ' (index)' : '';
       console.log(`  ${page.entry.routePath}${flags} — "${page.frontmatter.title}"`);
       if (page.toc.length > 0) {

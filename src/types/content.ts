@@ -1,4 +1,4 @@
-import type { Node } from '@markdoc/markdoc';
+import type { Node, RenderableTreeNode } from '@markdoc/markdoc';
 
 /** A single content page discovered on disk. */
 export interface ContentEntry {
@@ -45,14 +45,39 @@ export interface TocEntry {
   level: number;
 }
 
-/** A fully parsed content page — discovery metadata combined with parsed data. */
+/**
+ * A parsed content page — discovery metadata plus the raw Markdoc AST and
+ * frontmatter. TOC is not computed at this stage; it is derived from the
+ * transformed renderable tree so that anchor IDs always match what is
+ * actually rendered. See {@link TransformedPage}.
+ */
 export interface ParsedPage {
   /** The original discovery entry (route, file path, language, etc.). */
   entry: ContentEntry;
   /** Parsed frontmatter from the YAML block at the top of the file. */
   frontmatter: Frontmatter;
-  /** Table of contents extracted from headings. */
-  toc: TocEntry[];
-  /** Markdoc AST node for later rendering/transformation. */
+  /** Markdoc AST node for downstream transformation. */
   ast: Node;
+}
+
+/**
+ * A transformed content page — the Markdoc AST has been run through the
+ * default config (heading IDs, future tag transforms, etc.) and converted
+ * into a JSON-serializable renderable tree ready to ship to the client.
+ *
+ * The TOC is derived from the renderable tree after transform, so its IDs
+ * are guaranteed to match the IDs on the rendered heading tags.
+ */
+export interface TransformedPage {
+  /** The original discovery entry (route, file path, language, etc.). */
+  entry: ContentEntry;
+  /** Parsed frontmatter carried through from the parse stage. */
+  frontmatter: Frontmatter;
+  /** Table of contents extracted from the transformed renderable tree. */
+  toc: TocEntry[];
+  /**
+   * Serializable renderable tree produced by `Markdoc.transform()`.
+   * Always a single root node (transformContent normalizes this).
+   */
+  renderable: RenderableTreeNode;
 }

@@ -1,0 +1,91 @@
+import { loadSiteConfig } from './config/site-loader.js';
+import { loadLanguageConfig } from './config/language-loader.js';
+import { loadTopnavConfig } from './config/topnav-loader.js';
+import { loadSidenavConfig } from './config/sidenav-loader.js';
+import { loadAssets } from './config/assets-loader.js';
+import { loadContent } from './content/content-loader.js';
+import { parseContent } from './content/content-parser.js';
+import { transformContent } from './content/content-transformer.js';
+import type { ContentEntry, TransformedPage } from './types/content.js';
+import type { MordocData, NavigationConfig } from './types/pipeline.js';
+
+/**
+ * Loads the project's navigation configuration.
+ *
+ * If `config/navigation/topnav.yaml` exists, every sidenav file it
+ * references is loaded and the resolved tree is returned. Otherwise the
+ * single `config/navigation/sidenav.yaml` is loaded as a site-wide sidenav.
+ *
+ * Exported separately from `runPipeline` because the Vite plugin's HMR
+ * handler will need to re-resolve navigation independently when any nav
+ * file changes — without re-reading site.json or re-transforming content.
+ */
+export async function loadNavigation(projectRoot: string): Promise<NavigationConfig> {
+  const topnav = await loadTopnavConfig(projectRoot);
+  if (topnav) {
+    return { kind: 'topnav', topnav };
+  }
+  const sidenav = await loadSidenavConfig(projectRoot);
+  return { kind: 'sidenav', sidenav };
+}
+
+/**
+ * Runs the full Mordoc data pipeline for a project.
+ *
+ * Stages, in order:
+ *   1. Load every config file (site, language, navigation, assets).
+ *   2. Discover content files and build the route manifest.
+ *   3. Parse each markdown file into frontmatter + Markdoc AST.
+ *   4. Transform each AST into a renderable tree with TOC.
+ *
+ * Returns a single, JSON-serializable `MordocData`. This is the canonical
+ * hand-off shape consumed by both the Vite plugin (in dev) and the SSG
+ * build (in prod). The pipeline itself knows nothing about either —
+ * keeping it framework-agnostic means new consumers (a CI checker, a
+ * different bundler) can be added without touching this code.
+ *
+ * @param projectRoot - Absolute path to the user's project root.
+ */
+export async function runPipeline(projectRoot: string): Promise<MordocData> {
+  const site = await loadSiteConfig(projectRoot);
+  const language = await loadLanguageConfig(projectRoot, site.defaultLanguage);
+  const navigation = await loadNavigation(projectRoot);
+  const assets = await loadAssets(projectRoot);
+
+  const contentMap = await loadContent(
+    projectRoot,
+    site.defaultLanguage,
+    language?.languages ?? null,
+  );
+
+  const parsed = await parseContent(contentMap);
+  const pages = transformContent(parsed);
+
+  return { site, language, navigation, assets, pages };
+}
+
+/**
+ * Re-runs the parse + transform stages for a single content entry.
+ *
+ * This is the per-file granular update primitive the Vite plugin's
+ * `handleHotUpdate` will call when one markdown file changes — it returns
+ * a fresh `TransformedPage` for that entry alone, without touching any
+ * other page or any config.
+ *
+ * The wrapping `ContentMap` is synthetic; `parseContent` only iterates
+ * `entries`, so a one-element list is sufficient.
+ */
+export async function reparsePage(entry: ContentEntry): Promise<TransformedPage> {
+  const parsed = await parseContent({
+    entries: [entry],
+    languages: [entry.language],
+  });
+  const [transformed] = transformContent(parsed);
+  if (!transformed) {
+    // parseContent + transformContent both produce one output per input
+    // entry, so this branch should be unreachable. Guarded so a future
+    // refactor can't silently return undefined.
+    throw new Error(`reparsePage produced no result for ${entry.filePath}`);
+  }
+  return transformed;
+}

@@ -81,3 +81,29 @@ export interface TransformedPage {
    */
   renderable: RenderableTreeNode;
 }
+
+/**
+ * Lightweight projection of a `TransformedPage` — just the route identity.
+ *
+ * Shipped eagerly via `virtual:mordoc/pages`. Its only job is to let the
+ * shell enumerate which routes exist: the React Router route table on the
+ * client, page enumeration for the SSG build, and "does this path exist in
+ * other languages?" lookups for a language switcher.
+ *
+ * Everything else a page carries — title, description, TOC, frontmatter,
+ * renderable tree, isIndex — lives in the per-route lazy chunk
+ * (`virtual:mordoc/page/<routePath>`) and is only fetched when that route
+ * is actually visited. Human-readable labels for cross-page UI (sidenav
+ * entries, next/prev, breadcrumb ancestors) come from the navigation
+ * config, which already spells out its own labels. Index-ness is encoded
+ * in the `routePath` shape itself, so it doesn't need a flag here either.
+ *
+ * `segments` is excluded because it's derivable from `routePath` and
+ * `language`.
+ */
+export interface PageMeta {
+  /** Resolved route path (same as ContentEntry.routePath). */
+  routePath: string;
+  /** Language code this page belongs to. */
+  language: string;
+}

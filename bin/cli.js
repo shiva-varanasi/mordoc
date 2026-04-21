@@ -5,10 +5,20 @@
 // The actual logic lives in compiled output under dist/.
 
 import { runPipeline } from '../dist/pipeline.js';
+import { EAGER_VIRTUAL_IDS, generateVirtualModule } from '../dist/vite/plugin.js';
+import { runDevCommand } from '../dist/cli/dev.js';
 
 const command = process.argv[2];
 
-if (command === 'validate') {
+if (command === 'dev') {
+  try {
+    await runDevCommand({ projectRoot: process.cwd() });
+  } catch (err) {
+    console.error('\n✘ Dev server failed to start:\n');
+    console.error(err.message);
+    process.exit(1);
+  }
+} else if (command === 'validate') {
   try {
     const projectRoot = process.cwd();
     const data = await runPipeline(projectRoot);
@@ -45,6 +55,18 @@ if (command === 'validate') {
         }
       }
     }
+
+    // Vite plugin preview — show what each eager virtual module would emit.
+    // This is for verification before there's a React client to actually
+    // consume the modules; once the client exists we can drop this section.
+    console.log('\n✔ vite plugin — eager virtual modules\n');
+    for (const id of EAGER_VIRTUAL_IDS) {
+      const source = generateVirtualModule(id, data);
+      const bytes = Buffer.byteLength(source, 'utf8');
+      const preview = source.length > 140 ? source.slice(0, 137) + '...' : source;
+      console.log(`  ${id} (${bytes} bytes)`);
+      console.log(`    ${preview}`);
+    }
     console.log();
   } catch (err) {
     console.error('\n✘ Validation failed:\n');
@@ -54,6 +76,7 @@ if (command === 'validate') {
 } else {
   console.log('Usage: mordoc <command>');
   console.log('\nCommands:');
+  console.log('  dev        Start the Mordoc dev server');
   console.log('  validate   Run the full pipeline and print the resulting data');
   process.exit(1);
 }

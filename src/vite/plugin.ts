@@ -1,17 +1,18 @@
 import type { Plugin } from 'vite';
 import { runPipeline } from '../pipeline.js';
 import type { MordocData } from '../types/pipeline.js';
-import type { PageMeta, TransformedPage } from '../types/content.js';
+import type { PageData, PageMeta, TransformedPage } from '../types/content.js';
 
 /**
  * The set of "eager" virtual module IDs this plugin exposes.
  *
- * Eager = loaded up-front by the React client shell. These are small
- * modules holding the configs and a lightweight per-page metadata index
- * (no per-page renderable trees).
+ * Eager = loaded up-front by the React client shell. They hold the
+ * configs, a lightweight per-page route index, and a map of per-route
+ * lazy loaders. None of them carry the heavy per-page content.
  *
- * Per-route page chunks (`virtual:mordoc/page/<routePath>`) are added in
- * a later step and lazy-loaded on navigation.
+ * Per-route page chunks live under the `virtual:mordoc/page/<routePath>`
+ * prefix ({@link PAGE_MODULE_PREFIX}) and are loaded on navigation via
+ * the `virtual:mordoc/page-loaders` map.
  */
 export const EAGER_VIRTUAL_IDS = [
   'virtual:mordoc/site',
@@ -19,14 +20,35 @@ export const EAGER_VIRTUAL_IDS = [
   'virtual:mordoc/navigation',
   'virtual:mordoc/assets',
   'virtual:mordoc/pages',
+  'virtual:mordoc/page-loaders',
 ] as const;
 
 export type EagerVirtualId = typeof EAGER_VIRTUAL_IDS[number];
+
+/**
+ * Prefix for lazy per-route page modules.
+ *
+ * The full id is `${PAGE_MODULE_PREFIX}${routePath}`. Because every
+ * routePath starts with `/`, concatenation yields clean ids like
+ * `virtual:mordoc/page/flight-manual/safety`, and the root route `/`
+ * yields `virtual:mordoc/page/` (trailing slash). No sentinels needed.
+ */
+export const PAGE_MODULE_PREFIX = 'virtual:mordoc/page';
 
 /** Vite/Rollup convention: virtual modules are addressed with a leading null byte. */
 const RESOLVED_PREFIX = '\0';
 
 const EAGER_SET: ReadonlySet<string> = new Set(EAGER_VIRTUAL_IDS);
+
+/** True if `id` is a lazy per-route page module id (after prefix). */
+function isPageModuleId(id: string): boolean {
+  return id.startsWith(PAGE_MODULE_PREFIX + '/');
+}
+
+/** Extracts the routePath back out of a lazy page module id. */
+function routePathFromPageModuleId(id: string): string {
+  return id.slice(PAGE_MODULE_PREFIX.length);
+}
 
 /**
  * Projects a `TransformedPage` down to its route identity.
@@ -43,17 +65,65 @@ function toPageMeta(page: TransformedPage): PageMeta {
 }
 
 /**
- * Builds the JS source for a virtual module given a Mordoc data set.
+ * Projects a `TransformedPage` into the shape shipped by the per-route
+ * lazy module — i.e. the payload of `virtual:mordoc/page/<routePath>`.
+ */
+function toPageData(page: TransformedPage): PageData {
+  return {
+    renderable: page.renderable,
+    frontmatter: page.frontmatter,
+    toc: page.toc,
+  };
+}
+
+/**
+ * Builds the JS source for the `virtual:mordoc/page-loaders` module.
+ *
+ * Unlike the other eager modules this one can't just JSON-stringify its
+ * payload: it needs to emit real JS containing a literal `import()`
+ * expression per route. Emitting literals (rather than one dynamic
+ * `import(\`…${routePath}\`)` at the call site) is what lets Vite/Rollup
+ * statically analyze, code-split, and preload each route's chunk.
+ *
+ * Output shape:
+ *   export default {
+ *     "/": () => import("virtual:mordoc/page/"),
+ *     "/flight-manual": () => import("virtual:mordoc/page/flight-manual"),
+ *     ...
+ *   };
+ *
+ * `JSON.stringify` is used for both the object keys and the import
+ * specifiers — valid JSON strings are valid JS strings, so it handles
+ * any escaping the routePath might require.
+ */
+function generatePageLoadersSource(data: MordocData): string {
+  if (data.pages.length === 0) {
+    return 'export default {};';
+  }
+  const entries = data.pages.map((page) => {
+    const routePath = page.entry.routePath;
+    const key = JSON.stringify(routePath);
+    const specifier = JSON.stringify(`${PAGE_MODULE_PREFIX}${routePath}`);
+    return `  ${key}: () => import(${specifier})`;
+  });
+  return `export default {\n${entries.join(',\n')}\n};`;
+}
+
+/**
+ * Builds the JS source for a given *eager* virtual module.
  * Returns null if the id isn't one of ours.
  *
  * Pure function — no I/O, no Vite dependency. The plugin's `load` hook
  * uses it at runtime; the `validate` CLI uses it to preview output for
  * inspection without spinning up a dev server.
  *
- * `JSON.stringify` is safe as ES module source because every JSON literal
- * is also a valid JS expression. Renderable trees (which the per-page
- * lazy chunks will eventually emit) are plain Markdoc Tag objects — also
- * JSON-safe.
+ * Most cases emit plain `export default ${JSON.stringify(...)}` — a JSON
+ * literal is also a valid JS expression, and renderable trees are plain
+ * Markdoc Tag objects, also JSON-safe. The `page-loaders` case diverges
+ * because it must emit literal `import()` expressions rather than data.
+ *
+ * Lazy per-route modules (`virtual:mordoc/page/<routePath>`) go through
+ * {@link generatePageModule} instead.
  */
 export function generateVirtualModule(id: string, data: MordocData): string | null {
   switch (id) {
@@ -67,9 +137,24 @@ export function generateVirtualModule(id: string, data: MordocData): string | nu
       return `export default ${JSON.stringify(data.assets)};`;
     case 'virtual:mordoc/pages':
       return `export default ${JSON.stringify(data.pages.map(toPageMeta))};`;
+    case 'virtual:mordoc/page-loaders':
+      return generatePageLoadersSource(data);
     default:
       return null;
   }
+}
+
+/**
+ * Builds the JS source for the lazy `virtual:mordoc/page/<routePath>`
+ * module that carries a single page's full `PageData`. Returns null if
+ * no page matches the given routePath.
+ *
+ * Pure function, mirrors {@link generateVirtualModule} for the lazy side.
+ */
+export function generatePageModule(routePath: string, data: MordocData): string | null {
+  const page = data.pages.find((p) => p.entry.routePath === routePath);
+  if (!page) return null;
+  return `export default ${JSON.stringify(toPageData(page))};`;
 }
 
 export interface MordocVitePluginOptions {
@@ -85,10 +170,12 @@ export interface MordocVitePluginOptions {
  *   - `buildStart`: runs the pipeline once and caches the result.
  *     Fires in both dev (when the server starts) and prod (before bundling).
  *   - `resolveId` / `load`: serves the cached data as virtual ES modules.
+ *     Eager modules (configs, route index, loader map) resolve by exact id.
+ *     Lazy per-route page modules resolve by `PAGE_MODULE_PREFIX` match.
  *
- * HMR (granular re-runs on file changes) and the per-page lazy chunks
- * are deferred to subsequent steps. This scaffold establishes the contract
- * and gives the React client something to import against.
+ * HMR (granular re-runs on file changes) is deferred to a subsequent step.
+ * This scaffold establishes the full static contract — the client has
+ * every import surface it needs to build the router against.
  *
  * Note: asset paths in `virtual:mordoc/assets` are still absolute disk
  * paths at this stage. Translating them to browser-fetchable URLs is part
@@ -105,7 +192,7 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
     },
 
     resolveId(id) {
-      if (EAGER_SET.has(id)) {
+      if (EAGER_SET.has(id) || isPageModuleId(id)) {
         return RESOLVED_PREFIX + id;
       }
       return null;
@@ -114,7 +201,9 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
     load(id) {
       if (!id.startsWith(RESOLVED_PREFIX)) return null;
       const virtualId = id.slice(RESOLVED_PREFIX.length);
-      if (!EAGER_SET.has(virtualId)) return null;
+      const isEager = EAGER_SET.has(virtualId);
+      const isPage = isPageModuleId(virtualId);
+      if (!isEager && !isPage) return null;
       if (!data) {
         // buildStart populates `data` before any load can happen; this
         // guard exists only to surface an unexpected lifecycle ordering
@@ -123,7 +212,21 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
           `mordoc plugin: load("${id}") called before buildStart populated data.`,
         );
       }
-      return generateVirtualModule(virtualId, data);
+      if (isEager) {
+        return generateVirtualModule(virtualId, data);
+      }
+      const routePath = routePathFromPageModuleId(virtualId);
+      const source = generatePageModule(routePath, data);
+      if (source === null) {
+        // Reaching here means a consumer imported a page module for a
+        // routePath that isn't in the pipeline output. The static
+        // `page-loaders` map only emits entries for known pages, so this
+        // should be unreachable in normal operation.
+        throw new Error(
+          `mordoc plugin: no page found for routePath "${routePath}" (id: ${id}).`,
+        );
+      }
+      return source;
     },
   };
 }

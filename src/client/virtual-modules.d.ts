@@ -38,3 +38,27 @@ declare module 'virtual:mordoc/pages' {
   const value: import('../types/content.js').PageMeta[];
   export default value;
 }
+
+declare module 'virtual:mordoc/page-loaders' {
+  // A record keyed by routePath, each value a function that dynamically
+  // imports the matching lazy page module. The plugin emits a literal
+  // `import()` expression per route so Vite can statically code-split.
+  const value: Record<
+    string,
+    () => Promise<{ default: import('../types/content.js').PageData }>
+  >;
+  export default value;
+}
+
+// Wildcard declaration for per-route lazy page modules.
+//
+// Every specifier of the form `virtual:mordoc/page/<routePath>` resolves
+// to a module whose default export is the page's full `PageData` payload.
+// TypeScript accepts any path after the prefix here; the plugin throws at
+// runtime if the routePath doesn't exist. In practice, specifiers are
+// only ever produced by the static `page-loaders` map, which enumerates
+// known routes, so invalid specifiers shouldn't occur.
+declare module 'virtual:mordoc/page/*' {
+  const value: import('../types/content.js').PageData;
+  export default value;
+}

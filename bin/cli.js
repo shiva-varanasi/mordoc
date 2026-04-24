@@ -5,7 +5,12 @@
 // The actual logic lives in compiled output under dist/.
 
 import { runPipeline } from '../dist/pipeline.js';
-import { EAGER_VIRTUAL_IDS, generateVirtualModule } from '../dist/vite/plugin.js';
+import {
+  EAGER_VIRTUAL_IDS,
+  PAGE_MODULE_PREFIX,
+  generatePageModule,
+  generateVirtualModule,
+} from '../dist/vite/plugin.js';
 import { runDevCommand } from '../dist/cli/dev.js';
 
 const command = process.argv[2];
@@ -56,15 +61,27 @@ if (command === 'dev') {
       }
     }
 
-    // Vite plugin preview — show what each eager virtual module would emit.
-    // This is for verification before there's a React client to actually
-    // consume the modules; once the client exists we can drop this section.
+    // Vite plugin preview — show what each eager virtual module would emit,
+    // plus a sample lazy per-route module. This is verification before the
+    // React client consumes the modules; once the client exists we can
+    // drop this section.
     console.log('\n✔ vite plugin — eager virtual modules\n');
     for (const id of EAGER_VIRTUAL_IDS) {
       const source = generateVirtualModule(id, data);
       const bytes = Buffer.byteLength(source, 'utf8');
       const preview = source.length > 140 ? source.slice(0, 137) + '...' : source;
       console.log(`  ${id} (${bytes} bytes)`);
+      console.log(`    ${preview}`);
+    }
+
+    if (data.pages.length > 0) {
+      const sample = data.pages[0];
+      const sampleId = `${PAGE_MODULE_PREFIX}${sample.entry.routePath}`;
+      const source = generatePageModule(sample.entry.routePath, data);
+      const bytes = Buffer.byteLength(source, 'utf8');
+      const preview = source.length > 200 ? source.slice(0, 197) + '...' : source;
+      console.log(`\n✔ vite plugin — sample lazy page module\n`);
+      console.log(`  ${sampleId} (${bytes} bytes)`);
       console.log(`    ${preview}`);
     }
     console.log();

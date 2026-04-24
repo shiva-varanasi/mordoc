@@ -83,6 +83,28 @@ export interface TransformedPage {
 }
 
 /**
+ * Per-route payload shipped by the lazy `virtual:mordoc/page/<routePath>`
+ * modules — the full content a page component needs to render.
+ *
+ * Only fetched when the user navigates to the route. The eager
+ * `virtual:mordoc/pages` index carries just the route identity
+ * ({@link PageMeta}); everything visual or title-bar-facing lives here.
+ *
+ * `isIndex` is intentionally excluded — index-ness is already encoded in
+ * the route path shape (e.g. `/flight-manual` vs `/flight-manual/safety`),
+ * and any component that genuinely needs the distinction can derive it
+ * from the path or cross-reference the navigation tree.
+ */
+export interface PageData {
+  /** Serializable renderable tree produced by `Markdoc.transform()`. */
+  renderable: RenderableTreeNode;
+  /** Full parsed frontmatter, including title, description, and any theme-specific keys. */
+  frontmatter: Frontmatter;
+  /** Table of contents extracted from the renderable tree. */
+  toc: TocEntry[];
+}
+
+/**
  * Lightweight projection of a `TransformedPage` — just the route identity.
  *
  * Shipped eagerly via `virtual:mordoc/pages`. Its only job is to let the

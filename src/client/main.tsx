@@ -1,5 +1,7 @@
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { App } from './App.js';
+import { RouterProvider } from 'react-router';
+import { createAppRouter } from './routes.js';
 
 /**
  * Browser entry. Mounts the React app into #app.
@@ -12,4 +14,10 @@ if (!container) {
   throw new Error('mordoc: #app element not found in HTML shell');
 }
 
-createRoot(container).render(<App />);
+const router = createAppRouter();
+
+createRoot(container).render(
+  <StrictMode>
+    <RouterProvider router={router} />
+  </StrictMode>,
+);

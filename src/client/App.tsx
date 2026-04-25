@@ -1,6 +1,6 @@
 import { Link, Outlet } from 'react-router';
 import site from 'virtual:mordoc/site';
-import pages from 'virtual:mordoc/pages';
+import pages from 'virtual:mordoc/pages-index';
 
 /**
  * Root layout component.

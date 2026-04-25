@@ -19,7 +19,7 @@ export const EAGER_VIRTUAL_IDS = [
   'virtual:mordoc/language',
   'virtual:mordoc/navigation',
   'virtual:mordoc/assets',
-  'virtual:mordoc/pages',
+  'virtual:mordoc/pages-index',
   'virtual:mordoc/page-loaders',
 ] as const;
 
@@ -135,7 +135,7 @@ export function generateVirtualModule(id: string, data: MordocData): string | nu
       return `export default ${JSON.stringify(data.navigation)};`;
     case 'virtual:mordoc/assets':
       return `export default ${JSON.stringify(data.assets)};`;
-    case 'virtual:mordoc/pages':
+    case 'virtual:mordoc/pages-index':
       return `export default ${JSON.stringify(data.pages.map(toPageMeta))};`;
     case 'virtual:mordoc/page-loaders':
       return generatePageLoadersSource(data);

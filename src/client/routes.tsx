@@ -1,6 +1,6 @@
 import type { RouteObject } from 'react-router';
 import { createBrowserRouter } from 'react-router';
-import pages from 'virtual:mordoc/pages';
+import pages from 'virtual:mordoc/pages-index';
 import loaders from 'virtual:mordoc/page-loaders';
 import { App } from './App.js';
 import { Page } from './Page.js';
@@ -27,13 +27,13 @@ export function buildRoutes(): RouteObject[] {
   const pageRoutes: RouteObject[] = pages.map((page) => {
     const pageLoader = loaders[page.routePath];
     if (!pageLoader) {
-      // Defensive: the plugin emits `page-loaders` and `pages` from the
+      // Defensive: the plugin emits `page-loaders` and `pages-index` from the
       // same pipeline output, so they should always agree. A mismatch
       // here means the eager modules went out of sync — surface it
       // loudly at app bootstrap rather than during navigation.
       throw new Error(
         `mordoc: no page loader found for routePath "${page.routePath}". ` +
-          `virtual:mordoc/pages and virtual:mordoc/page-loaders are out of sync.`,
+          `virtual:mordoc/pages-index and virtual:mordoc/page-loaders are out of sync.`,
       );
     }
     const common = {

@@ -34,7 +34,7 @@ declare module 'virtual:mordoc/assets' {
   export default value;
 }
 
-declare module 'virtual:mordoc/pages' {
+declare module 'virtual:mordoc/pages-index' {
   const value: import('../types/content.js').PageMeta[];
   export default value;
 }

@@ -87,7 +87,7 @@ export interface TransformedPage {
  * modules — the full content a page component needs to render.
  *
  * Only fetched when the user navigates to the route. The eager
- * `virtual:mordoc/pages` index carries just the route identity
+ * `virtual:mordoc/pages-index` carries just the route identity
  * ({@link PageMeta}); everything visual or title-bar-facing lives here.
  *
  * `isIndex` is intentionally excluded — index-ness is already encoded in
@@ -107,7 +107,7 @@ export interface PageData {
 /**
  * Lightweight projection of a `TransformedPage` — just the route identity.
  *
- * Shipped eagerly via `virtual:mordoc/pages`. Its only job is to let the
+ * Shipped eagerly via `virtual:mordoc/pages-index`. Its only job is to let the
  * shell enumerate which routes exist: the React Router route table on the
  * client, page enumeration for the SSG build, and "does this path exist in
  * other languages?" lookups for a language switcher.

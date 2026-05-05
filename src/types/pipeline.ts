@@ -2,7 +2,7 @@ import type { SiteConfig } from './site.js';
 import type { LanguageConfig } from './language.js';
 import type { ResolvedTopnavConfig, SidenavConfig } from './navigation.js';
 import type { ResolvedAssets } from './assets.js';
-import type { TransformedPage } from './content.js';
+import type { PageMeta, TransformedPage } from './content.js';
 
 /**
  * Resolved navigation for the site, discriminated by `kind`:
@@ -37,4 +37,28 @@ export interface MordocData {
   navigation: NavigationConfig;
   assets: ResolvedAssets;
   pages: TransformedPage[];
+}
+
+/**
+ * The lightweight projection of `MordocData` consumed by the React shell —
+ * everything needed to render the site chrome (header, navigation, link
+ * lists), but none of the per-page content trees.
+ *
+ * Per-page content (`PageData`) is delivered through the route loader → lazy
+ * `virtual:mordoc/page/<routePath>` module on both the client and the server.
+ * Keeping `ShellData` content-free forces all per-page data through that one
+ * channel, which is what makes CSR and SSR symmetric: the server doesn't get
+ * a privileged "all pages already loaded" view that the client doesn't have.
+ *
+ * Three usage sites, one definition:
+ *   1. The value shape of `MordocDataContext` in the React tree.
+ *   2. The `data` parameter of `entry-server.tsx`'s `render()`.
+ *   3. The return shape of `mordocVitePlugin`'s `api.getShellData()`.
+ */
+export interface ShellData {
+  site: SiteConfig;
+  language: LanguageConfig | null;
+  navigation: NavigationConfig;
+  assets: ResolvedAssets;
+  pagesIndex: PageMeta[];
 }

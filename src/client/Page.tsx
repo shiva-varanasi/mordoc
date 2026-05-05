@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useLoaderData } from 'react-router';
 import React from 'react';
 import Markdoc from '@markdoc/markdoc';
-import site from 'virtual:mordoc/site';
+import { useMordocData } from './data-context.js';
 import type { PageData } from '../types/content.js';
 
 /**
@@ -23,11 +23,12 @@ import type { PageData } from '../types/content.js';
  */
 export function Page() {
   const pageData = useLoaderData() as PageData;
+  const { site } = useMordocData();
 
   useEffect(() => {
     const pageTitle = pageData.frontmatter.title;
     document.title = pageTitle ? `${pageTitle} — ${site.name}` : site.name;
-  }, [pageData.frontmatter.title]);
+  }, [pageData.frontmatter.title, site.name]);
 
   const rendered = Markdoc.renderers.react(pageData.renderable, React, {
     components: {},

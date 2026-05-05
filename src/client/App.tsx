@@ -1,6 +1,5 @@
 import { Link, Outlet } from 'react-router';
-import site from 'virtual:mordoc/site';
-import pages from 'virtual:mordoc/pages-index';
+import { useMordocData } from './data-context.js';
 
 /**
  * Root layout component.
@@ -14,8 +13,16 @@ import pages from 'virtual:mordoc/pages-index';
  * The link list uses `<Link>` rather than `<a>` so client-side
  * navigation (route transitions, lazy chunk loading) is actually
  * exercised — that's the whole point of verifying the router wiring.
+ *
+ * Reads site-wide data via `useMordocData()` rather than importing the
+ * eager virtual modules directly. That single channel is what keeps
+ * CSR and SSR symmetric: the same component reads the same context,
+ * whether the provider is filled by `main.tsx` (browser) or
+ * `entry-server.tsx` (Node).
  */
 export function App() {
+  const { site, pagesIndex } = useMordocData();
+
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', maxWidth: '900px', margin: '0 auto', padding: '2rem' }}>
       <header style={{ borderBottom: '1px solid #e5e5e5', paddingBottom: '1rem', marginBottom: '2rem' }}>
@@ -31,12 +38,12 @@ export function App() {
         <nav aria-label="All pages" style={{ borderRight: '1px solid #e5e5e5', paddingRight: '1rem' }}>
           <strong>All pages</strong>
           <ul style={{ listStyle: 'none', padding: 0, margin: '0.5rem 0 0' }}>
-            {pages.map((page) => (
-              <li key={page.routePath} style={{ marginBottom: '0.25rem' }}>
-                <Link to={page.routePath}>
-                  <code>{page.routePath}</code>
+            {pagesIndex.map((pageIndex) => (
+              <li key={pageIndex.routePath} style={{ marginBottom: '0.25rem' }}>
+                <Link to={pageIndex.routePath}>
+                  <code>{pageIndex.routePath}</code>
                 </Link>{' '}
-                <span style={{ color: '#999', fontSize: '0.85em' }}>[{page.language}]</span>
+                <span style={{ color: '#999', fontSize: '0.85em' }}>[{pageIndex.language}]</span>
               </li>
             ))}
           </ul>

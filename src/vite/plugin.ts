@@ -1,6 +1,6 @@
 import type { Plugin } from 'vite';
 import { runPipeline } from '../pipeline.js';
-import type { MordocData } from '../types/pipeline.js';
+import type { MordocData, ShellData } from '../types/pipeline.js';
 import type { PageData, PageMeta, TransformedPage } from '../types/content.js';
 
 /**
@@ -160,6 +160,48 @@ export function generatePageModule(routePath: string, data: MordocData): string 
 export interface MordocVitePluginOptions {
   /** Absolute path to the user's project root. */
   projectRoot: string;
+  /**
+   * Pre-loaded pipeline output. When provided, the plugin skips its own
+   * `runPipeline(projectRoot)` call in `buildStart` and uses this value
+   * directly.
+   *
+   * The build command runs Vite twice (once for the client, once for the
+   * SSR entry) and both passes need the same `MordocData`. Letting the
+   * caller compute it once and inject it here avoids running the pipeline
+   * twice per build, and gives the build command a single point at which
+   * to mutate the data (e.g. rewriting asset paths) before either Vite
+   * pass starts.
+   *
+   * Dev path passes `projectRoot` only; this remains unset and the
+   * plugin runs the pipeline itself, exactly as before.
+   */
+  data?: MordocData;
+}
+
+/**
+ * Public surface of the plugin's `api` object.
+ *
+ * Vite's plugin `api` field is the standard, documented mechanism for a
+ * plugin to expose values to other plugins or to the embedding server
+ * (e.g. our `dev.ts` middleware). Using it instead of module-level state
+ * keeps the boundary explicit and re-runnable: each `mordocVitePlugin()`
+ * invocation has its own cache and its own api.
+ *
+ * Today only `getShellData` is exposed. The SSG runner will hang the same
+ * pattern off this object when it lands.
+ */
+export interface MordocVitePluginApi {
+  /**
+   * Returns the lightweight `ShellData` projection of the cached pipeline
+   * output. The projection happens inside the plugin so callers never see
+   * `TransformedPage[]`, keeping the SSR boundary content-free.
+   *
+   * Throws if called before `buildStart` has populated the cache. In
+   * normal Vite lifecycle, `buildStart` for all plugins completes inside
+   * `server.listen()` before any HTTP request can reach middleware, so
+   * this should be unreachable in practice.
+   */
+  getShellData(): ShellData;
 }
 
 /**
@@ -172,6 +214,9 @@ export interface MordocVitePluginOptions {
  *   - `resolveId` / `load`: serves the cached data as virtual ES modules.
  *     Eager modules (configs, route index, loader map) resolve by exact id.
  *     Lazy per-route page modules resolve by `PAGE_MODULE_PREFIX` match.
+ *   - `api.getShellData()`: lets the dev middleware (and later the SSG
+ *     runner) read the same cached data the virtual modules expose,
+ *     pre-projected to the SSR-shaped `ShellData`.
  *
  * HMR (granular re-runs on file changes) is deferred to a subsequent step.
  * This scaffold establishes the full static contract — the client has
@@ -182,13 +227,39 @@ export interface MordocVitePluginOptions {
  * of the deferred asset-serving design.
  */
 export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
-  let data: MordocData | null = null;
+  // Seed the cache from the caller if data was injected; otherwise it
+  // gets filled by buildStart's own runPipeline call. Either way, every
+  // hook below sees a populated `data` by the time it runs.
+  let data: MordocData | null = options.data ?? null;
+
+  const api: MordocVitePluginApi = {
+    getShellData(): ShellData {
+      if (!data) {
+        throw new Error(
+          'mordoc plugin: getShellData() called before buildStart populated the cache.',
+        );
+      }
+      return {
+        site: data.site,
+        language: data.language,
+        navigation: data.navigation,
+        assets: data.assets,
+        pagesIndex: data.pages.map(toPageMeta),
+      };
+    },
+  };
 
   return {
     name: 'mordoc',
+    api,
 
     async buildStart() {
-      data = await runPipeline(options.projectRoot);
+      // Skip the pipeline if the caller already supplied data — the build
+      // command does this so the client and SSR Vite passes share one
+      // pipeline result. Dev (no `data`) still runs it here.
+      if (!data) {
+        data = await runPipeline(options.projectRoot);
+      }
     },
 
     resolveId(id) {

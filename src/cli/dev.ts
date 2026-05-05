@@ -1,40 +1,77 @@
-import { createServer } from 'vite';
+import { createServer, type ViteDevServer } from 'vite';
 import react from '@vitejs/plugin-react';
-import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { mordocVitePlugin } from '../vite/plugin.js';
+import fs from 'node:fs/promises';
+import type { IncomingMessage } from 'node:http';
+import { mordocVitePlugin, type MordocVitePluginApi } from '../vite/plugin.js';
+import type { ShellData } from '../types/pipeline.js';
+import { getClientRoot, getPackageRoot } from './paths.js';
+
+/** Markers in `index.html` substituted at request time. */
+const SSR_TITLE_MARKER = '<!--ssr-title-->';
+const SSR_OUTLET_MARKER = '<!--ssr-outlet-->';
 
 /**
- * Resolves the absolute path to mordoc's own package root.
+ * Minimal HTML escape for values interpolated into element text content.
  *
- * This file compiles to `dist/cli/dev.js`, which sits two directories below
- * the package root. Using `import.meta.url` means the resolution works
- * regardless of where mordoc is installed — in its own repo during
- * development, or under `node_modules/mordoc/` in a user's project.
+ * `site.name` comes from `config/site.json` — content the project owner
+ * controls — but escaping is cheap insurance against `<` / `&` / quotes
+ * in legitimate site names breaking the resulting HTML.
  */
-function getPackageRoot(): string {
-  return path.resolve(fileURLToPath(import.meta.url), '../../..');
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 /**
- * HTML shell served in dev. Minimal: no title derived from site config
- * yet (that requires routing + per-route data), no SSR content, just the
- * mount point and the client entry. Vite's `transformIndexHtml` injects
- * its HMR client and React Fast Refresh setup on top of this.
+ * Adapts Node's `IncomingMessage` to a fetch `Request`, which is what
+ * React Router's `createStaticHandler.query()` expects.
+ *
+ * Body-less by design — Mordoc's SSR path only handles GETs. Method and
+ * headers are preserved so loader code that consults them sees the same
+ * shape it would in a real fetch. Multi-value headers (e.g. `set-cookie`
+ * on incoming requests, rare but possible) are appended individually.
+ *
+ * The SSG runner will construct a synthetic `new Request(\`http://localhost\${routePath}\`)`
+ * directly when it lands; this adapter only exists for the dev path.
  */
-const DEV_HTML_SHELL = `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mordoc Dev</title>
-</head>
-<body>
-  <div id="app"></div>
-  <script type="module" src="/main.tsx"></script>
-</body>
-</html>
-`;
+function nodeRequestToFetchRequest(req: IncomingMessage): Request {
+  const protocol =
+    typeof req.headers['x-forwarded-proto'] === 'string'
+      ? req.headers['x-forwarded-proto']
+      : 'http';
+  const host = req.headers.host ?? 'localhost';
+  const url = `${protocol}://${host}${req.url ?? '/'}`;
+
+  const headers = new Headers();
+  for (const [name, value] of Object.entries(req.headers)) {
+    if (value == null) continue;
+    if (Array.isArray(value)) {
+      for (const v of value) headers.append(name, v);
+    } else {
+      headers.set(name, value);
+    }
+  }
+
+  return new Request(url, { method: req.method ?? 'GET', headers });
+}
+
+/** Locates mordoc's plugin instance on a running Vite server and returns its api. */
+function getMordocApi(server: ViteDevServer): MordocVitePluginApi {
+  const plugin = server.config.plugins.find((p) => p.name === 'mordoc');
+  if (!plugin) {
+    throw new Error('mordoc dev: mordoc plugin not registered on the Vite server.');
+  }
+  const api = plugin.api as MordocVitePluginApi | undefined;
+  if (!api || typeof api.getShellData !== 'function') {
+    throw new Error('mordoc dev: mordoc plugin is missing its api.getShellData() method.');
+  }
+  return api;
+}
 
 export interface DevCommandOptions {
   /** Absolute path to the user's project root. */
@@ -48,22 +85,42 @@ export interface DevCommandOptions {
  *
  * Architecture:
  *   - Vite's `root` is set to mordoc's own `src/client/` — that's where
- *     the React app source lives. The user's project does NOT contain any
- *     TSX; Vite never looks at user code as code.
+ *     the React app source AND the HTML shell (`index.html`) live. The
+ *     user's project does NOT contain any TSX or HTML; Vite never looks
+ *     at user code as code.
  *   - The user's content and config are funneled in through the mordoc
- *     Vite plugin's virtual modules. Vite sees them as ordinary module
- *     imports from the client's perspective.
- *   - `appType: 'custom'` disables Vite's default HTML handling so we can
- *     serve a hand-crafted shell and, in a later step, SSR-rendered HTML.
- *   - `configFile: false` prevents Vite from accidentally picking up any
- *     vite.config.js the user might have in their project.
+ *     Vite plugin's virtual modules (for the React tree) and through
+ *     `plugin.api.getShellData()` (for the SSR `render(request, data)`
+ *     call).
+ *   - `appType: 'custom'` disables Vite's default HTML handling so we
+ *     read `index.html` ourselves, transform it for HMR, run SSR, and
+ *     inject the rendered tree.
+ *   - `configFile: false` prevents Vite from accidentally picking up
+ *     any vite.config.js the user might have in their project.
  *
- * Deferred from this step: SSR-in-dev, HMR for virtual modules, React
- * Router. Those land together when routing comes online.
+ * Per-request flow:
+ *   1. Read the raw `index.html` template from disk (re-read each
+ *      request so HMR-driven edits to the shell are picked up).
+ *   2. `vite.transformIndexHtml` injects the HMR client + plugin
+ *      transforms.
+ *   3. Substitute `<!--ssr-title-->` with `site.name`. The proper
+ *      per-route `<title>`/`<meta>` injection is its own follow-up.
+ *   4. `vite.ssrLoadModule('/entry-server.tsx')` evaluates the server
+ *      entry in Node (resolving any `virtual:mordoc/*` imports through
+ *      our plugin's `load` hook).
+ *   5. `render(request, shellData)` returns `{ html }`. The
+ *      `<StaticRouterProvider>` it uses also emits a `<script>` tag
+ *      containing the hydration data — that lands inside `html` and
+ *      flows into the document automatically.
+ *   6. Substitute `<!--ssr-outlet-->` with the rendered tree, send.
+ *
+ * Deferred from this step: granular HMR for content/config edits,
+ * route-aware head injection, redirect/Response handling from loaders.
  */
 export async function runDevCommand(options: DevCommandOptions): Promise<void> {
   const { projectRoot, port } = options;
-  const clientRoot = path.join(getPackageRoot(), 'src', 'client');
+  const clientRoot = getClientRoot();
+  const templatePath = path.join(clientRoot, 'index.html');
 
   const server = await createServer({
     configFile: false,
@@ -85,23 +142,44 @@ export async function runDevCommand(options: DevCommandOptions): Promise<void> {
     },
   });
 
-  // Single middleware: every non-asset request gets the HTML shell.
-  // Per-route rendering arrives when routing + SSR land in the next step.
+  const mordocApi = getMordocApi(server);
+
   server.middlewares.use(async (req, res, next) => {
     try {
       const url = req.originalUrl ?? req.url ?? '/';
 
       // Let Vite handle asset/module requests (anything with a file
-      // extension in the last path segment).
+      // extension in the last path segment). Vite's own middleware will
+      // already have picked up the lazy `virtual:mordoc/page/...`
+      // chunks via its `/@id/` mapping before reaching this point, so
+      // this only catches static-style URLs.
       const lastSegment = url.split('?')[0]?.split('/').pop() ?? '';
       if (lastSegment.includes('.')) {
         return next();
       }
 
-      const html = await server.transformIndexHtml(url, DEV_HTML_SHELL);
+      const shellData: ShellData = mordocApi.getShellData();
+
+      const rawTemplate = await fs.readFile(templatePath, 'utf-8');
+      const transformed = await server.transformIndexHtml(url, rawTemplate);
+
+      const withTitle = transformed.replace(
+        SSR_TITLE_MARKER,
+        () => escapeHtml(shellData.site.name),
+      );
+
+      const serverEntry = (await server.ssrLoadModule('/entry-server.tsx')) as {
+        render: (request: Request, data: ShellData) => Promise<{ html: string }>;
+      };
+
+      const request = nodeRequestToFetchRequest(req);
+      const { html: appHtml } = await serverEntry.render(request, shellData);
+
+      const finalHtml = withTitle.replace(SSR_OUTLET_MARKER, () => appHtml);
+
       res.statusCode = 200;
       res.setHeader('Content-Type', 'text/html');
-      res.end(html);
+      res.end(finalHtml);
     } catch (err) {
       if (err instanceof Error) {
         server.ssrFixStacktrace(err);

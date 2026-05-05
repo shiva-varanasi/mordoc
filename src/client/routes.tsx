@@ -1,4 +1,4 @@
-import type { RouteObject } from 'react-router';
+import type { HydrationState, RouteObject } from 'react-router';
 import { createBrowserRouter } from 'react-router';
 import pagesIndex from 'virtual:mordoc/pages-index';
 import loaders from 'virtual:mordoc/page-loaders';
@@ -20,8 +20,21 @@ import { NotFound } from './NotFound.js';
  * `page-loaders` map. The map is what lets Vite statically code-split:
  * every specifier inside it is a literal `import("...")` string.
  *
- * Kept as its own module so the (future) SSR entry can reuse the same
- * route list against `createStaticRouter` without duplicating logic.
+ * The same loader function runs in three contexts; only the runtime
+ * resolving the dynamic `import('virtual:mordoc/page/...')` differs:
+ *   - Browser (CSR / post-hydration): native `import()` fetches the
+ *     lazy chunk over HTTP (Vite-served virtual in dev, hashed JS in
+ *     prod).
+ *   - Dev SSR: Vite's `ssrLoadModule` resolves it through the plugin's
+ *     `load` hook — the generated JS source is evaluated in Node.
+ *   - SSG (later step): the bundled SSR output's module map resolves
+ *     it at build time.
+ * The component code (`useLoaderData()`) and the data shape (`PageData`)
+ * are identical in all three; only the resolution mechanism changes.
+ *
+ * Kept as its own module so the SSR entry reuses the same route list
+ * against `createStaticHandler`/`createStaticRouter` without duplicating
+ * logic.
  */
 export function buildRoutes(): RouteObject[] {
   const pageRoutes: RouteObject[] = pagesIndex.map((pageIndex) => {
@@ -55,7 +68,17 @@ export function buildRoutes(): RouteObject[] {
   ];
 }
 
-/** Creates the browser-side data router. Consumed by `main.tsx`. */
-export function createAppRouter() {
-  return createBrowserRouter(buildRoutes());
+/**
+ * Creates the browser-side data router. Consumed by `main.tsx`.
+ *
+ * `hydrationData` should be passed when SSR has run for the initial
+ * request — `<StaticRouterProvider>` serializes the loaders' results
+ * into a `<script>` tag at render time, exposed on the client as
+ * `window.__staticRouterHydrationData`. Threading it through here lets
+ * the data router skip re-running the initial route's loader (which
+ * would otherwise re-fetch the same lazy chunk that already produced
+ * the SSR HTML).
+ */
+export function createAppRouter(hydrationData?: HydrationState) {
+  return createBrowserRouter(buildRoutes(), { hydrationData });
 }

@@ -12,6 +12,7 @@ import {
   generateVirtualModule,
 } from '../dist/vite/plugin.js';
 import { runDevCommand } from '../dist/cli/dev.js';
+import { runBuildCommand } from '../dist/cli/build.js';
 
 const command = process.argv[2];
 
@@ -21,6 +22,14 @@ if (command === 'dev') {
   } catch (err) {
     console.error('\n✘ Dev server failed to start:\n');
     console.error(err.message);
+    process.exit(1);
+  }
+} else if (command === 'build') {
+  try {
+    await runBuildCommand({ projectRoot: process.cwd() });
+  } catch (err) {
+    console.error('\n✘ Build failed:\n');
+    console.error(err.stack ?? err.message);
     process.exit(1);
   }
 } else if (command === 'validate') {
@@ -94,6 +103,7 @@ if (command === 'dev') {
   console.log('Usage: mordoc <command>');
   console.log('\nCommands:');
   console.log('  dev        Start the Mordoc dev server');
+  console.log('  build      Render the project to static HTML in dist/');
   console.log('  validate   Run the full pipeline and print the resulting data');
   process.exit(1);
 }

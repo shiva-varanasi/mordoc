@@ -5,7 +5,7 @@ import fs from 'node:fs/promises';
 import type { IncomingMessage } from 'node:http';
 import { mordocVitePlugin, type MordocVitePluginApi } from '../vite/plugin.js';
 import type { ShellData } from '../types/pipeline.js';
-import { getClientRoot, getPackageRoot } from './paths.js';
+import { getClientRoot, getPackageRoot } from '../utils/paths.js';
 
 /** Markers in `index.html` substituted at request time. */
 const SSR_TITLE_MARKER = '<!--ssr-title-->';
@@ -84,7 +84,7 @@ export interface DevCommandOptions {
  * Starts the Mordoc dev server.
  *
  * Architecture:
- *   - Vite's `root` is set to mordoc's own `src/client/` — that's where
+ *   - Vite's `root` is set to mordoc's own `src/app/` — that's where
  *     the React app source AND the HTML shell (`index.html`) live. The
  *     user's project does NOT contain any TSX or HTML; Vite never looks
  *     at user code as code.

@@ -14,7 +14,7 @@ import { createAppRouter } from './routes.js';
  * Browser entry. Assembles `ShellData` from the eager virtual modules
  * and hydrates the React tree.
  *
- * This is the only file in `src/client/` that is allowed to import the
+ * This is the only file in `src/app/` that imports the
  * eager `virtual:mordoc/*` modules directly — every other shell
  * component reads them via `useMordocData()`. Keeping the imports
  * pinned here is what guarantees CSR/SSR symmetry: the server entry

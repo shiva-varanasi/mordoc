@@ -4,7 +4,7 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 import { runPipeline } from '../pipeline.js';
 import { mordocVitePlugin } from '../vite/plugin.js';
-import { getClientRoot } from './paths.js';
+import { getClientRoot } from '../utils/paths.js';
 import { runSsg } from './ssg-runner.js';
 import { copyAndRewriteAssets } from './asset-rewrite.js';
 
@@ -41,7 +41,7 @@ function getOutDirs(projectRoot: string): BuildOutDirs {
  * Runs the full Mordoc production build for a project.
  *
  * Architecture mirrors `dev.ts`:
- *   - Vite's `root` is mordoc's own `src/client/` — the user's project
+ *   - Vite's `root` is mordoc's own `src/app/` — the user's project
  *     contains no TSX/HTML that Vite ever sees as code. All user-side
  *     data flows through the mordoc plugin's virtual modules.
  *   - `configFile: false` prevents Vite from picking up any stray

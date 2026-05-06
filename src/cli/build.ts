@@ -44,6 +44,11 @@ function getOutDirs(projectRoot: string): BuildOutDirs {
  *   - Vite's `root` is mordoc's own `src/app/` — the user's project
  *     contains no TSX/HTML that Vite ever sees as code. All user-side
  *     data flows through the mordoc plugin's virtual modules.
+ *   - `publicDir` is pointed at `<projectRoot>/public/` for the client
+ *     build so that author assets (referenced from markdown as
+ *     `/images/foo.png` etc.) get copied into `dist/` verbatim. The SSR
+ *     build sets `publicDir: false` to avoid copying the same files into
+ *     the throwaway SSR intermediate.
  *   - `configFile: false` prevents Vite from picking up any stray
  *     `vite.config.js` the user might have lying around.
  *
@@ -79,6 +84,7 @@ function getOutDirs(projectRoot: string): BuildOutDirs {
 export async function runBuildCommand(options: BuildCommandOptions): Promise<void> {
   const { projectRoot } = options;
   const clientRoot = getClientRoot();
+  const publicDir = path.join(projectRoot, 'public');
   const { clientOutDir, ssrOutDir } = getOutDirs(projectRoot);
 
   console.log('\n  Mordoc build');
@@ -106,6 +112,7 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
   await viteBuild({
     configFile: false,
     root: clientRoot,
+    publicDir,
     plugins: [
       react(),
       mordocVitePlugin({ projectRoot, data }),
@@ -124,6 +131,11 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
   await viteBuild({
     configFile: false,
     root: clientRoot,
+    // The SSR pass produces a Node-loadable bundle in a throwaway
+    // intermediate; copying author assets into it is wasted I/O and
+    // would put them under `node_modules/.mordoc/ssr/` rather than
+    // `dist/`. Disable publicDir entirely for this pass.
+    publicDir: false,
     plugins: [
       react(),
       mordocVitePlugin({ projectRoot, data }),

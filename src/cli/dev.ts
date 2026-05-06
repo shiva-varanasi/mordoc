@@ -88,6 +88,12 @@ export interface DevCommandOptions {
  *     the React app source AND the HTML shell (`index.html`) live. The
  *     user's project does NOT contain any TSX or HTML; Vite never looks
  *     at user code as code.
+ *   - `publicDir` is pointed at the user's `<projectRoot>/public/` so
+ *     that markdown references like `![cockpit](/images/cockpit.png)`
+ *     resolve against files the author drops there. Vite's default
+ *     would resolve `publicDir` against `root` (i.e. `src/app/public/`),
+ *     which is not what we want — author assets live in the user's
+ *     project, not in mordoc's package.
  *   - The user's content and config are funneled in through the mordoc
  *     Vite plugin's virtual modules (for the React tree) and through
  *     `plugin.api.getShellData()` (for the SSR `render(request, data)`
@@ -125,6 +131,7 @@ export async function runDevCommand(options: DevCommandOptions): Promise<void> {
   const server = await createServer({
     configFile: false,
     root: clientRoot,
+    publicDir: path.join(projectRoot, 'public'),
     appType: 'custom',
     plugins: [
       react(),

@@ -1,5 +1,14 @@
-import type { Plugin } from 'vite';
-import { runPipeline } from '../pipeline.js';
+import path from 'node:path';
+import type { Plugin, ViteDevServer } from 'vite';
+import { loadAssets } from '../config/assets-loader.js';
+import { loadSiteConfig } from '../config/site-loader.js';
+import {
+  loadNavigation,
+  pagesRouteSignature,
+  replaceTransformedPage,
+  reparsePage,
+  runPipeline,
+} from '../pipeline.js';
 import type { MordocData, ShellData } from '../types/pipeline.js';
 import type { PageData, PageMeta, TransformedPage } from '../types/content.js';
 
@@ -157,6 +166,156 @@ export function generatePageModule(routePath: string, data: MordocData): string 
   return `export default ${JSON.stringify(toPageData(page))};`;
 }
 
+/**
+ * absPath must be normalized absolute path.
+ */
+function forwardProjectRel(projectRoot: string, absPath: string): string | null {
+  const rel = path.relative(projectRoot, absPath).split(path.sep).join('/');
+  if (rel.startsWith('..')) return null;
+  return rel;
+}
+
+function resolvedVirtualId(virtualId: string): string {
+  return RESOLVED_PREFIX + virtualId;
+}
+
+async function reloadVirtualModule(server: ViteDevServer, virtualId: string): Promise<void> {
+  const resolvedId = resolvedVirtualId(virtualId);
+
+  // Invalidate in the client module graph + trigger HMR
+  const clientMod = server.moduleGraph.getModuleById(resolvedId);
+  if (clientMod) {
+    server.moduleGraph.invalidateModule(clientMod);
+  }
+
+  // Invalidate in the SSR module graph so ssrLoadModule re-runs load()
+  const ssrMod = server.environments.ssr.moduleGraph.getModuleById(resolvedId);
+  if (ssrMod) {
+    server.environments.ssr.moduleGraph.invalidateModule(ssrMod);
+  }
+
+  // Trigger HMR for the client side
+  if (clientMod) {
+    await server.reloadModule(clientMod);
+  }
+}
+
+async function reloadAllMordocVirtualModules(
+  server: ViteDevServer,
+  pages: TransformedPage[],
+): Promise<void> {
+  for (const id of EAGER_VIRTUAL_IDS) {
+    await reloadVirtualModule(server, id);
+  }
+  for (const page of pages) {
+    await reloadVirtualModule(server, `${PAGE_MODULE_PREFIX}${page.entry.routePath}`);
+  }
+}
+
+type WatchEvent = 'add' | 'change' | 'unlink';
+
+/** Applies a debounced batch of `content/` + `config/` file events for dev HMR. */
+async function applyMordocWatchBatch(
+  server: ViteDevServer,
+  projectRoot: string,
+  batch: Map<string, WatchEvent>,
+  getData: () => MordocData | null,
+  setData: (next: MordocData) => void,
+): Promise<void> {
+  const data = getData();
+  if (!data || batch.size === 0) return;
+
+  const rels = [...batch.keys()]
+    .map((abs) => ({ abs, rel: forwardProjectRel(projectRoot, abs) }))
+    .filter((x): x is { abs: string; rel: string } => x.rel !== null);
+
+  const contentEvents = rels.filter(({ rel }) => rel.startsWith('content/'));
+  const configEvents = rels.filter(({ rel }) => rel.startsWith('config/'));
+
+  const hasContentStructural = contentEvents.some(
+    ({ abs }) => batch.get(abs) !== 'change',
+  );
+
+  // Any new/removed path under content ⇒ re-run pipeline.
+  if (hasContentStructural) {
+    await rerunPipelineForDev(server, projectRoot, getData, setData);
+    return;
+  }
+
+  if (configEvents.some(({ rel }) => rel === 'config/language.json')) {
+    await rerunPipelineForDev(server, projectRoot, getData, setData);
+    return;
+  }
+
+  const siteRel = 'config/site.json';
+  if (configEvents.some(({ rel }) => rel === siteRel)) {
+    const site = await loadSiteConfig(projectRoot);
+    if (site.defaultLanguage !== data.site.defaultLanguage) {
+      await rerunPipelineForDev(server, projectRoot, getData, setData);
+      return;
+    }
+    data.site = site;
+    await reloadVirtualModule(server, 'virtual:mordoc/site');
+  }
+
+  if (configEvents.some(({ rel }) => rel.startsWith('config/navigation/'))) {
+    data.navigation = await loadNavigation(projectRoot);
+    await reloadVirtualModule(server, 'virtual:mordoc/navigation');
+  }
+
+  const isAssetsPath = (rel: string) =>
+    rel === 'config/assets' || rel.startsWith('config/assets/');
+  if (configEvents.some(({ rel }) => isAssetsPath(rel))) {
+    data.assets = await loadAssets(projectRoot);
+    await reloadVirtualModule(server, 'virtual:mordoc/assets');
+  }
+
+  /**
+   * Dev: invalidate lazy virtual page modules so SSR re-runs `load()` with fresh
+   * `data`, then full document reload so the new HTML and `__staticRouterHydrationData`
+   * match.
+   */
+  const reparsedVirtualIds: string[] = [];
+  for (const { abs, rel } of contentEvents) {
+    if (batch.get(abs) !== 'change') continue;
+    if (!rel.toLowerCase().endsWith('.md')) continue;
+
+    const page = data.pages.find((p) => path.normalize(p.entry.filePath) === abs);
+    if (!page) {
+      await rerunPipelineForDev(server, projectRoot, getData, setData);
+      return;
+    }
+    const reparsed = await reparsePage(page.entry);
+    replaceTransformedPage(data, reparsed);
+    reparsedVirtualIds.push(`${PAGE_MODULE_PREFIX}${reparsed.entry.routePath}`);
+  }
+  if (reparsedVirtualIds.length > 0) {
+    for (const virtualId of reparsedVirtualIds) {
+      await reloadVirtualModule(server, virtualId);
+    }
+    server.ws.send({ type: 'full-reload', path: '*' });
+  }
+}
+
+async function rerunPipelineForDev(
+  server: ViteDevServer,
+  projectRoot: string,
+  getData: () => MordocData | null,
+  setData: (next: MordocData) => void,
+): Promise<void> {
+  const prev = getData();
+  if (!prev) return;
+  const prevSig = pagesRouteSignature(prev.pages);
+  const next = await runPipeline(projectRoot);
+  const nextSig = pagesRouteSignature(next.pages);
+  setData(next);
+  if (prevSig !== nextSig) {
+    server.ws.send({ type: 'full-reload', path: '*' });
+    return;
+  }
+  await reloadAllMordocVirtualModules(server, next.pages);
+}
+
 export interface MordocVitePluginOptions {
   /** Absolute path to the user's project root. */
   projectRoot: string;
@@ -217,10 +376,12 @@ export interface MordocVitePluginApi {
  *   - `api.getShellData()`: lets the dev middleware (and later the SSG
  *     runner) read the same cached data the virtual modules expose,
  *     pre-projected to the SSR-shaped `ShellData`.
- *
- * HMR (granular re-runs on file changes) is deferred to a subsequent step.
- * This scaffold establishes the full static contract — the client has
- * every import surface it needs to build the router against.
+ *   - `configureServer` (dev only, when `data` is not injected): watches
+ *     `content/` and `config/`, refreshes the in-memory pipeline cache,
+ *     triggers `reloadModule` for config-only eager updates, runs `runPipeline`
+ *     when the route set may change, and sends a **full document reload** after
+ *     granular `.md` edits so React Router picks up fresh loader data (invalidate
+ *     lazy virtuals for SSR, then **full document reload**).
  *
  * Note: asset paths in `virtual:mordoc/assets` are still absolute disk
  * paths at this stage. Translating them to browser-fetchable URLs is part
@@ -260,6 +421,65 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
       if (!data) {
         data = await runPipeline(options.projectRoot);
       }
+    },
+
+    configureServer(server) {
+      if (options.data) {
+        return;
+      }
+      const projectRoot = options.projectRoot;
+      let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+      const pending = new Map<string, WatchEvent>();
+
+      const flush = async () => {
+        debounceTimer = null;
+        if (pending.size === 0) return;
+        if (!data) {
+          debounceTimer = setTimeout(flush, 50);
+          return;
+        }
+        const batch = new Map(pending);
+        pending.clear();
+        try {
+          await applyMordocWatchBatch(
+            server,
+            projectRoot,
+            batch,
+            () => data,
+            (next) => {
+              data = next;
+            },
+          );
+        } catch (err) {
+          console.error('[mordoc] watch update failed:', err);
+          try {
+            const recovered = await runPipeline(projectRoot);
+            data = recovered;
+            await reloadAllMordocVirtualModules(server, recovered.pages);
+            server.ws.send({ type: 'full-reload', path: '*' });
+          } catch (recoverErr) {
+            console.error('[mordoc] watch recovery failed:', recoverErr);
+          }
+        }
+      };
+
+      const schedule = (absPath: string, event: WatchEvent) => {
+        pending.set(absPath, event);
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(flush, 75);
+      };
+
+      server.watcher.add(path.join(projectRoot, 'content'));
+      server.watcher.add(path.join(projectRoot, 'config'));
+
+      server.watcher.on('all', (event, rawPath) => {
+        if (event !== 'add' && event !== 'change' && event !== 'unlink') return;
+        const absPath = path.normalize(String(rawPath));
+        const rel = forwardProjectRel(projectRoot, absPath);
+        if (!rel) return;
+        if (!rel.startsWith('content/') && !rel.startsWith('config/')) return;
+        schedule(absPath, event as WatchEvent);
+      });
     },
 
     resolveId(id) {

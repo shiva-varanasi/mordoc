@@ -6,6 +6,7 @@ import { loadAssets } from './config/assets-loader.js';
 import { loadContent } from './content/content-loader.js';
 import { parseContent } from './content/content-parser.js';
 import { transformContent } from './content/content-transformer.js';
+import path from 'node:path';
 import type { ContentEntry, TransformedPage } from './types/content.js';
 import type { MordocData, NavigationConfig } from './types/pipeline.js';
 
@@ -88,4 +89,31 @@ export async function reparsePage(entry: ContentEntry): Promise<TransformedPage>
     throw new Error(`reparsePage produced no result for ${entry.filePath}`);
   }
   return transformed;
+}
+
+/**
+ * Stable fingerprint of which routes exist — used to decide whether a
+ * config or content-tree edit requires a full browser reload (v1 skips
+ * mutating the route table client-side when pages are added or removed).
+ */
+export function pagesRouteSignature(pages: TransformedPage[]): string {
+  return pages
+    .map((p) => `${p.entry.language}\t${p.entry.routePath}`)
+    .sort()
+    .join('|');
+}
+
+/**
+ * Replaces one page in an in-memory `MordocData` after `reparsePage`.
+ * Matches by normalized absolute `filePath` so Windows drives and
+ * separators stay consistent with the dev watcher.
+ */
+export function replaceTransformedPage(data: MordocData, page: TransformedPage): void {
+  const target = path.normalize(page.entry.filePath);
+  const idx = data.pages.findIndex((p) => path.normalize(p.entry.filePath) === target);
+  if (idx === -1) {
+    throw new Error(`replaceTransformedPage: no page for ${page.entry.filePath}`);
+  }
+  data.pages[idx] = page;
+  data.pages.sort((a, b) => a.entry.routePath.localeCompare(b.entry.routePath));
 }

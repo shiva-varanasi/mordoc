@@ -1,0 +1,28 @@
+:root {
+  --bg: #ffffff;
+  --fg: #111111;
+  --border: #e5e5e5;
+  --header-bg: #ffffff;
+  --search-bg: #f5f5f5;
+  --muted: #666666;
+}
+
+[data-theme="dark"] {
+  --bg: #0f0f0f;
+  --fg: #f0f0f0;
+  --border: #2a2a2a;
+  --header-bg: #111111;
+  --search-bg: #1e1e1e;
+  --muted: #999999;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, sans-serif;
+}

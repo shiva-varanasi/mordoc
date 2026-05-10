@@ -1,0 +1,39 @@
+.app {
+  min-height: 100vh;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.sidenav {
+  border-right: 1px solid var(--border);
+  padding-right: 1rem;
+}
+
+.navList {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+}
+
+.navItem {
+  margin-bottom: 0.25rem;
+}
+
+.navLink {
+  color: var(--fg);
+}
+
+.navMeta {
+  color: var(--muted);
+  font-size: 0.85em;
+}
+
+.main {
+  padding-left: 2rem;
+}

@@ -7,6 +7,7 @@ import navigation from 'virtual:mordoc/navigation';
 import assets from 'virtual:mordoc/assets';
 import pagesIndex from 'virtual:mordoc/pages-index';
 import type { ShellData } from '../types/pipeline.js';
+import './index.css';
 import { MordocDataContext } from './data-context.js';
 import { createAppRouter } from './routes.js';
 

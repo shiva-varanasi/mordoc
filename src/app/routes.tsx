@@ -3,8 +3,8 @@ import { createBrowserRouter } from 'react-router';
 import pagesIndex from 'virtual:mordoc/pages-index';
 import loaders from 'virtual:mordoc/page-loaders';
 import { App } from './App.js';
-import { Page } from './Page.js';
-import { NotFound } from './NotFound.js';
+import { Content } from './content/Content.js';
+import { NotFound } from './not-found/NotFound.js';
 
 /**
  * Builds the React Router route config from Mordoc's eager virtual
@@ -51,7 +51,7 @@ export function buildRoutes(): RouteObject[] {
     }
     const common = {
       loader: async () => (await pageLoader()).default,
-      Component: Page,
+      Component: Content,
       handle: { language: pageIndex.language, routePath: pageIndex.routePath },
     };
     return pageIndex.routePath === '/'

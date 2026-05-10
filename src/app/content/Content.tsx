@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { useLoaderData } from 'react-router';
 import React from 'react';
 import Markdoc from '@markdoc/markdoc';
-import { useMordocData } from './data-context.js';
-import type { PageData } from '../types/content.js';
+import { useMordocData } from '../data-context.js';
+import type { PageData } from '../../types/content.js';
 
 /**
  * Renders a single content page.
@@ -21,7 +21,7 @@ import type { PageData } from '../types/content.js';
  * runtime under Node/Vite's ESM loader even though the `.d.ts` permits
  * them. Same rule as `markdoc-config.ts` on the Node side.
  */
-export function Page() {
+export function Content() {
   const pageData = useLoaderData() as PageData;
   const { site } = useMordocData();
 

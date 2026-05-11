@@ -1,0 +1,60 @@
+.sidenav {
+  border-right: 1px solid var(--border);
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Indent nested lists */
+.list .list {
+  padding-left: 0.75rem;
+  margin-top: 0.125rem;
+}
+
+.item {
+  margin: 0;
+}
+
+.link {
+  display: block;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  border-left: 2px solid transparent;
+  color: var(--fg);
+  text-decoration: none;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  transition: background 0.1s;
+}
+
+.link:hover {
+  background: var(--search-bg);
+}
+
+.link.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: var(--active-bg);
+  font-weight: 500;
+}
+
+/* Section heading — item with children but no path */
+.group {
+  display: block;
+  padding: 0.5rem 0.5rem 0.2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 0.75rem;
+}
+
+.item:first-child > .group {
+  margin-top: 0;
+}

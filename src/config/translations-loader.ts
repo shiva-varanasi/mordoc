@@ -46,7 +46,7 @@ async function loadTranslationFile(filePath: string, lang: string): Promise<Reco
  * config/navigation/translations/<lang>.yaml. Missing files silently yield
  * an empty map (English labels are shown as fallback).
  */
-export async function loadTranslations(
+export async function loadNavTranslations(
   projectRoot: string,
   languages: string[],
   defaultLanguage: string,

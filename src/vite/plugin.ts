@@ -4,7 +4,7 @@ import { loadAssets } from '../config/assets-loader.js';
 import { loadSiteConfig } from '../config/site-loader.js';
 import {
   loadNavigation,
-  loadTranslations,
+  loadNavTranslations,
   pagesRouteSignature,
   replaceTransformedPage,
   reparsePage,
@@ -277,7 +277,7 @@ async function applyMordocWatchBatch(
   }
 
   if (isTranslationsChange) {
-    data.translations = await loadTranslations(
+    data.translations = await loadNavTranslations(
       projectRoot,
       data.language?.languages ?? [data.site.defaultLanguage],
       data.site.defaultLanguage,

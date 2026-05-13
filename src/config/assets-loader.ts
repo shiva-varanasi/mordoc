@@ -22,7 +22,7 @@ async function findFile(filePath: string): Promise<string | null> {
  * Returns the absolute path of the first match, or null if none found.
  * Priority order: svg → png → jpg.
  */
-async function findByExtension(dir: string, baseName: string): Promise<string | null> {
+async function findFileByBaseName(dir: string, baseName: string): Promise<string | null> {
   for (const ext of LOGO_EXTENSIONS) {
     const result = await findFile(join(dir, `${baseName}.${ext}`));
     if (result) return result;
@@ -42,8 +42,8 @@ export async function loadAssets(projectRoot: string): Promise<ResolvedAssets> {
   const assetsDir = join(projectRoot, ASSETS_DIR);
 
   const favicon = await findFile(join(assetsDir, 'favicon.ico'));
-  const logo = await findByExtension(assetsDir, 'logo');
-  const logoDarkFile = await findByExtension(assetsDir, 'logo-dark');
+  const logo = await findFileByBaseName(assetsDir, 'logo');
+  const logoDarkFile = await findFileByBaseName(assetsDir, 'logo-dark');
   const logoDark = logoDarkFile ?? logo;
 
   return { favicon, logo, logoDark };

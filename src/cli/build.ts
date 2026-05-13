@@ -4,7 +4,7 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 import { runPipeline } from '../pipeline.js';
 import { mordocVitePlugin } from '../vite/plugin.js';
-import { getClientRoot } from '../utils/paths.js';
+import { getAppRoot } from '../utils/paths.js';
 import { runSsg } from './ssg-runner.js';
 import { copyAndRewriteAssets } from './asset-rewrite.js';
 
@@ -83,7 +83,7 @@ function getOutDirs(projectRoot: string): BuildOutDirs {
  */
 export async function runBuildCommand(options: BuildCommandOptions): Promise<void> {
   const { projectRoot } = options;
-  const clientRoot = getClientRoot();
+  const appRoot = getAppRoot();
   const publicDir = path.join(projectRoot, 'public');
   const { clientOutDir, ssrOutDir } = getOutDirs(projectRoot);
 
@@ -111,7 +111,7 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
   console.log('→ building client bundle...');
   await viteBuild({
     configFile: false,
-    root: clientRoot,
+    root: appRoot,
     publicDir,
     plugins: [
       react(),
@@ -130,7 +130,7 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
   console.log('→ building SSR bundle...');
   await viteBuild({
     configFile: false,
-    root: clientRoot,
+    root: appRoot,
     // The SSR pass produces a Node-loadable bundle in a throwaway
     // intermediate; copying author assets into it is wasted I/O and
     // would put them under `node_modules/.mordoc/ssr/` rather than

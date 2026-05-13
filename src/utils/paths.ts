@@ -27,6 +27,6 @@ export function getPackageRoot(): string {
  * of its own files; everything user-side flows through the mordoc plugin's
  * virtual modules.
  */
-export function getClientRoot(): string {
+export function getAppRoot(): string {
   return path.join(getPackageRoot(), 'src', 'app');
 }

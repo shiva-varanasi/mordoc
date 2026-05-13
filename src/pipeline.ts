@@ -10,7 +10,7 @@ import { transformContent } from './content/content-transformer.js';
 import path from 'node:path';
 export { loadTranslations };
 import type { ContentEntry, TransformedPage } from './types/content.js';
-import type { MordocData, NavigationConfig } from './types/pipeline.js';
+import type { MordocData, NavigationConfig, ShellData } from './types/pipeline.js';
 
 /**
  * Loads the project's navigation configuration.
@@ -109,6 +109,21 @@ export function pagesRouteSignature(pages: TransformedPage[]): string {
     .map((p) => `${p.entry.language}\t${p.entry.routePath}`)
     .sort()
     .join('|');
+}
+
+/** Projects `MordocData` to the `ShellData` consumed by the React shell and SSR renderer. */
+export function toShellData(data: MordocData): ShellData {
+  return {
+    site: data.site,
+    language: data.language,
+    navigation: data.navigation,
+    assets: data.assets,
+    pagesIndex: data.pages.map((p) => ({
+      routePath: p.entry.routePath,
+      language: p.entry.language,
+    })),
+    translations: data.translations,
+  };
 }
 
 /**

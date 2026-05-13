@@ -55,7 +55,7 @@ export interface MordocData {
  * Three usage sites, one definition:
  *   1. The value shape of `MordocDataContext` in the React tree.
  *   2. The `data` parameter of `entry-server.tsx`'s `render()`.
- *   3. The return shape of `mordocVitePlugin`'s `api.getShellData()`.
+ *   3. The return type of `toShellData()` in `pipeline.ts`.
  */
 export interface ShellData {
   site: SiteConfig;

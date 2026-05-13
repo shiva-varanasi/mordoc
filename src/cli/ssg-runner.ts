@@ -1,10 +1,12 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
+import { toShellData } from '../pipeline.js';
 import type { MordocData, ShellData } from '../types/pipeline.js';
+import type { TransformedPage } from '../types/content.js';
 
-/** Markers in `index.html` substituted at SSG time. Same shape as `dev.ts`. */
-const SSR_TITLE_MARKER = '<!--ssr-title-->';
+/** Markers in `index.html` substituted at SSG time. */
+const SSR_HEAD_MARKER = '<!--ssr-head-->';
 const SSR_OUTLET_MARKER = '<!--ssr-outlet-->';
 
 /** The contract `entry-server.tsx` exports — kept as a local type so the SSR bundle stays an opaque dependency. */
@@ -34,14 +36,6 @@ export interface SsgRunnerOptions {
   ssrOutDir: string;
 }
 
-/**
- * Minimal HTML escape for values interpolated into element text content.
- *
- * Same function as in `dev.ts`. Duplicated rather than extracted because
- * pulling a shared "escape" module out is busywork at two callers; a
- * third caller would justify the refactor. The cost of the duplication
- * is one ~6-line function.
- */
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -52,25 +46,25 @@ function escapeHtml(value: string): string {
 }
 
 /**
- * Projects `MordocData` to the SSR-shaped `ShellData`.
+ * Builds the per-route `<head>` HTML injected at `<!--ssr-head-->`.
  *
- * Identical projection to the Vite plugin's `api.getShellData()`. The
- * SSG runner doesn't have a plugin instance to call (the build command
- * tears the plugins down after each Vite pass), so it does the
- * projection itself from the same `MordocData` the plugins were given.
+ * Title format matches `Content.tsx`'s `document.title` assignment so
+ * dev and prod are consistent: `Page Title — Site Name`.
+ * `<meta name="description">` is omitted when frontmatter has no description.
  */
-function toShellData(data: MordocData): ShellData {
-  return {
-    site: data.site,
-    language: data.language,
-    navigation: data.navigation,
-    assets: data.assets,
-    pagesIndex: data.pages.map((p) => ({
-      routePath: p.entry.routePath,
-      language: p.entry.language,
-    })),
-    translations: data.translations,
-  };
+function buildHeadHtml(page: TransformedPage, siteName: string): string {
+  const pageTitle = page.frontmatter.title;
+  const title = pageTitle
+    ? `${escapeHtml(pageTitle)} — ${escapeHtml(siteName)}`
+    : escapeHtml(siteName);
+
+  const parts = [`<title>${title}</title>`];
+
+  if (page.frontmatter.description) {
+    parts.push(`<meta name="description" content="${escapeHtml(page.frontmatter.description)}">`);
+  }
+
+  return parts.join('\n  ');
 }
 
 /**
@@ -113,7 +107,7 @@ function toOutputPath(routePath: string, clientOutDir: string): string {
  *      same SSR bundle. React Router's `<StaticRouterProvider>` then
  *      renders the matched tree to a string AND emits a `<script>` tag
  *      carrying the loader data, both inside the returned `html`.
- *   3. Substitute `<!--ssr-title-->` and `<!--ssr-outlet-->` in the
+ *   3. Substitute `<!--ssr-head-->` and `<!--ssr-outlet-->` in the
  *      transformed-by-Vite `index.html` template using the
  *      replacement-FUNCTION form. The string form of `String.replace`
  *      honours `$` patterns (`$$` → `$`), and the hydration `<script>`
@@ -149,15 +143,15 @@ export async function runSsg(options: SsgRunnerOptions): Promise<void> {
   }
 
   const shellData = toShellData(data);
-  const titleHtml = escapeHtml(shellData.site.name);
 
   for (const page of data.pages) {
     const routePath = page.entry.routePath;
     const request = new Request(`http://localhost${routePath}`);
     const { html: appHtml } = await ssrModule.render(request, shellData);
 
-    const withTitle = template.replace(SSR_TITLE_MARKER, () => titleHtml);
-    const finalHtml = withTitle.replace(SSR_OUTLET_MARKER, () => appHtml);
+    const headHtml = buildHeadHtml(page, data.site.name);
+    const withHead = template.replace(SSR_HEAD_MARKER, () => headHtml);
+    const finalHtml = withHead.replace(SSR_OUTLET_MARKER, () => appHtml);
 
     const outPath = toOutputPath(routePath, clientOutDir);
     await fs.mkdir(path.dirname(outPath), { recursive: true });

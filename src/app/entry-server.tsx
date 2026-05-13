@@ -35,10 +35,9 @@ import { buildRoutes } from './routes.js';
  *      `StrictMode` to mirror `main.tsx` exactly — any divergence here
  *      surfaces as a hydration mismatch.
  *
- * The return shape is intentionally minimal (`{ html }`). When the head
- * pipeline lands, this function will grow a `head` field for per-route
- * `<title>`/`<meta>` injection. Add fields when callers need them; do
- * not speculate.
+ * The return shape is intentionally minimal (`{ html }`). Per-route head
+ * tags (`<title>`, `<meta name="description">`) are built by the SSG runner
+ * directly from `TransformedPage.frontmatter` — no changes to this contract needed.
  *
  * If the static handler returns a `Response` (a redirect from a loader,
  * for example), this function throws. Redirect handling is a follow-up

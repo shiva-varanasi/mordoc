@@ -63,6 +63,7 @@ export function buildRoutes(): RouteObject[] {
     {
       path: '/',
       Component: App,
+      HydrateFallback: () => null,
       children: [...pageRoutes, { path: '*', Component: NotFound }],
     },
   ];

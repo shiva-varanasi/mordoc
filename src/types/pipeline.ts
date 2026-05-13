@@ -37,6 +37,8 @@ export interface MordocData {
   navigation: NavigationConfig;
   assets: ResolvedAssets;
   pages: TransformedPage[];
+  /** Nav label translations keyed by language code. Empty for single-language projects. */
+  translations: Record<string, Record<string, string>>;
 }
 
 /**
@@ -61,4 +63,6 @@ export interface ShellData {
   navigation: NavigationConfig;
   assets: ResolvedAssets;
   pagesIndex: PageMeta[];
+  /** Nav label translations keyed by language code. Empty for single-language projects. */
+  translations: Record<string, Record<string, string>>;
 }

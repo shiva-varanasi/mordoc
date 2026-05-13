@@ -4,6 +4,7 @@ import { loadAssets } from '../config/assets-loader.js';
 import { loadSiteConfig } from '../config/site-loader.js';
 import {
   loadNavigation,
+  loadTranslations,
   pagesRouteSignature,
   replaceTransformedPage,
   reparsePage,
@@ -30,6 +31,7 @@ export const EAGER_VIRTUAL_IDS = [
   'virtual:mordoc/assets',
   'virtual:mordoc/pages-index',
   'virtual:mordoc/page-loaders',
+  'virtual:mordoc/translations',
 ] as const;
 
 export type EagerVirtualId = typeof EAGER_VIRTUAL_IDS[number];
@@ -148,6 +150,8 @@ export function generateVirtualModule(id: string, data: MordocData): string | nu
       return `export default ${JSON.stringify(data.pages.map(toPageMeta))};`;
     case 'virtual:mordoc/page-loaders':
       return generatePageLoadersSource(data);
+    case 'virtual:mordoc/translations':
+      return `export default ${JSON.stringify(data.translations)};`;
     default:
       return null;
   }
@@ -258,9 +262,27 @@ async function applyMordocWatchBatch(
     await reloadVirtualModule(server, 'virtual:mordoc/site');
   }
 
-  if (configEvents.some(({ rel }) => rel.startsWith('config/navigation/'))) {
+  const isNavStructureChange = configEvents.some(
+    ({ rel }) =>
+      rel.startsWith('config/navigation/') &&
+      !rel.startsWith('config/navigation/translations/'),
+  );
+  const isTranslationsChange = configEvents.some(({ rel }) =>
+    rel.startsWith('config/navigation/translations/'),
+  );
+
+  if (isNavStructureChange) {
     data.navigation = await loadNavigation(projectRoot);
     await reloadVirtualModule(server, 'virtual:mordoc/navigation');
+  }
+
+  if (isTranslationsChange) {
+    data.translations = await loadTranslations(
+      projectRoot,
+      data.language?.languages ?? [data.site.defaultLanguage],
+      data.site.defaultLanguage,
+    );
+    await reloadVirtualModule(server, 'virtual:mordoc/translations');
   }
 
   const isAssetsPath = (rel: string) =>
@@ -406,6 +428,7 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
         navigation: data.navigation,
         assets: data.assets,
         pagesIndex: data.pages.map(toPageMeta),
+        translations: data.translations,
       };
     },
   };

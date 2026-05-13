@@ -1,5 +1,6 @@
 import { NavLink, useLocation } from 'react-router';
 import { useMordocData } from '../data-context.js';
+import { detectCurrentLang, buildLangPrefix, stripLangPrefix, resolveLabel } from '../lang-utils.js';
 import type { SidenavConfig, SidenavItem } from '../../types/navigation.js';
 import styles from './Sidenav.module.css';
 
@@ -38,27 +39,57 @@ function SidenavNode({ item }: { item: SidenavItem }) {
   );
 }
 
-function resolveActiveSidenav(navigation: ReturnType<typeof useMordocData>['navigation'], pathname: string): SidenavConfig {
+/**
+ * Recursively prepends the lang prefix to all item paths and translates labels.
+ * Run once at the Sidenav level so the render components stay data-only.
+ */
+function applyLangToSidenav(
+  items: SidenavConfig,
+  prefix: string,
+  lang: string,
+  defaultLanguage: string,
+  translations: Record<string, Record<string, string>>,
+): SidenavConfig {
+  return items.map((item) => ({
+    ...item,
+    label: resolveLabel(item.label, lang, defaultLanguage, translations),
+    path: item.path !== undefined ? `${prefix}${item.path}` : undefined,
+    children: item.children
+      ? applyLangToSidenav(item.children, prefix, lang, defaultLanguage, translations)
+      : undefined,
+  }));
+}
+
+function resolveActiveSidenav(
+  navigation: ReturnType<typeof useMordocData>['navigation'],
+  contentPath: string,
+): SidenavConfig {
   if (navigation.kind === 'sidenav') return navigation.sidenav;
 
-  // Longest-prefix match wins so /flight-school beats / if both match.
+  // Longest-prefix match so /flight-school beats / when both match.
   const match = navigation.topnav
-    .filter((item) => pathname === item.path || pathname.startsWith(item.path + '/'))
+    .filter((item) => contentPath === item.path || contentPath.startsWith(item.path + '/'))
     .sort((a, b) => b.path.length - a.path.length)[0];
 
   return match?.sidenav ?? [];
 }
 
 export function Sidenav() {
-  const { navigation } = useMordocData();
+  const { navigation, language, site, translations } = useMordocData();
   const { pathname } = useLocation();
-  const sidenav = resolveActiveSidenav(navigation, pathname);
-  console.log('active sidenav', sidenav);
-  console.log('navigation', navigation);
+
+  const currentLang = detectCurrentLang(pathname, language, site.defaultLanguage);
+  const contentPath = stripLangPrefix(pathname, currentLang, site.defaultLanguage);
+  const sidenav = resolveActiveSidenav(navigation, contentPath);
+
+  if (sidenav.length === 0) return <nav className={styles.sidenav} aria-label="Side navigation" />;
+
+  const prefix = buildLangPrefix(currentLang, site.defaultLanguage);
+  const processedSidenav = applyLangToSidenav(sidenav, prefix, currentLang, site.defaultLanguage, translations);
 
   return (
     <nav className={styles.sidenav} aria-label="Side navigation">
-      {sidenav.length > 0 && <SidenavList items={sidenav} />}
+      <SidenavList items={processedSidenav} />
     </nav>
   );
 }

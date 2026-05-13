@@ -1,11 +1,12 @@
 import { StrictMode } from 'react';
-import { hydrateRoot } from 'react-dom/client';
+import { createRoot, hydrateRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router';
 import site from 'virtual:mordoc/site';
 import language from 'virtual:mordoc/language';
 import navigation from 'virtual:mordoc/navigation';
 import assets from 'virtual:mordoc/assets';
 import pagesIndex from 'virtual:mordoc/pages-index';
+import translations from 'virtual:mordoc/translations';
 import type { ShellData } from '../types/pipeline.js';
 import './index.css';
 import { MordocDataContext } from './data-context.js';
@@ -41,15 +42,25 @@ const shellData: ShellData = {
   navigation,
   assets,
   pagesIndex,
+  translations,
 };
 
-const router = createAppRouter(window.__staticRouterHydrationData);
+const hydrationData = window.__staticRouterHydrationData;
+const router = createAppRouter(hydrationData);
 
-hydrateRoot(
-  container,
+const app = (
   <StrictMode>
     <MordocDataContext.Provider value={shellData}>
       <RouterProvider router={router} />
     </MordocDataContext.Provider>
-  </StrictMode>,
+  </StrictMode>
 );
+
+// SSR/SSG (production): server-rendered HTML is in the container — hydrate to
+// preserve it and attach event listeners without a full re-render.
+// Dev: container is empty — mount fresh via createRoot.
+if (hydrationData) {
+  hydrateRoot(container, app);
+} else {
+  createRoot(container).render(app);
+}

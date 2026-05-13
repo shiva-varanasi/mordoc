@@ -50,6 +50,13 @@ declare module 'virtual:mordoc/page-loaders' {
   export default value;
 }
 
+declare module 'virtual:mordoc/translations' {
+  // Outer key: language code (e.g. "de"). Inner key: default (English) label.
+  // Value: translated label. Empty for single-language projects.
+  const value: Record<string, Record<string, string>>;
+  export default value;
+}
+
 // Wildcard declaration for per-route lazy page modules.
 //
 // Every specifier of the form `virtual:mordoc/page/<routePath>` resolves

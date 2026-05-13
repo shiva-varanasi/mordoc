@@ -4,9 +4,11 @@ import { loadTopnavConfig } from './config/topnav-loader.js';
 import { loadSidenavConfig } from './config/sidenav-loader.js';
 import { loadAssets } from './config/assets-loader.js';
 import { loadContent } from './content/content-loader.js';
+import { loadTranslations } from './config/translations-loader.js';
 import { parseContent } from './content/content-parser.js';
 import { transformContent } from './content/content-transformer.js';
 import path from 'node:path';
+export { loadTranslations };
 import type { ContentEntry, TransformedPage } from './types/content.js';
 import type { MordocData, NavigationConfig } from './types/pipeline.js';
 
@@ -59,10 +61,16 @@ export async function runPipeline(projectRoot: string): Promise<MordocData> {
     language?.languages ?? null,
   );
 
+  const translations = await loadTranslations(
+    projectRoot,
+    language?.languages ?? [site.defaultLanguage],
+    site.defaultLanguage,
+  );
+
   const parsed = await parseContent(contentMap);
   const pages = transformContent(parsed);
 
-  return { site, language, navigation, assets, pages };
+  return { site, language, navigation, assets, pages, translations };
 }
 
 /**

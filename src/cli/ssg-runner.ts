@@ -69,6 +69,7 @@ function toShellData(data: MordocData): ShellData {
       routePath: p.entry.routePath,
       language: p.entry.language,
     })),
+    translations: data.translations,
   };
 }
 

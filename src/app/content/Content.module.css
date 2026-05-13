@@ -1,0 +1,10 @@
+.page {
+  display: flex;
+  gap: 2rem;
+  align-items: start;
+}
+
+.article {
+  flex: 1;
+  min-width: 0;
+}

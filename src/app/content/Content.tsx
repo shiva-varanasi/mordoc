@@ -25,7 +25,7 @@ export function Content() {
 
   useEffect(() => {
     const pageTitle = pageData.frontmatter.title;
-    document.title = pageTitle ? `${pageTitle} — ${site.name}` : site.name;
+    document.title = pageTitle || site.name;
   }, [pageData.frontmatter.title, site.name]);
 
   const rendered = Markdoc.renderers.react(pageData.renderable, React, {

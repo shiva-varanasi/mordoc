@@ -10,39 +10,24 @@ import { MordocDataContext } from './data-context.js';
 import { buildRoutes } from './routes.js';
 
 /**
- * Server-side render of a single request to HTML.
+ * Renders a single route to an HTML string for SSG.
  *
- * Pure function — no Vite, no `req`/`res`, no I/O. The dev middleware
- * loads this module via `vite.ssrLoadModule` and calls `render()` per
- * request; the future SSG runner will load it from the bundled SSR
- * output and call it once per route at build time. Same contract.
+ * Called once per route by the SSG runner at build time. Pure function —
+ * no Vite, no I/O. The SSG runner synthesises a `Request` for each route
+ * path, loads this module from the bundled SSR output, and calls `render()`.
  *
  * The flow:
- *   1. Build the route list (shared with the browser router via
- *      `buildRoutes`).
- *   2. `createStaticHandler.query(request)` runs the matched route's
- *      loader on the server. The loader is the same function used in
- *      CSR; it performs a dynamic `import('virtual:mordoc/page/...')`,
- *      which Vite resolves through the plugin's `load` hook and
- *      evaluates in Node.
- *   3. `createStaticRouter` + `<StaticRouterProvider>` render the
- *      matched tree, identically to what the browser router would
- *      produce. The provider also emits a `<script>` tag containing
- *      the loader data, which `main.tsx` consumes as
- *      `window.__staticRouterHydrationData` to skip re-running loaders
- *      on hydrate.
- *   4. The whole tree is wrapped in `MordocDataContext.Provider` and
- *      `StrictMode` to mirror `main.tsx` exactly — any divergence here
- *      surfaces as a hydration mismatch.
+ *   1. Build the route list (shared with the browser entry via `buildRoutes`).
+ *   2. `createStaticHandler.query(request)` runs the matched route's loader,
+ *      which imports the lazy `virtual:mordoc/page/...` module — resolved by
+ *      the Vite plugin and bundled into the SSR output.
+ *   3. `createStaticRouter` + `<StaticRouterProvider>` render the matched
+ *      component tree to a string.
+ *   4. The tree is wrapped in `MordocDataContext.Provider` and `StrictMode`
+ *      to mirror `main.tsx` — divergence here causes hydration mismatches.
  *
- * The return shape is intentionally minimal (`{ html }`). Per-route head
- * tags (`<title>`, `<meta name="description">`) are built by the SSG runner
- * directly from `TransformedPage.frontmatter` — no changes to this contract needed.
- *
- * If the static handler returns a `Response` (a redirect from a loader,
- * for example), this function throws. Redirect handling is a follow-up
- * once a real-world case requires it; for now, surfacing the unhandled
- * case loudly is preferable to silently producing broken HTML.
+ * If the static handler returns a `Response` (e.g. a redirect from a loader),
+ * this function throws — redirect handling is not yet supported.
  */
 export async function render(
   request: Request,

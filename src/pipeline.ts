@@ -67,10 +67,10 @@ export async function runPipeline(projectRoot: string): Promise<MordocData> {
     site.defaultLanguage,
   );
 
-  const parsed = await parseContent(contentMap);
-  const pages = transformContent(parsed);
+  const parsedContent = await parseContent(contentMap);
+  const transformedContent = transformContent(parsedContent);
 
-  return { site, language, navigation, assets, pages, translations };
+  return { site, language, navigation, assets, pages: transformedContent, translations };
 }
 
 /**

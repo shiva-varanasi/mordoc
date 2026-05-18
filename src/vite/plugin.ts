@@ -292,11 +292,9 @@ async function applyMordocWatchBatch(
     await reloadVirtualModule(server, 'virtual:mordoc/assets');
   }
 
-  /**
-   * Dev: invalidate lazy virtual page modules so SSR re-runs `load()` with fresh
-   * `data`, then full document reload so the new HTML and `__staticRouterHydrationData`
-   * match.
-   */
+  // Invalidate the lazy virtual module so Vite drops the stale cached version,
+  // then trigger a full browser reload so React Router re-runs the route loader
+  // against the freshly patched data.
   const reparsedVirtualIds: string[] = [];
   for (const { abs, rel } of contentEvents) {
     if (batch.get(abs) !== 'change') continue;

@@ -1,14 +1,55 @@
 .searchBar {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  width: 320px;
-  padding: 0.5rem 0.875rem;
+  gap: var(--search-gap);
+  width: var(--search-width);
+  max-width: 100%;
+  height: var(--search-height);
+  padding: 0 var(--search-px);
   background: var(--search-bg);
-  color: var(--muted);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 0.875rem;
+  color: var(--search-fg);
+  border: 1px solid var(--search-border);
+  border-radius: var(--search-radius);
+  font-size: var(--search-font-size);
+  font-family: inherit;
   cursor: pointer;
   text-align: left;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.searchBar:hover {
+  background-color: var(--search-bg-hover);
+  border-color: var(--search-border-hover);
+}
+
+.searchBar:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.icon {
+  width: var(--search-icon-size);
+  height: var(--search-icon-size);
+  flex-shrink: 0;
+  color: var(--search-fg);
+}
+
+.placeholder {
+  flex: 1;
+  color: var(--search-fg);
+}
+
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  height: var(--kbd-height);
+  padding: 0 var(--kbd-px);
+  border: 1px solid var(--search-border);
+  border-radius: var(--kbd-radius);
+  background: var(--toggle-bg);
+  font-family: ui-monospace, 'JetBrains Mono', 'Cascadia Code', 'Fira Code', monospace;
+  font-size: var(--kbd-font-size);
+  font-weight: 500;
+  color: var(--search-fg);
+  flex-shrink: 0;
 }

@@ -1,48 +1,128 @@
+import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router';
 import { useMordocData } from '../data-context.js';
 import { detectCurrentLang, buildLangPrefix, stripLangPrefix, resolveLabel } from '../lang-utils.js';
 import type { SidenavConfig, SidenavItem } from '../../types/navigation.js';
 import styles from './Sidenav.module.css';
 
-function SidenavList({ items }: { items: SidenavConfig }) {
+function ChevronIcon({ open }: { open: boolean }) {
   return (
-    <ul className={styles.list}>
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className={`${styles.chevron} ${open ? styles.chevronOpen : ''}`}
+    >
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  );
+}
+
+function groupContainsActive(items: SidenavConfig, activePath: string): boolean {
+  return items.some(
+    (item) =>
+      (item.path !== undefined && item.path === activePath) ||
+      (item.children !== undefined && groupContainsActive(item.children, activePath)),
+  );
+}
+
+function SidenavList({ items, depth = 0 }: { items: SidenavConfig; depth?: number }) {
+  return (
+    <ul className={styles.menu}>
       {items.map((item, i) => (
-        <SidenavNode key={i} item={item} />
+        <SidenavNode key={i} item={item} depth={depth} />
       ))}
     </ul>
   );
 }
 
-function SidenavNode({ item }: { item: SidenavItem }) {
-  if (item.path) {
+function SidenavNode({ item, depth }: { item: SidenavItem; depth: number }) {
+  const location = useLocation();
+  const isGroupActive = item.children
+    ? groupContainsActive(item.children, location.pathname)
+    : false;
+  const [open, setOpen] = useState(isGroupActive);
+
+  // Leaf item — path only, no children
+  if (item.path && !item.children) {
+    const isTop = depth === 0;
     return (
-      <li className={styles.item}>
+      <li className={styles.menuItem}>
         <NavLink
           to={item.path}
           end
           className={({ isActive }) =>
-            isActive ? `${styles.link} ${styles.active}` : styles.link
+            isTop
+              ? `${styles.topLink}${isActive ? ` ${styles.topLinkActive}` : ''}`
+              : `${styles.navLink}${isActive ? ` ${styles.navLinkActive}` : ''}`
           }
         >
           {item.label}
         </NavLink>
-        {item.children && <SidenavList items={item.children} />}
       </li>
     );
   }
+
+  // Variant 2 — linked group label with separate chevron toggle
+  if (item.path && item.children) {
+    return (
+      <li className={styles.menuItem}>
+        <div className={styles.linkedLabelWrapper}>
+          <NavLink
+            to={item.path}
+            end
+            className={({ isActive }) =>
+              isActive
+                ? `${styles.linkedLabelLink} ${styles.linkActive}`
+                : styles.linkedLabelLink
+            }
+          >
+            {item.label}
+          </NavLink>
+          <button
+            className={styles.linkedLabelToggle}
+            onClick={() => setOpen((o) => !o)}
+            aria-expanded={open}
+            aria-label={open ? 'Collapse section' : 'Expand section'}
+          >
+            <ChevronIcon open={open} />
+          </button>
+        </div>
+        {open && (
+          <div className={styles.groupContent}>
+            <SidenavList items={item.children} depth={depth + 1} />
+          </div>
+        )}
+      </li>
+    );
+  }
+
+  // Variant 1 — non-linked group label, whole row toggles
   return (
-    <li className={styles.item}>
-      <span className={styles.group}>{item.label}</span>
-      {item.children && <SidenavList items={item.children} />}
+    <li className={styles.menuItem}>
+      <button
+        className={styles.groupLabelTrigger}
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+      >
+        <span className={styles.groupLabelText}>{item.label}</span>
+        <ChevronIcon open={open} />
+      </button>
+      {open && item.children && (
+        <div className={styles.groupContent}>
+          <SidenavList items={item.children} depth={depth + 1} />
+        </div>
+      )}
     </li>
   );
 }
 
-/**
- * Recursively prepends the lang prefix to all item paths and translates labels.
- * Run once at the Sidenav level so the render components stay data-only.
- */
 function applyLangToSidenav(
   items: SidenavConfig,
   prefix: string,
@@ -66,7 +146,6 @@ function resolveActiveSidenav(
 ): SidenavConfig {
   if (navigation.kind === 'sidenav') return navigation.sidenav;
 
-  // Longest-prefix match so /flight-school beats / when both match.
   const match = navigation.topnav
     .filter((item) => contentPath === item.path || contentPath.startsWith(item.path + '/'))
     .sort((a, b) => b.path.length - a.path.length)[0];
@@ -82,14 +161,22 @@ export function Sidenav() {
   const contentPath = stripLangPrefix(pathname, currentLang, site.defaultLanguage);
   const sidenav = resolveActiveSidenav(navigation, contentPath);
 
-  if (sidenav.length === 0) return <nav className={styles.sidenav} aria-label="Side navigation" />;
+  if (sidenav.length === 0) {
+    return <nav className={styles.sidenav} aria-label="Side navigation" />;
+  }
 
   const prefix = buildLangPrefix(currentLang, site.defaultLanguage);
-  const processedSidenav = applyLangToSidenav(sidenav, prefix, currentLang, site.defaultLanguage, translations);
+  const processedSidenav = applyLangToSidenav(
+    sidenav,
+    prefix,
+    currentLang,
+    site.defaultLanguage,
+    translations,
+  );
 
   return (
     <nav className={styles.sidenav} aria-label="Side navigation">
-      <SidenavList items={processedSidenav} />
+      <SidenavList items={processedSidenav} depth={0} />
     </nav>
   );
 }

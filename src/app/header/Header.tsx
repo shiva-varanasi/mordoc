@@ -4,12 +4,99 @@ import { useMordocData } from '../data-context.js';
 import { detectCurrentLang, buildLangPrefix, stripLangPrefix } from '../lang-utils.js';
 import { SearchBar } from './SearchBar.js';
 import { Topnav } from './Topnav.js';
+import { LanguagePicker } from './LanguagePicker.js';
 import styles from './Header.module.css';
 
 type Theme = 'light' | 'dark';
 
-export function Header() {
-  const { site, assets, language } = useMordocData();
+interface HeaderProps {
+  sidenavOpen: boolean;
+  onMenuToggle: () => void;
+  /** Structural layout class injected by App.module.css (.headerArea) */
+  className?: string;
+}
+
+function HamburgerIcon() {
+  return (
+    <svg
+      width="var(--menu-btn-icon, 20px)"
+      height="var(--menu-btn-icon, 20px)"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg
+      width="var(--menu-btn-icon, 20px)"
+      height="var(--menu-btn-icon, 20px)"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      style={{ width: 'var(--toggle-icon-size)', height: 'var(--toggle-icon-size)' }}
+    >
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  );
+}
+
+function SunIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      style={{ width: 'var(--toggle-icon-size)', height: 'var(--toggle-icon-size)' }}
+    >
+      <circle cx="12" cy="12" r="5" />
+      <line x1="12" y1="1" x2="12" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="23" />
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <line x1="1" y1="12" x2="3" y2="12" />
+      <line x1="21" y1="12" x2="23" y2="12" />
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    </svg>
+  );
+}
+
+export function Header({ sidenavOpen, onMenuToggle, className }: HeaderProps) {
+  const { site, assets, language, navigation } = useMordocData();
   const location = useLocation();
   const navigate = useNavigate();
   const [theme, setTheme] = useState<Theme>('light');
@@ -20,7 +107,7 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.classList.toggle('dark', theme === 'dark');
     localStorage.setItem('mordoc-theme', theme);
   }, [theme]);
 
@@ -30,50 +117,66 @@ export function Header() {
 
   function handleLangChange(newLang: string) {
     const prefix = buildLangPrefix(newLang, site.defaultLanguage);
-    const target = currentContentPath === '/' ? (prefix || '/') : `${prefix}${currentContentPath}`;
+    const target =
+      currentContentPath === '/' ? prefix || '/' : `${prefix}${currentContentPath}`;
     navigate(target);
   }
 
+  const hasTopnav = navigation.kind === 'topnav';
+
   return (
-    <header className={styles.header}>
-      <div className={styles.left}>
-        <Link to="/" className={styles.logo}>
-          {logo ? (
-            <img src={logo} alt={site.name} className={styles.logoImage} />
-          ) : (
-            <span>{site.name}</span>
-          )}
-        </Link>
-        <Topnav />
-      </div>
+    <header className={`${styles.header}${className ? ` ${className}` : ''}`}>
+      {/* Top bar */}
+      <div className={styles.inner}>
+        {/* Brand — hamburger + logo */}
+        <div className={styles.brand}>
+          <button
+            className={styles.menuBtn}
+            onClick={onMenuToggle}
+            aria-label={sidenavOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={sidenavOpen}
+          >
+            {sidenavOpen ? <CloseIcon /> : <HamburgerIcon />}
+          </button>
+          <Link to="/" className={styles.logo}>
+            {logo ? (
+              <img src={logo} alt={site.name} className={styles.logoImage} />
+            ) : (
+              <span className={styles.logoText}>{site.name}</span>
+            )}
+          </Link>
+        </div>
 
-      <div className={styles.right}>
-        <SearchBar />
+        {/* Centered search */}
+        <div className={styles.search}>
+          <SearchBar />
+        </div>
 
-        <div className={styles.controls}>
+        {/* Right actions */}
+        <div className={styles.actions}>
           {language && language.languages.length > 1 && (
-            <select
-              value={currentLang}
-              onChange={(e) => handleLangChange(e.target.value)}
-              className={styles.languagePicker}
-            >
-              {language.languages.map((lang) => (
-                <option key={lang} value={lang}>
-                  {lang.toUpperCase()}
-                </option>
-              ))}
-            </select>
+            <LanguagePicker
+              languages={language.languages}
+              currentLang={currentLang}
+              onChange={handleLangChange}
+            />
           )}
-
           <button
             onClick={() => setTheme((t) => (t === 'light' ? 'dark' : 'light'))}
             aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
             className={styles.themeToggle}
           >
-            {theme === 'light' ? '☾' : '☀'}
+            {theme === 'light' ? <MoonIcon /> : <SunIcon />}
           </button>
         </div>
       </div>
+
+      {/* Topnav second row — desktop only, only when topnav navigation is configured */}
+      {hasTopnav && (
+        <div className={styles.topnavRow}>
+          <Topnav />
+        </div>
+      )}
     </header>
   );
 }

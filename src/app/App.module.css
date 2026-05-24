@@ -1,15 +1,82 @@
+/* ── Full page shell ──────────────────────────────────────── */
 .app {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
+  width: 100%;
+  background: var(--color-bg);
 }
 
+/* ── Header area — structural box only ───────────────────── */
+/* Aesthetics (background, border, backdrop) live in Header.module.css */
+/* Height is intentionally auto — the header's flex column drives it */
+.headerArea {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+}
+
+/* ── Body row — sidenav | content ────────────────────────── */
 .layout {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
+  flex: 1;
+  display: flex;
+  width: 100%;
+  min-height: 0;
 }
 
-.main {
-  padding-left: 2rem;
+/* ── Sidenav area ─────────────────────────────────────────── */
+/* Aesthetics (background, border-right) live in Sidenav.module.css */
+.sidenavArea {
+  position: sticky;
+  top: var(--header-total);
+  align-self: flex-start;
+  width: var(--sidebar-width);
+  height: calc(100svh - var(--header-total));
+  overflow-y: auto;
+  flex-shrink: 0;
+  background: var(--color-bg);
+  border-right: 1px solid var(--color-border);
+}
+
+/* ── Content area — everything right of sidenav ──────────── */
+.contentArea {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Mobile overlay behind open sidenav ──────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  top: var(--header-total);
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 35;
+}
+
+/* ════════════════════════════════════════════════════════════
+   Responsive
+   ════════════════════════════════════════════════════════════ */
+
+/* TOC visibility is handled in Content.module.css */
+
+/* Tablet / mobile — sidenav goes off-canvas */
+@media (max-width: 767.98px) {
+  :root {
+    --page-gutter: 1rem;
+  }
+
+  .sidenavArea {
+    position: fixed;
+    top: var(--header-total);
+    left: 0;
+    transform: translateX(-100%);
+    transition: transform 200ms ease;
+    z-index: 40;
+    height: calc(100svh - var(--header-total));
+  }
+
+  .sidenavAreaOpen {
+    transform: translateX(0);
+  }
 }

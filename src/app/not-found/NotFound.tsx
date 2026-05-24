@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router';
+import { Footer } from '../footer/Footer.js';
 
 /**
  * Fallback route component for paths that don't match any page.
@@ -10,14 +11,17 @@ import { Link, useLocation } from 'react-router';
 export function NotFound() {
   const location = useLocation();
   return (
-    <section>
-      <h1>Page not found</h1>
-      <p>
-        No page matches <code>{location.pathname}</code>.
-      </p>
-      <p>
-        <Link to="/">Go home</Link>
-      </p>
-    </section>
+    <>
+      <section style={{ padding: '3rem 2rem', flex: 1 }}>
+        <h1>Page not found</h1>
+        <p>
+          No page matches <code>{location.pathname}</code>.
+        </p>
+        <p>
+          <Link to="/">Go home</Link>
+        </p>
+      </section>
+      <Footer />
+    </>
   );
 }

@@ -1,60 +1,243 @@
+/* ============================================================
+   SIDENAV — inner content only
+   Geometry (position / width / height / overflow) lives in App.module.css
+   ============================================================ */
+
 .sidenav {
-  border-right: 1px solid var(--border);
-  padding-right: 1rem;
-  padding-top: 0.5rem;
+  padding: var(--sidebar-pad-y) var(--sidebar-pad-x);
 }
 
-.list {
+/* ── Menu list ───────────────────────────────────────────────── */
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-/* Indent nested lists */
-.list .list {
-  padding-left: 0.75rem;
-  margin-top: 0.125rem;
+/* ── Menu item wrapper ───────────────────────────────────────── */
+
+.menuItem {
+  width: 100%;
 }
 
-.item {
-  margin: 0;
+/* ============================================================
+   GROUP VARIANT 1 — non-linked trigger (no path, toggles whole row)
+   ============================================================ */
+
+.groupLabelTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: var(--sidebar-group-h);
+  padding: var(--sidebar-item-pad-y) var(--sidebar-item-pad-x);
+  margin-top: 10px;
+  border-radius: var(--radius-md);
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: 0;
+  color: var(--sidebar-group-label-fg);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  text-align: left;
+  transition: color 150ms ease, background-color 150ms ease;
 }
 
-.link {
-  display: block;
-  padding: 0.3rem 0.5rem;
-  border-radius: 4px;
-  border-left: 2px solid transparent;
-  color: var(--fg);
+.menuItem:first-child > .groupLabelTrigger {
+  margin-top: 0;
+}
+
+.groupLabelTrigger:hover {
+  background: var(--sidebar-accent);
+}
+
+.groupLabelText {
+  flex: 1;
+}
+
+/* ============================================================
+   GROUP VARIANT 2 — linked label + separate chevron toggle
+   ============================================================ */
+
+.linkedLabelWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  width: 100%;
+  border-radius: var(--radius-md);
+  padding-right: 4px;
+  margin-top: 10px;
+  transition: background-color 150ms ease;
+}
+
+.menuItem:first-child > .linkedLabelWrapper {
+  margin-top: 0;
+}
+
+.linkedLabelWrapper:hover {
+  background: var(--sidebar-accent);
+}
+
+.linkedLabelLink {
+  display: flex;
+  flex: 1 1 0%;
+  align-items: center;
+  min-width: 0;
+  padding: var(--sidebar-item-pad-y) var(--sidebar-item-pad-x);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--sidebar-fg);
   text-decoration: none;
-  font-size: 0.9rem;
+  transition: color 150ms ease;
+}
+
+.linkedLabelLink:hover {
+  background: var(--sidebar-accent);
+}
+
+.linkedLabelLink.linkActive {
+  color: var(--sidebar-primary);
+}
+
+.linkedLabelToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: none;
+  color: var(--sidebar-fg-muted);
+  cursor: pointer;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.linkedLabelToggle:hover {
+  background: var(--sidebar-accent);
+}
+
+/* ============================================================
+   TOP-LEVEL LEAF LINK (depth=0, no children)
+   Matches group-label height/weight for visual consistency
+   ============================================================ */
+
+.topLink {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: var(--sidebar-group-h);
+  padding: var(--sidebar-item-pad-y) var(--sidebar-item-pad-x);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--sidebar-fg);
+  text-decoration: none;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.topLink:hover {
+  background: var(--sidebar-accent);
+}
+
+.topLink.topLinkActive {
+  background: var(--color-accent-bg);
+  color: var(--sidebar-primary);
+  font-weight: 600;
+}
+
+/* ============================================================
+   NESTED LEAF LINK (depth>0)
+   Indented under a group, lighter weight
+   ============================================================ */
+
+.navLink {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: var(--sidebar-item-h);
+  padding: var(--sidebar-item-pad-y) 8px var(--sidebar-item-pad-y) 24px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 400;
   line-height: 1.4;
-  transition: background 0.1s;
+  color: var(--sidebar-fg);
+  text-decoration: none;
+  transition: color 150ms ease, background-color 150ms ease;
 }
 
-.link:hover {
-  background: var(--search-bg);
+.navLink:hover {
+  background: var(--sidebar-accent);
 }
 
-.link.active {
-  color: var(--accent);
-  border-left-color: var(--accent);
-  background: var(--active-bg);
+.navLink.navLinkActive {
+  background: var(--color-accent-bg);
+  color: var(--sidebar-primary);
   font-weight: 500;
 }
 
-/* Section heading — item with children but no path */
-.group {
-  display: block;
-  padding: 0.5rem 0.5rem 0.2rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-top: 0.75rem;
+/* ============================================================
+   GROUP CONTENT AREA — slight breathing room under label
+   ============================================================ */
+
+.groupContent {
+  padding-top: 4px;
 }
 
-.item:first-child > .group {
-  margin-top: 0;
+/* ============================================================
+   CHEVRON ICON
+   ============================================================ */
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--sidebar-fg-muted);
+  transition: transform 200ms ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* ============================================================
+   FOCUS STATES
+   ============================================================ */
+
+.groupLabelTrigger:focus-visible,
+.linkedLabelLink:focus-visible,
+.linkedLabelToggle:focus-visible,
+.navLink:focus-visible,
+.topLink:focus-visible {
+  outline: 2px solid var(--sidebar-ring);
+  outline-offset: -2px;
+  border-radius: var(--radius-md);
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .groupLabelTrigger,
+  .linkedLabelWrapper,
+  .linkedLabelLink,
+  .linkedLabelToggle,
+  .navLink,
+  .topLink,
+  .chevron {
+    transition: none !important;
+  }
 }

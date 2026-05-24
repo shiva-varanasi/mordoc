@@ -9,6 +9,7 @@ import pagesIndex from 'virtual:mordoc/pages-index';
 import translations from 'virtual:mordoc/translations';
 import type { ShellData } from '../types/pipeline.js';
 import './index.css';
+import 'virtual:mordoc/theme';
 import { MordocDataContext } from './data-context.js';
 import { createAppRouter } from './routes.js';
 

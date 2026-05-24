@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import type { Plugin, ViteDevServer } from 'vite';
 import { loadAssets } from '../config/assets-loader.js';
@@ -48,6 +49,11 @@ export const PAGE_MODULE_PREFIX = 'virtual:mordoc/page';
 
 /** Vite/Rollup convention: virtual modules are addressed with a leading null byte. */
 const RESOLVED_PREFIX = '\0';
+
+/** Virtual module ID for the user's optional config/theme.css. */
+const THEME_CSS_ID = 'virtual:mordoc/theme';
+/** Resolved ID used when config/theme.css does not exist — load returns empty. */
+const RESOLVED_THEME_CSS_EMPTY = '\0virtual:mordoc/theme';
 
 const EAGER_SET: ReadonlySet<string> = new Set(EAGER_VIRTUAL_IDS);
 
@@ -456,6 +462,10 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
     },
 
     resolveId(id) {
+      if (id === THEME_CSS_ID) {
+        const themePath = path.join(options.projectRoot, 'config', 'theme.css');
+        return fs.existsSync(themePath) ? themePath : RESOLVED_THEME_CSS_EMPTY;
+      }
       if (EAGER_SET.has(id) || isPageModuleId(id)) {
         return RESOLVED_PREFIX + id;
       }
@@ -463,6 +473,7 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
     },
 
     load(id) {
+      if (id === RESOLVED_THEME_CSS_EMPTY) return '';
       if (!id.startsWith(RESOLVED_PREFIX)) return null;
       const virtualId = id.slice(RESOLVED_PREFIX.length);
       const isEager = EAGER_SET.has(virtualId);

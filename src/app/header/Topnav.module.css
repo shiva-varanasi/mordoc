@@ -27,11 +27,11 @@
 }
 
 .link:focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--accent-emphasis);
   outline-offset: -2px;
 }
 
 .link.active {
   color: var(--color-fg);
-  border-bottom-color: var(--color-accent);
+  border-bottom-color: var(--accent-emphasis);
 }

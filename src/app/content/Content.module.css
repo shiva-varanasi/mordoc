@@ -1,3 +1,20 @@
+/* ============================================================
+   CONTENT TOKENS
+   ============================================================ */
+:root {
+  --breadcrumb-link:       #6b6b6b;
+  --breadcrumb-link-hover: #1c1c1c;
+  --breadcrumb-current:    #1c1c1c;
+  --breadcrumb-sep:        #6b6b6b;
+}
+
+:global(.dark) {
+  --breadcrumb-link:       #a0a0a0;
+  --breadcrumb-link-hover: #eaeaea;
+  --breadcrumb-current:    #eaeaea;
+  --breadcrumb-sep:        #6b6b6b;
+}
+
 /* ── Content area grid ──────────────────────────────────────
    Grid areas: [contentColumn | tocColumn]
                 [footerRow     |     .    ]
@@ -100,7 +117,7 @@
 }
 
 .breadcrumbLink:focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--accent-emphasis);
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -267,7 +284,7 @@
 }
 
 .prose :global(a) {
-  color: var(--color-accent);
+  color: var(--accent-emphasis);
   text-decoration: underline;
   text-underline-offset: 2px;
   text-decoration-color: transparent;
@@ -275,7 +292,7 @@
 }
 
 .prose :global(a:hover) {
-  text-decoration-color: var(--color-accent);
+  text-decoration-color: var(--accent-emphasis);
 }
 
 .prose :global(strong) {

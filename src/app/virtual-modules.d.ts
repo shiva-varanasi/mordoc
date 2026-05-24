@@ -57,6 +57,9 @@ declare module 'virtual:mordoc/translations' {
   export default value;
 }
 
+// CSS-only side-effect import; resolves to config/theme.css when present.
+declare module 'virtual:mordoc/theme' {}
+
 // Wildcard declaration for per-route lazy page modules.
 //
 // Every specifier of the form `virtual:mordoc/page/<routePath>` resolves

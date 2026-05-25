@@ -82,17 +82,33 @@ const image: Schema = {
 };
 
 /**
+ * Callout block tag — renders note, warning, and danger callout boxes.
+ *
+ * Authors use: {% callout type="note" title="..." %}...{% /callout %}
+ * The `children` array lists the Markdoc node types allowed inside, keeping
+ * callout content intentionally limited (no nested headings or images).
+ */
+const callout: Schema = {
+  render: 'Callout',
+  children: ['paragraph', 'list', 'fence', 'blockquote'],
+  attributes: {
+    type:  { type: String, default: 'note', matches: ['note', 'warning', 'danger'] },
+    title: { type: String },
+  },
+};
+
+/**
  * The default Markdoc config used by Mordoc's content transformer.
  *
  * Currently minimal:
  *   - Custom `heading` node (adds stable, deduplicated anchor IDs).
  *   - Custom `fence` node (routes to CodeBlock for syntax highlighting).
- *   - No other custom tags yet — they will be registered as the default theme
- *     adds components that render them (callouts, cards, tabs, etc.).
+ *   - Custom `image` node (routes to Image for lightbox support).
+ *   - Custom `callout` tag (routes to Callout for note/warning/danger boxes).
  */
 export function createDefaultMarkdocConfig(): Config {
   return {
     nodes: { heading, fence, image },
-    tags: {},
+    tags: { callout },
   };
 }

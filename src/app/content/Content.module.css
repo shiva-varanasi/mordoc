@@ -317,23 +317,11 @@
   font-weight: 500;
 }
 
-/* Code blocks */
-.prose :global(pre) {
-  margin: 1.25rem 0;
-  padding: 1.25rem 1.5rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  overflow-x: auto;
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  line-height: 1.7;
-}
-
+/* Reset inline-code styles for code inside a pre — the CodeBlock component owns that styling */
 .prose :global(pre code) {
   padding: 0;
   background: none;
-  color: var(--color-fg);
+  border: none;
   border-radius: 0;
   font-size: inherit;
   font-weight: 400;

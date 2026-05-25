@@ -57,21 +57,29 @@ const heading: Schema = {
 };
 
 /**
+ * Routes fenced code blocks to the CodeBlock React component.
+ * Markdoc's built-in fence node provides `language` and `content` attributes.
+ */
+const fence: Schema = {
+  render: 'CodeBlock',
+  attributes: {
+    language: { type: String },
+    content:  { type: String, render: true },
+  },
+};
+
+/**
  * The default Markdoc config used by Mordoc's content transformer.
  *
  * Currently minimal:
  *   - Custom `heading` node (adds stable, deduplicated anchor IDs).
- *   - No custom tags yet — they will be registered as the default theme
+ *   - Custom `fence` node (routes to CodeBlock for syntax highlighting).
+ *   - No other custom tags yet — they will be registered as the default theme
  *     adds components that render them (callouts, cards, tabs, etc.).
- *
- * TODO: add custom `link` and `image` node transforms to rewrite relative
- * paths (`./safety.md` → `/flight-manual/safety`, `./images/foo.png` →
- * served asset URL). Deferred until the client is visible in the browser
- * and the asset-serving strategy is decided.
  */
 export function createDefaultMarkdocConfig(): Config {
   return {
-    nodes: { heading },
+    nodes: { heading, fence },
     tags: {},
   };
 }

@@ -8,6 +8,7 @@ import { Footer } from '../footer/Footer.js';
 import { detectCurrentLang, buildLangPrefix, stripLangPrefix, resolveLabel } from '../lang-utils.js';
 import type { PageData } from '../../types/content.js';
 import type { SidenavConfig } from '../../types/navigation.js';
+import { CodeBlock } from './code-block/CodeBlock.js';
 import styles from './Content.module.css';
 
 /**
@@ -166,7 +167,7 @@ export function Content() {
   }, [pageData.frontmatter.title, site.name]);
 
   const rendered = Markdoc.renderers.react(pageData.renderable, React, {
-    components: {},
+    components: { CodeBlock },
   });
 
   return (

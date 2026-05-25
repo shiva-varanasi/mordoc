@@ -9,6 +9,7 @@ import { detectCurrentLang, buildLangPrefix, stripLangPrefix, resolveLabel } fro
 import type { PageData } from '../../types/content.js';
 import type { SidenavConfig } from '../../types/navigation.js';
 import { CodeBlock } from './code-block/CodeBlock.js';
+import { Image } from './image/Image.js';
 import styles from './Content.module.css';
 
 /**
@@ -167,7 +168,7 @@ export function Content() {
   }, [pageData.frontmatter.title, site.name]);
 
   const rendered = Markdoc.renderers.react(pageData.renderable, React, {
-    components: { CodeBlock },
+    components: { CodeBlock, Image },
   });
 
   return (

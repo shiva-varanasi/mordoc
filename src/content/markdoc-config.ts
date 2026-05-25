@@ -69,6 +69,19 @@ const fence: Schema = {
 };
 
 /**
+ * Routes inline images to the Image React component, which adds a lightbox.
+ * Markdoc's built-in image node provides `src`, `alt`, and `title` attributes.
+ */
+const image: Schema = {
+  render: 'Image',
+  attributes: {
+    src:   { type: String },
+    alt:   { type: String },
+    title: { type: String },
+  },
+};
+
+/**
  * The default Markdoc config used by Mordoc's content transformer.
  *
  * Currently minimal:
@@ -79,7 +92,7 @@ const fence: Schema = {
  */
 export function createDefaultMarkdocConfig(): Config {
   return {
-    nodes: { heading, fence },
+    nodes: { heading, fence, image },
     tags: {},
   };
 }

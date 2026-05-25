@@ -135,7 +135,7 @@
 
 .articleHeader {
   margin-bottom: 2.5rem;
-  padding-bottom: 1.5rem;
+  padding-bottom: 1rem;
   border-bottom: 1px solid var(--color-border);
   opacity: 1;
 }
@@ -292,7 +292,8 @@
 }
 
 .prose :global(a:hover) {
-  text-decoration-color: var(--accent-emphasis);
+  color: var(--accent-strong);
+  text-decoration-color: var(--accent-strong);
 }
 
 .prose :global(strong) {
@@ -307,8 +308,9 @@
 /* Inline code */
 .prose :global(code) {
   padding: 0.1em 0.375em;
-  background: var(--color-code-bg);
-  color: var(--color-code-fg);
+  background: var(--color-surface);
+  color: var(--color-content-fg);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   font-family: var(--font-mono);
   font-size: 0.875em;
@@ -350,7 +352,7 @@
   text-align: left;
   font-weight: 600;
   font-size: 0.8125rem;
-  color: var(--color-fg-muted);
+  color: var(--color-fg);
   border-bottom: 1px solid var(--color-border);
 }
 

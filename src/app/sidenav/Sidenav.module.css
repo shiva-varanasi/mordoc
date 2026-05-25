@@ -215,7 +215,7 @@
 }
 
 .navLink.navLinkActive {
-  background: var(--accent-muted);
+  background: var(--accent-subtle);
   color: var(--accent-emphasis);
   font-weight: 500;
 }

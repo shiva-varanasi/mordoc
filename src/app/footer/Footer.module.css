@@ -24,11 +24,13 @@
 }
 
 .link {
-  color: var(--color-fg-muted);
-  text-decoration: none;
-  transition: color 0.15s;
+  color: var(--accent-emphasis);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.15s;
 }
 
 .link:hover {
-  color: var(--accent-emphasis);
+  text-decoration-color: var(--accent-emphasis);
 }

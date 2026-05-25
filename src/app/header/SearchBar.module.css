@@ -12,7 +12,7 @@
   --search-bg:           rgba(245, 245, 245, 0.5);
   --search-bg-hover:     #f5f5f5;
   --search-border:       #e5e5e5;
-  --search-border-hover: var(--accent-muted);
+  --search-border-hover: color-mix(in oklch, var(--accent) 30%, transparent);
   --search-fg:           #666666;
   --kbd-height:          20px;
   --kbd-px:              6px;

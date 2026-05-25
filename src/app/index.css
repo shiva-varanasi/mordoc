@@ -18,21 +18,16 @@
   --color-fg-muted:      #6b7280;
 
   /* Interaction */
-  --color-bg-hover:      #f3f4f6;
-  --color-search-bg:     #f3f4f6;
+  --color-bg-hover: #f3f4f6;
 
   /* Accent — single configurable token; all other accent vars are derived.
      Users override --accent (and optionally dark) in config/theme.css. */
   --accent:          #D64518;
-  --accent-subtle:   color-mix(in oklch, var(--accent) 10%, white);
+  --accent-subtle:   color-mix(in oklch, var(--accent) 8%, white);
   --accent-muted:    color-mix(in oklch, var(--accent) 20%, white);
   --accent-emphasis: var(--accent);
   --accent-strong:   color-mix(in oklch, var(--accent) 80%, black);
   --accent-on:       white;
-
-  /* Inline code */
-  --color-code-bg: var(--accent-subtle);
-  --color-code-fg: var(--accent-emphasis);
 
   /* Layout — shared across multiple components */
   --header-height:      4rem;
@@ -69,8 +64,7 @@
   --color-content-fg: rgb(214, 214, 214);
   --color-fg-muted:   #94a3b8;
 
-  --color-bg-hover:  #1e2432;
-  --color-search-bg: #1e2432;
+  --color-bg-hover: #1e2432;
 
   /* Accent — re-derived for dark surfaces; --accent base stays the same */
   --accent-subtle:   color-mix(in oklch, var(--accent) 12%, #121212);

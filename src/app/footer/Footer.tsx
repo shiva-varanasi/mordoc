@@ -14,7 +14,7 @@ export function Footer() {
         <span className={styles.built}>
           Built with{' '}
           <a
-            href="https://github.com/your-org/mordoc"
+            href="https://mordoc.dev"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.link}

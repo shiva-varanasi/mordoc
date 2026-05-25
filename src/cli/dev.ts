@@ -61,6 +61,33 @@ export async function runDevCommand(options: DevCommandOptions): Promise<void> {
     },
   });
 
+  // Serve config/assets/* at /_assets/* — same URL shape as build output.
+  server.middlewares.use(async (req, res, next) => {
+    const url = (req.url ?? '').split('?')[0];
+    if (!url.startsWith('/_assets/')) return next();
+    const filename = url.slice('/_assets/'.length);
+    if (!filename || filename.includes('/') || filename.includes('..')) return next();
+    const filePath = path.join(projectRoot, 'config', 'assets', filename);
+    try {
+      const content = await fs.readFile(filePath);
+      const ext = path.extname(filename).slice(1).toLowerCase();
+      const mime: Record<string, string> = {
+        svg: 'image/svg+xml',
+        png: 'image/png',
+        jpg: 'image/jpeg',
+        jpeg: 'image/jpeg',
+        ico: 'image/x-icon',
+        gif: 'image/gif',
+        webp: 'image/webp',
+      };
+      res.setHeader('Content-Type', mime[ext] ?? 'application/octet-stream');
+      res.statusCode = 200;
+      res.end(content);
+    } catch {
+      next();
+    }
+  });
+
   server.middlewares.use(async (req, res, next) => {
     try {
       const url = req.url ?? '/';

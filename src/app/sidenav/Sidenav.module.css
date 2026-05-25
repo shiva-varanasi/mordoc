@@ -125,7 +125,7 @@
   padding: var(--sidebar-item-pad-y) var(--sidebar-item-pad-x);
   border-radius: var(--radius-md);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.25;
   color: var(--sidebar-fg);
   text-decoration: none;
@@ -185,7 +185,7 @@
 }
 
 .topLink.topLinkActive {
-  background: var(--accent-muted);
+  background: var(--accent-subtle);
   color: var(--accent-emphasis);
   font-weight: 600;
 }

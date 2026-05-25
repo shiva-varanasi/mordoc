@@ -29,7 +29,6 @@
 
 @media (max-width: 479px) {
   :root {
-    --header-px:        12px;
     --header-gap:       8px;
     --actions-gap:      2px;
     --toggle-size:      36px;
@@ -39,21 +38,18 @@
 
 @media (min-width: 768px) {
   :root {
-    --header-px:  24px;
     --header-gap: 16px;
   }
 }
 
 @media (min-width: 1024px) {
   :root {
-    --header-px:  32px;
     --header-gap: 20px;
   }
 }
 
 @media (min-width: 1280px) {
   :root {
-    --header-px:  40px;
     --header-gap: 24px;
   }
 }
@@ -181,7 +177,6 @@
   padding: 0 var(--header-px);
   display: flex;
   align-items: stretch;
-  border-top: 1px solid var(--color-border);
 }
 
 /* ── Focus ring on logo ─────────────────────────────────── */

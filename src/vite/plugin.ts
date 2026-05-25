@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { Plugin, ViteDevServer } from 'vite';
 import { loadAssets } from '../config/assets-loader.js';
+import type { ResolvedAssets } from '../types/assets.js';
 import { loadSiteConfig } from '../config/site-loader.js';
 import {
   loadNavigation,
@@ -56,6 +57,20 @@ const THEME_CSS_ID = 'virtual:mordoc/theme';
 const RESOLVED_THEME_CSS_EMPTY = '\0virtual:mordoc/theme';
 
 const EAGER_SET: ReadonlySet<string> = new Set(EAGER_VIRTUAL_IDS);
+
+/**
+ * Rewrites absolute disk paths in `ResolvedAssets` to `/_assets/<basename>`
+ * web URLs so the browser can fetch them from the dev middleware.
+ */
+function rewriteAssetsForDev(assets: ResolvedAssets): ResolvedAssets {
+  const toUrl = (p: string | null) =>
+    p ? `/_assets/${path.basename(p)}` : null;
+  return {
+    favicon: toUrl(assets.favicon),
+    logo: toUrl(assets.logo),
+    logoDark: toUrl(assets.logoDark),
+  };
+}
 
 /** True if `id` is a lazy per-route page module id (after prefix). */
 function isPageModuleId(id: string): boolean {
@@ -380,9 +395,10 @@ export interface MordocVitePluginOptions {
  *     granular `.md` edits so React Router picks up fresh loader data (invalidate
  *     lazy virtuals for SSR, then **full document reload**).
  *
- * Note: asset paths in `virtual:mordoc/assets` are still absolute disk
- * paths at this stage. Translating them to browser-fetchable URLs is part
- * of the deferred asset-serving design.
+ * Asset paths: in dev, `virtual:mordoc/assets` emits `/_assets/<basename>`
+ * web URLs and `configureServer` registers a middleware that serves those
+ * files from `<projectRoot>/config/assets/`. In build, `copyAndRewriteAssets`
+ * handles the rewrite before the plugin receives the data.
  */
 export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
   // Seed the cache from the caller if data was injected; otherwise it
@@ -488,6 +504,14 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
         );
       }
       if (isEager) {
+        // In dev (no injected data), rewrite asset disk paths to /_assets/ URLs
+        // so the browser can fetch them via the dev asset middleware.
+        if (virtualId === 'virtual:mordoc/assets' && !options.data) {
+          return generateVirtualModule(virtualId, {
+            ...data,
+            assets: rewriteAssetsForDev(data.assets),
+          });
+        }
         return generateVirtualModule(virtualId, data);
       }
       const routePath = routePathFromPageModuleId(virtualId);

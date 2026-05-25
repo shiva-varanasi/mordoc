@@ -32,12 +32,10 @@ const ASSET_DIR_NAME = '_assets';
  *   theme exists; the cost is small and the alternative is a latent
  *   regression waiting for the first `<link rel="icon" href={...} />`.
  *
- * Why a build-time-only concern:
- *   Dev still serves the user's `config/assets/` from absolute disk
- *   paths, untouched. No shell component reads `assets.*` today, so
- *   nothing in dev breaks. Proper dev-time asset serving (a Vite middle-
- *   ware that maps `/_assets/*` to `<projectRoot>/config/assets/*`) is
- *   part of the asset-serving slice that follows this one.
+ * Why build-only:
+ *   Dev rewrites asset paths at virtual-module generation time (plugin.ts
+ *   `rewriteAssetsForDev`) and serves files via a `/_assets/*` middleware
+ *   in dev.ts — no copy step needed there.
  *
  * Filename strategy:
  *   Output filename = basename of the source file. The current loader

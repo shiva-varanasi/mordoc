@@ -283,7 +283,9 @@
   border-top: 1px solid var(--color-border);
 }
 
-.prose :global(a) {
+/* Target only plain inline links (no class) — component links like cards manage
+   their own decoration and must not be underlined by prose styles. */
+.prose :global(a:not([class])) {
   color: var(--accent-emphasis);
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -291,7 +293,7 @@
   transition: text-decoration-color 0.15s;
 }
 
-.prose :global(a:hover) {
+.prose :global(a:not([class]):hover) {
   color: var(--accent-strong);
   text-decoration-color: var(--accent-strong);
 }

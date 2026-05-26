@@ -98,6 +98,41 @@ const callout: Schema = {
 };
 
 /**
+ * Card tag — a single card with optional icon, image, link, and badge.
+ *
+ * Variant is inferred from attributes: `image` → image card, `icon` → icon
+ * card, neither → plain. Self-closing (no body) → compact mode.
+ * Authors use: {% card title="..." href="..." icon="..." %}Description{% /card %}
+ * Must be used inside {% cardGrid %}.
+ */
+const card: Schema = {
+  render: 'Card',
+  children: ['paragraph', 'inline', 'list'],
+  attributes: {
+    title: { type: String, required: true },
+    href:  { type: String },
+    icon:  { type: String },
+    image: { type: String },
+    tag:   { type: String },
+  },
+};
+
+/**
+ * CardGrid tag — responsive grid container for card tags.
+ *
+ * `cols` controls the number of columns (1–4, default 3). The grid
+ * collapses responsively: 2-col at medium viewports, 1-col at small.
+ * Authors use: {% cardGrid cols="3" %}...{% /cardGrid %}
+ */
+const cardGrid: Schema = {
+  render: 'CardGrid',
+  children: ['tag'],
+  attributes: {
+    cols: { type: String, default: '3' },
+  },
+};
+
+/**
  * The default Markdoc config used by Mordoc's content transformer.
  *
  * Currently minimal:
@@ -105,10 +140,11 @@ const callout: Schema = {
  *   - Custom `fence` node (routes to CodeBlock for syntax highlighting).
  *   - Custom `image` node (routes to Image for lightbox support).
  *   - Custom `callout` tag (routes to Callout for note/warning/danger boxes).
+ *   - Custom `card` / `cardGrid` tags (routes to Card / CardGrid components).
  */
 export function createDefaultMarkdocConfig(): Config {
   return {
     nodes: { heading, fence, image },
-    tags: { callout },
+    tags: { callout, card, cardGrid },
   };
 }

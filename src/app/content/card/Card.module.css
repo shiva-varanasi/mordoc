@@ -1,0 +1,146 @@
+/* ============================================================
+   CARD TOKENS
+   ============================================================ */
+:root {
+  --card-bg:           var(--color-bg);
+  --card-border:       var(--color-border);
+  --card-border-hover: var(--accent);
+  --card-shadow:       var(--shadow-sm);
+  --card-shadow-hover: var(--shadow-md);
+  --card-title-color:  var(--color-fg);
+  --card-desc-color:   var(--color-fg-muted);
+  --card-tag-bg:       var(--accent-subtle);
+  --card-tag-color:    var(--accent-emphasis);
+  --card-arrow-color:  var(--color-fg-muted);
+}
+
+/* ── Base card ───────────────────────────────────────────────── */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+}
+
+.linked {
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.linked:hover {
+  border-color: var(--card-border-hover);
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-1px);
+}
+
+.linked:hover .arrow {
+  color: var(--accent-emphasis);
+  transform: translateX(3px);
+}
+
+/* ── Image variant ───────────────────────────────────────────── */
+
+.imageWrap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--color-surface);
+  flex-shrink: 0;
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Body ─────────────────────────────────────────────────────── */
+
+.body {
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  flex: 1;
+  gap: 0.5rem;
+}
+
+/* Image cards get slightly less top padding since the image already provides visual separation */
+.imageCard .body {
+  padding-top: 1rem;
+}
+
+/* ── Tag badge ───────────────────────────────────────────────── */
+
+.tag {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 0.2em 0.6em;
+  border-radius: var(--radius-sm);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--card-tag-bg);
+  color: var(--card-tag-color);
+  line-height: 1.5;
+}
+
+/* ── Icon ─────────────────────────────────────────────────────── */
+
+.icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  object-fit: contain;
+  display: block;
+}
+
+/* ── Title row ───────────────────────────────────────────────── */
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--card-title-color);
+}
+
+/* ── Arrow ───────────────────────────────────────────────────── */
+
+.arrow {
+  flex-shrink: 0;
+  color: var(--card-arrow-color);
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+/* ── Description ─────────────────────────────────────────────── */
+
+.description {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--card-desc-color);
+}
+
+/* Markdoc wraps card body text in <p> tags — reset them so card padding governs spacing */
+.description :global(p) {
+  margin: 0;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.description :global(p + p) {
+  margin-top: 0.375rem;
+}

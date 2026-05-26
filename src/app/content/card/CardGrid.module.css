@@ -1,0 +1,22 @@
+/* ── CardGrid ─────────────────────────────────────────────────── */
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+/* Collapse to 2 columns on medium viewports */
+@media (max-width: 960px) {
+  .cardGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Collapse to single column on small viewports */
+@media (max-width: 600px) {
+  .cardGrid {
+    grid-template-columns: 1fr;
+  }
+}

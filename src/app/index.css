@@ -10,7 +10,7 @@
   --color-bg:            #ffffff;
   --color-surface:       #fafafa;
   --color-border:        #e5e5e5;
-  --color-header-bg:     rgba(255, 255, 255, 0.7);
+  --color-header-bg:     rgba(255, 255, 255);
 
   /* Text */
   --color-fg:            #1c1c1c;
@@ -58,7 +58,7 @@
   --color-bg:        #121212;
   --color-surface:   #0f0f0f;
   --color-border:    #2e2e2e;
-  --color-header-bg: rgba(18, 18, 18, 0.7);
+  --color-header-bg: rgba(18, 18, 18);
 
   --color-fg:         #e2e8f0;
   --color-content-fg: rgb(214, 214, 214);

@@ -133,6 +133,63 @@ const cardGrid: Schema = {
 };
 
 /**
+ * Hero tag — full-width landing page hero section.
+ *
+ * Layout is inferred: `image` present → split (text + image), absent → centered.
+ * `background` accepts an image path or any CSS color value.
+ * CTA buttons are passed as children ({% button %} tags).
+ * Authors use: {% hero title="..." description="..." image="..." background="..." %}
+ *   {% button href="..." %}Label{% /button %}
+ * {% /hero %}
+ */
+const hero: Schema = {
+  render: 'Hero',
+  children: ['tag', 'paragraph'],
+  attributes: {
+    title:            { type: String, required: true },
+    titleAccent:      { type: String },
+    description:      { type: String },
+    image:            { type: String },
+    background:       { type: String },
+    titleColor:       { type: String },
+    titleAccentColor: { type: String },
+    descriptionColor: { type: String },
+  },
+};
+
+/**
+ * Section tag — full-width landing page content block.
+ *
+ * Optional `title` renders an <h2>. `background` accepts "subtle",
+ * an image path, or any CSS color value.
+ * Authors use: {% section title="..." background="subtle" %}...{% /section %}
+ */
+const section: Schema = {
+  render: 'Section',
+  children: ['heading', 'paragraph', 'list', 'fence', 'blockquote', 'tag', 'hr'],
+  attributes: {
+    title:      { type: String },
+    background: { type: String },
+  },
+};
+
+/**
+ * Button tag — styled CTA link, usable in landing pages and content pages.
+ *
+ * `variant` defaults to "primary" (filled). "secondary" renders outlined.
+ * Internal hrefs use React Router Link; external open in a new tab.
+ * Authors use: {% button href="..." variant="secondary" %}Label{% /button %}
+ */
+const button: Schema = {
+  render: 'Button',
+  children: ['paragraph', 'inline', 'text', 'strong', 'em'],
+  attributes: {
+    href:    { type: String, required: true },
+    variant: { type: String, default: 'primary', matches: ['primary', 'secondary'] },
+  },
+};
+
+/**
  * The default Markdoc config used by Mordoc's content transformer.
  *
  * Currently minimal:
@@ -145,6 +202,6 @@ const cardGrid: Schema = {
 export function createDefaultMarkdocConfig(): Config {
   return {
     nodes: { heading, fence, image },
-    tags: { callout, card, cardGrid },
+    tags: { callout, card, cardGrid, hero, section, button },
   };
 }

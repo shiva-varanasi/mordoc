@@ -1,0 +1,100 @@
+/* ── Section ──────────────────────────────────────────────────── */
+
+.section {
+  position: relative;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+/* Dark overlay for image backgrounds */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 0;
+}
+
+/* ── Inner container ──────────────────────────────────────────── */
+
+.inner {
+  position: relative;
+  z-index: 1;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 4rem var(--page-gutter);
+}
+
+/* ── Section title ────────────────────────────────────────────── */
+
+.sectionTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.018em;
+  color: var(--color-fg);
+  margin: 0 0 2rem 0;
+}
+
+.hasBackgroundImage .sectionTitle {
+  color: #ffffff;
+}
+
+/* ── Content area ─────────────────────────────────────────────── */
+
+.content :global(h2) {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: var(--color-fg);
+  margin: 2.5rem 0 1rem;
+}
+
+.content :global(h2):first-child {
+  margin-top: 0;
+}
+
+.content :global(h3) {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-fg);
+  margin: 2rem 0 0.75rem;
+}
+
+.content :global(p) {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--color-fg-muted);
+  margin: 0 0 1rem;
+  max-width: 60ch;
+}
+
+.content :global(p):last-child {
+  margin-bottom: 0;
+}
+
+/* Image bg — push prose text to white */
+.hasBackgroundImage .content :global(h2),
+.hasBackgroundImage .content :global(h3) {
+  color: #ffffff;
+}
+
+.hasBackgroundImage .content :global(p) {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .inner {
+    padding: 2.5rem var(--page-gutter);
+  }
+
+  .sectionTitle {
+    font-size: 1.375rem;
+  }
+}

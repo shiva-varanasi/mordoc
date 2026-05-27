@@ -6,12 +6,9 @@
   min-height: calc(100svh - var(--header-total));
 }
 
-/* Content area — full width, no prose max-width constraint.
-   Individual tags (hero, section, cardGrid) own their own inner widths.
-   Horizontal padding matches the shared --page-gutter token so the
-   landing page aligns with the rest of the shell. */
+/* No padding — hero and section components each own their inner spacing
+   so full-bleed backgrounds can reach the viewport edge. */
 .content {
   flex: 1;
   width: 100%;
-  padding: 3rem var(--page-gutter) 2rem;
 }

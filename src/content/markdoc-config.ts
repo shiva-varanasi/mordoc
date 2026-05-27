@@ -176,16 +176,14 @@ const section: Schema = {
 /**
  * Button tag — styled CTA link, usable in landing pages and content pages.
  *
- * `variant` defaults to "primary" (filled). "secondary" renders outlined.
  * Internal hrefs use React Router Link; external open in a new tab.
- * Authors use: {% button href="..." variant="secondary" %}Label{% /button %}
+ * Authors use: {% button href="..." %}Label{% /button %}
  */
 const button: Schema = {
   render: 'Button',
   children: ['paragraph', 'inline', 'text', 'strong', 'em'],
   attributes: {
     href:    { type: String, required: true },
-    variant: { type: String, default: 'primary', matches: ['primary', 'secondary'] },
   },
 };
 

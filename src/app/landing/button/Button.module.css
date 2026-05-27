@@ -28,20 +28,6 @@
 .primary:hover {
   background: var(--accent-strong);
   border-color: var(--accent-strong);
-  box-shadow: 0 0 0 3px var(--accent-muted);
-}
-
-/* ── Secondary ────────────────────────────────────────────────── */
-
-.secondary {
-  background: transparent;
-  color: var(--accent-emphasis);
-  border-color: var(--accent-emphasis);
-}
-
-.secondary:hover {
-  background: var(--accent-subtle);
-  box-shadow: 0 0 0 3px var(--accent-muted);
 }
 
 /* Markdoc wraps button body text in <p> — collapse it so the button

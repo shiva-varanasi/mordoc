@@ -16,6 +16,7 @@ export function Toc({ items }: TocProps) {
     observerRef.current?.disconnect();
 
     const headingIds = items.map((item) => item.id);
+    const headerHeight = document.querySelector('header')?.offsetHeight ?? 64;
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
@@ -27,7 +28,7 @@ export function Toc({ items }: TocProps) {
         }
       },
       {
-        rootMargin: '-80px 0px -80% 0px',
+        rootMargin: `-${headerHeight + 16}px 0px -80% 0px`,
         threshold: 0,
       },
     );
@@ -46,8 +47,9 @@ export function Toc({ items }: TocProps) {
     e.preventDefault();
     const el = document.getElementById(id);
     if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY - 100;
-    window.scrollTo({ top, behavior: 'smooth' });
+    // scroll-margin-top on headings (Content.module.css) accounts for the sticky
+    // header height via --header-total, so scrollIntoView gives the correct offset.
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     history.pushState(null, '', `#${id}`);
   }
 

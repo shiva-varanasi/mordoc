@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Outlet, useLocation } from 'react-router';
+import { Outlet, useLocation, useMatches } from 'react-router';
 import { Header } from './header/Header.js';
 import { Sidenav } from './sidenav/Sidenav.js';
 import { useMordocData } from './data-context.js';
@@ -8,7 +8,11 @@ import styles from './App.module.css';
 export function App() {
   const [sidenavOpen, setSidenavOpen] = useState(false);
   const location = useLocation();
+  const matches = useMatches();
   const { navigation } = useMordocData();
+
+  const currentLayout = (matches.at(-1)?.handle as { layout?: string } | undefined)?.layout ?? 'content';
+  const isLanding = currentLayout === 'landing';
 
   // Close sidenav on navigation (mobile)
   useEffect(() => {
@@ -29,16 +33,19 @@ export function App() {
       <Header
         sidenavOpen={sidenavOpen}
         onMenuToggle={() => setSidenavOpen((o) => !o)}
+        showMenu={!isLanding}
         className={styles.headerArea}
       />
       <div className={styles.layout}>
-        <aside
-          className={`${styles.sidenavArea} ${sidenavOpen ? styles.sidenavAreaOpen : ''}`}
-          aria-label="Side navigation"
-        >
-          <Sidenav />
-        </aside>
-        {sidenavOpen && (
+        {!isLanding && (
+          <aside
+            className={`${styles.sidenavArea} ${sidenavOpen ? styles.sidenavAreaOpen : ''}`}
+            aria-label="Side navigation"
+          >
+            <Sidenav />
+          </aside>
+        )}
+        {!isLanding && sidenavOpen && (
           <div
             className={styles.overlay}
             onClick={() => setSidenavOpen(false)}

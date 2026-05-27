@@ -12,6 +12,8 @@ type Theme = 'light' | 'dark';
 interface HeaderProps {
   sidenavOpen: boolean;
   onMenuToggle: () => void;
+  /** When false, the hamburger/close menu button is not rendered (e.g. on landing pages that have no sidenav). */
+  showMenu?: boolean;
   /** Structural layout class injected by App.module.css (.headerArea) */
   className?: string;
 }
@@ -95,7 +97,7 @@ function SunIcon() {
   );
 }
 
-export function Header({ sidenavOpen, onMenuToggle, className }: HeaderProps) {
+export function Header({ sidenavOpen, onMenuToggle, showMenu = true, className }: HeaderProps) {
   const { site, assets, language, navigation } = useMordocData();
   const location = useLocation();
   const navigate = useNavigate();
@@ -130,14 +132,16 @@ export function Header({ sidenavOpen, onMenuToggle, className }: HeaderProps) {
       <div className={styles.inner}>
         {/* Brand — hamburger + logo */}
         <div className={styles.brand}>
-          <button
-            className={styles.menuBtn}
-            onClick={onMenuToggle}
-            aria-label={sidenavOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={sidenavOpen}
-          >
-            {sidenavOpen ? <CloseIcon /> : <HamburgerIcon />}
-          </button>
+          {showMenu && (
+            <button
+              className={styles.menuBtn}
+              onClick={onMenuToggle}
+              aria-label={sidenavOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={sidenavOpen}
+            >
+              {sidenavOpen ? <CloseIcon /> : <HamburgerIcon />}
+            </button>
+          )}
           <Link to="/" className={styles.logo}>
             {logo ? (
               <img src={logo} alt={site.name} className={styles.logoImage} />

@@ -90,10 +90,14 @@ function routePathFromPageModuleId(id: string): string {
  * navigation. See the rationale in the `PageMeta` type's doc comment.
  */
 function toPageMeta(page: TransformedPage): PageMeta {
-  return {
+  const meta: PageMeta = {
     routePath: page.entry.routePath,
     language: page.entry.language,
   };
+  if (page.frontmatter.layout === 'landing') {
+    meta.layout = 'landing';
+  }
+  return meta;
 }
 
 /**

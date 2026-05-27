@@ -4,6 +4,7 @@ import pagesIndex from 'virtual:mordoc/pages-index';
 import loaders from 'virtual:mordoc/page-loaders';
 import { App } from './App.js';
 import { Content } from './content/Content.js';
+import { LandingPage } from './landing/LandingPage.js';
 import { NotFound } from './not-found/NotFound.js';
 
 /**
@@ -51,8 +52,8 @@ export function buildRoutes(): RouteObject[] {
     }
     const common = {
       loader: async () => (await pageLoader()).default,
-      Component: Content,
-      handle: { language: pageIndex.language, routePath: pageIndex.routePath },
+      Component: pageIndex.layout === 'landing' ? LandingPage : Content,
+      handle: { language: pageIndex.language, routePath: pageIndex.routePath, layout: pageIndex.layout ?? 'content' },
     };
     return pageIndex.routePath === '/'
       ? { index: true, ...common }

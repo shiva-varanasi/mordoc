@@ -32,6 +32,8 @@ export interface ContentMap {
 export interface Frontmatter {
   title: string;
   description?: string;
+  /** When set to 'landing', the page renders with the full-width landing layout (no sidenav, no TOC). */
+  layout?: 'landing';
   [key: string]: unknown;
 }
 
@@ -128,4 +130,6 @@ export interface PageMeta {
   routePath: string;
   /** Language code this page belongs to. */
   language: string;
+  /** Present only when the page opts into the landing layout via `layout: landing` in frontmatter. */
+  layout?: 'landing';
 }

@@ -157,7 +157,7 @@ export function Content() {
     ? resolveLabel(sectionLabel, currentLang, site.defaultLanguage, translations)
     : null;
   const breadcrumb: BreadcrumbEntry[] = [
-    { label: site.name, path: prefix || '/' },
+    { label: 'Home', path: prefix || '/' },
     ...(resolvedSectionLabel && sectionPath
       ? [{ label: resolvedSectionLabel, path: `${prefix}${sectionPath}` }]
       : []),

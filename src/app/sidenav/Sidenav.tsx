@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { NavLink, useLocation } from 'react-router';
+import React, { useState } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router';
 import { useMordocData } from '../data-context.js';
 import { detectCurrentLang, buildLangPrefix, stripLangPrefix, resolveLabel } from '../lang-utils.js';
 import type { SidenavConfig, SidenavItem } from '../../types/navigation.js';
@@ -44,10 +44,12 @@ function SidenavList({ items, depth = 0 }: { items: SidenavConfig; depth?: numbe
 
 function SidenavNode({ item, depth }: { item: SidenavItem; depth: number }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const isGroupActive = item.children
     ? groupContainsActive(item.children, location.pathname)
     : false;
-  const [open, setOpen] = useState(isGroupActive);
+  const isLabelActive = item.path ? location.pathname === item.path : false;
+  const [open, setOpen] = useState(isGroupActive || isLabelActive);
 
   // Leaf item — path only, no children
   if (item.path && !item.children) {
@@ -69,31 +71,29 @@ function SidenavNode({ item, depth }: { item: SidenavItem; depth: number }) {
     );
   }
 
-  // Variant 2 — linked group label with separate chevron toggle
+  // Variant 2 — linked group: whole row navigates + toggles as one unit
   if (item.path && item.children) {
+    function handleLinkedGroupClick(e: React.MouseEvent<HTMLAnchorElement>) {
+      e.preventDefault();
+      if (isLabelActive && open) {
+        setOpen(false);
+      } else {
+        setOpen(true);
+        if (!isLabelActive) navigate(item.path!);
+      }
+    }
+
     return (
       <li className={styles.menuItem}>
-        <div className={styles.linkedLabelWrapper}>
-          <NavLink
-            to={item.path}
-            end
-            className={({ isActive }) =>
-              isActive
-                ? `${styles.linkedLabelLink} ${styles.linkActive}`
-                : styles.linkedLabelLink
-            }
-          >
-            {item.label}
-          </NavLink>
-          <button
-            className={styles.linkedLabelToggle}
-            onClick={() => setOpen((o) => !o)}
-            aria-expanded={open}
-            aria-label={open ? 'Collapse section' : 'Expand section'}
-          >
-            <ChevronIcon open={open} />
-          </button>
-        </div>
+        <a
+          href={item.path}
+          onClick={handleLinkedGroupClick}
+          aria-expanded={open}
+          className={isLabelActive ? `${styles.linkedGroupLabel} ${styles.linkActive}` : styles.linkedGroupLabel}
+        >
+          <span>{item.label}</span>
+          <ChevronIcon open={open} />
+        </a>
         {open && (
           <div className={styles.groupContent}>
             <SidenavList items={item.children} depth={depth + 1} />

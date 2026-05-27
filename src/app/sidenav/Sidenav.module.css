@@ -94,34 +94,16 @@
 }
 
 /* ============================================================
-   GROUP VARIANT 2 — linked label + separate chevron toggle
+   GROUP VARIANT 2 — linked group label (whole row is one element)
    ============================================================ */
 
-.linkedLabelWrapper {
+.linkedGroupLabel {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
+  gap: 8px;
   width: 100%;
-  border-radius: var(--radius-md);
-  padding-right: 4px;
-  margin-top: 10px;
-  transition: background-color 150ms ease;
-}
-
-.menuItem:first-child > .linkedLabelWrapper {
-  margin-top: 0;
-}
-
-.linkedLabelWrapper:hover {
-  background: var(--sidebar-accent);
-}
-
-.linkedLabelLink {
-  display: flex;
-  flex: 1 1 0%;
-  align-items: center;
-  min-width: 0;
+  min-height: var(--sidebar-group-h);
   padding: var(--sidebar-item-pad-y) var(--sidebar-item-pad-x);
   border-radius: var(--radius-md);
   font-size: 14px;
@@ -129,35 +111,22 @@
   line-height: 1.25;
   color: var(--sidebar-fg);
   text-decoration: none;
-  transition: color 150ms ease;
-}
-
-.linkedLabelLink:hover {
-  background: var(--sidebar-accent);
-}
-
-.linkedLabelLink.linkActive {
-  color: var(--accent-emphasis);
-}
-
-.linkedLabelToggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 24px;
-  height: 24px;
-  padding: 4px;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: none;
-  color: var(--sidebar-fg-muted);
   cursor: pointer;
+  margin-top: 10px;
   transition: color 150ms ease, background-color 150ms ease;
 }
 
-.linkedLabelToggle:hover {
+.menuItem:first-child > .linkedGroupLabel {
+  margin-top: 0;
+}
+
+.linkedGroupLabel:hover {
   background: var(--sidebar-accent);
+}
+
+.linkedGroupLabel.linkActive {
+  color: var(--accent-emphasis);
+  background: var(--accent-subtle);
 }
 
 /* ============================================================
@@ -247,8 +216,7 @@
    ============================================================ */
 
 .groupLabelTrigger:focus-visible,
-.linkedLabelLink:focus-visible,
-.linkedLabelToggle:focus-visible,
+.linkedGroupLabel:focus-visible,
 .navLink:focus-visible,
 .topLink:focus-visible {
   outline: 2px solid var(--accent-emphasis);
@@ -262,9 +230,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .groupLabelTrigger,
-  .linkedLabelWrapper,
-  .linkedLabelLink,
-  .linkedLabelToggle,
+  .linkedGroupLabel,
   .navLink,
   .topLink,
   .chevron {

@@ -12,6 +12,7 @@ type Theme = 'light' | 'dark';
 interface HeaderProps {
   sidenavOpen: boolean;
   onMenuToggle: () => void;
+  onSearchOpen: () => void;
   /** When false, the hamburger/close menu button is not rendered (e.g. on landing pages that have no sidenav). */
   showMenu?: boolean;
   /** Structural layout class injected by App.module.css (.headerArea) */
@@ -97,7 +98,7 @@ function SunIcon() {
   );
 }
 
-export function Header({ sidenavOpen, onMenuToggle, showMenu = true, className }: HeaderProps) {
+export function Header({ sidenavOpen, onMenuToggle, onSearchOpen, showMenu = true, className }: HeaderProps) {
   const { site, assets, language, navigation } = useMordocData();
   const location = useLocation();
   const navigate = useNavigate();
@@ -153,7 +154,7 @@ export function Header({ sidenavOpen, onMenuToggle, showMenu = true, className }
 
         {/* Centered search */}
         <div className={styles.search}>
-          <SearchBar />
+          <SearchBar onOpen={onSearchOpen} />
         </div>
 
         {/* Right actions */}

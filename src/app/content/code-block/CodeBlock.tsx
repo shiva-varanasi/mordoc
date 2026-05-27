@@ -90,7 +90,7 @@ export function CodeBlock({ language = '', content = '' }: CodeBlockProps) {
   };
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} data-pagefind-ignore>
       <div className={styles.header}>
         <span className={styles.language}>{displayName(lang)}</span>
         <button

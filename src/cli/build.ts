@@ -7,6 +7,7 @@ import { mordocVitePlugin } from '../vite/plugin.js';
 import { getAppRoot } from '../utils/paths.js';
 import { runSsg } from './ssg-runner.js';
 import { copyAndRewriteAssets } from './asset-rewrite.js';
+import { runPagefindIndexer } from './pagefind-indexer.js';
 
 export interface BuildCommandOptions {
   /** Absolute path to the user's project root. */
@@ -181,6 +182,9 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
 
   console.log('\n→ verifying output...');
   await verifyBuildOutput(data, clientOutDir);
+
+  console.log('\n→ building search index...');
+  await runPagefindIndexer(data, clientOutDir);
 
   console.log('\n✔ build complete');
   console.log(`  output → ${clientOutDir}\n`);

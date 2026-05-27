@@ -179,16 +179,16 @@ export function Content() {
     <div className={styles.contentAreaGrid}>
       {/* Article area */}
       <div className={styles.articleArea}>
-        <article className={styles.article}>
-          <div className={styles.articleMeta}>
+        <article className={styles.article} data-pagefind-body>
+          <div className={styles.articleMeta} data-pagefind-ignore>
             <Breadcrumb entries={breadcrumb} />
           </div>
           <header className={styles.articleHeader}>
-            <h1 className={styles.title}>{pageData.frontmatter.title}</h1>
+            <h1 className={styles.title} data-pagefind-meta="title">{pageData.frontmatter.title}</h1>
             {typeof pageData.frontmatter.description === 'string' && (
               <p className={styles.description}>{pageData.frontmatter.description}</p>
             )}
-            <div className={styles.metaRow}>
+            <div className={styles.metaRow} data-pagefind-ignore>
               <span className={styles.readTime}>{readTime} MIN READ</span>
             </div>
           </header>

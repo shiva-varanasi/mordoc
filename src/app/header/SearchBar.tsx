@@ -1,8 +1,8 @@
 import styles from './SearchBar.module.css';
 
-export function SearchBar() {
+export function SearchBar({ onOpen }: { onOpen: () => void }) {
   return (
-    <button className={styles.searchBar} onClick={() => {/* will open SearchModal */}}>
+    <button className={styles.searchBar} onClick={onOpen}>
       <svg
         className={styles.icon}
         width="16"

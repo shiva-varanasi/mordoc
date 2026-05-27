@@ -1,0 +1,185 @@
+/* ============================================================
+   SEARCH MODAL TOKENS
+   ============================================================ */
+:root {
+  --modal-max-width:    640px;
+  --modal-overlay-bg:  rgba(0, 0, 0, 0.45);
+  --modal-bg:          var(--color-bg);
+  --modal-border:      var(--color-border);
+  --modal-shadow:      0 24px 64px rgba(0, 0, 0, 0.22);
+  --modal-input-size:  16px;
+  --modal-result-hover: var(--color-bg-hover);
+  --modal-result-selected: var(--accent-subtle);
+}
+
+:global(.dark) {
+  --modal-overlay-bg: rgba(0, 0, 0, 0.65);
+}
+
+/* ============================================================
+   OVERLAY — full-screen backdrop
+   ============================================================ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--modal-overlay-bg);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 8vh;
+  padding-inline: 1rem;
+}
+
+/* ============================================================
+   MODAL SHELL
+   ============================================================ */
+.modal {
+  width: 100%;
+  max-width: var(--modal-max-width);
+  background: var(--modal-bg);
+  border: 1px solid var(--modal-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--modal-shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   INPUT ROW
+   ============================================================ */
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  height: 54px;
+  border-bottom: 1px solid var(--modal-border);
+  flex-shrink: 0;
+}
+
+.searchIcon {
+  color: var(--color-fg-muted);
+  flex-shrink: 0;
+}
+
+.input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-family: var(--font-sans);
+  font-size: var(--modal-input-size);
+  color: var(--color-fg);
+  min-width: 0;
+}
+
+.input::placeholder {
+  color: var(--color-fg-muted);
+}
+
+.input:disabled {
+  cursor: not-allowed;
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.closeBtn kbd {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-fg-muted);
+  background: var(--color-surface);
+}
+
+/* ============================================================
+   STATUS / NOTICES
+   ============================================================ */
+.notice,
+.status {
+  padding: 20px 16px;
+  color: var(--color-fg-muted);
+  font-size: 13px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.notice code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--color-surface);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+/* ============================================================
+   RESULTS LIST
+   ============================================================ */
+.results {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.result:hover {
+  background: var(--modal-result-hover);
+}
+
+.resultSelected {
+  background: var(--modal-result-selected);
+}
+
+.resultTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.resultExcerpt {
+  font-size: 12px;
+  color: var(--color-fg-muted);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Pagefind wraps matched terms in <mark> for highlighting */
+.resultExcerpt :global(mark) {
+  background: var(--accent-muted);
+  color: var(--color-fg);
+  border-radius: 2px;
+  padding: 0 2px;
+  font-style: normal;
+}

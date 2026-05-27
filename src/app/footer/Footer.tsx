@@ -6,7 +6,7 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className={styles.footer}>
+    <footer className={styles.footer} data-pagefind-ignore>
       <div className={styles.inner}>
         <span className={styles.copy}>
           © {year} {site.name}

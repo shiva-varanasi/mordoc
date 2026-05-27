@@ -5,7 +5,8 @@ import fs from 'node:fs/promises';
 import { mordocVitePlugin } from '../vite/plugin.js';
 import { getAppRoot, getPackageRoot } from '../utils/paths.js';
 
-/** Marker in `index.html` replaced with empty string — React mounts the full app client-side. */
+/** Markers in `index.html` replaced at request time. */
+const SSR_LANG_MARKER = '<!--ssr-lang-->';
 const SSR_OUTLET_MARKER = '<!--ssr-outlet-->';
 
 export interface DevCommandOptions {
@@ -100,7 +101,11 @@ export async function runDevCommand(options: DevCommandOptions): Promise<void> {
 
       const rawTemplate = await fs.readFile(templatePath, 'utf-8');
       const transformed = await server.transformIndexHtml(url, rawTemplate);
-      const finalHtml = transformed.replace(SSR_OUTLET_MARKER, '');
+      // In dev, App.tsx's useEffect corrects document.documentElement.lang after hydration.
+      // We still replace the marker so the attribute value is valid (empty = unknown language).
+      const finalHtml = transformed
+        .replace(SSR_LANG_MARKER, '')
+        .replace(SSR_OUTLET_MARKER, '');
 
       res.statusCode = 200;
       res.setHeader('Content-Type', 'text/html');

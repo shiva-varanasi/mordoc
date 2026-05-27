@@ -31,14 +31,14 @@ export function Button({ href, children }: ButtonProps) {
 
   if (isExternal(href)) {
     return (
-      <a href={href} className={className} target="_blank" rel="noopener noreferrer">
+      <a href={href} className={className} target="_blank" rel="noopener noreferrer" data-pagefind-ignore>
         {children}
       </a>
     );
   }
 
   return (
-    <Link to={href} className={className}>
+    <Link to={href} className={className} data-pagefind-ignore>
       {children}
     </Link>
   );

@@ -2,10 +2,12 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { toShellData } from '../pipeline.js';
+import { detectCurrentLang } from '../utils/lang-utils.js';
 import type { MordocData, ShellData } from '../types/pipeline.js';
 import type { TransformedPage } from '../types/content.js';
 
 /** Markers in `index.html` substituted at SSG time. */
+const SSR_LANG_MARKER = '<!--ssr-lang-->';
 const SSR_HEAD_MARKER = '<!--ssr-head-->';
 const SSR_OUTLET_MARKER = '<!--ssr-outlet-->';
 
@@ -149,8 +151,11 @@ export async function runSsg(options: SsgRunnerOptions): Promise<void> {
     const request = new Request(`http://localhost${routePath}`);
     const { html: appHtml } = await ssrModule.render(request, shellData);
 
+    const pageLang = detectCurrentLang(routePath, data.language, data.site.defaultLanguage);
     const headHtml = buildHeadHtml(page, data.site.name);
-    const withHead = template.replace(SSR_HEAD_MARKER, () => headHtml);
+    // lang is a plain ASCII code — string-form replace is safe (no $-patterns)
+    const withLang = template.replace(SSR_LANG_MARKER, pageLang);
+    const withHead = withLang.replace(SSR_HEAD_MARKER, () => headHtml);
     const finalHtml = withHead.replace(SSR_OUTLET_MARKER, () => appHtml);
 
     const outPath = toOutputPath(routePath, clientOutDir);

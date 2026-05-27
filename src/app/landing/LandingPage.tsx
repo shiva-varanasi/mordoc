@@ -49,7 +49,7 @@ export function LandingPage() {
 
   return (
     <div className={styles.landing}>
-      <div className={styles.content}>
+      <div className={styles.content} data-pagefind-body>
         {rendered}
       </div>
       <Footer />

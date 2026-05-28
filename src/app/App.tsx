@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Outlet, useLocation, useMatches } from 'react-router';
+import { Outlet, ScrollRestoration, useLocation, useMatches } from 'react-router';
 import { Header } from './header/Header.js';
 import { Sidenav } from './sidenav/Sidenav.js';
 import { SearchModal, switchPagefind } from './header/SearchModal.js';
@@ -59,6 +59,7 @@ export function App() {
 
   return (
     <div className={styles.app}>
+      <ScrollRestoration />
       <Header
         sidenavOpen={sidenavOpen}
         onMenuToggle={() => setSidenavOpen((o) => !o)}

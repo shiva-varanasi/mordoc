@@ -1,0 +1,100 @@
+/* ── Shimmer keyframe ────────────────────────────────────────── */
+
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+
+/* ── Page shell — exact grid match to Content.module.css ────── */
+
+/* Must use the same grid-template-columns as contentAreaGrid so that
+   the 1fr content column is the same width, keeping margin: 0 auto
+   centering identical between skeleton and real article. */
+.page {
+  display: grid;
+  grid-template-columns: 1fr var(--toc-width);
+  grid-template-areas: "content toc";
+  min-height: calc(100svh - var(--header-total));
+}
+
+.articleArea {
+  grid-area: content;
+  min-width: 0;
+}
+
+.article {
+  max-width: var(--content-max-width);
+  width: 100%;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .article {
+    padding: 3rem 2rem;
+  }
+}
+
+/* Matches Content.module.css responsive collapse — TOC column disappears
+   below xl, so the content column becomes full width in both cases. */
+@media (max-width: 1279.98px) {
+  .page {
+    grid-template-columns: 1fr;
+    grid-template-areas: "content";
+  }
+}
+
+/* ── Shimmer block — base primitive ─────────────────────────── */
+
+/* Highlight travels from left to right using background-position.
+   background-size is fixed-pixel so the sweep width is constant
+   regardless of the block's rendered width. */
+.block {
+  border-radius: var(--radius-sm);
+  background-image: linear-gradient(
+    90deg,
+    var(--color-surface)  0px,
+    var(--color-border)  80px,
+    var(--color-surface) 160px
+  );
+  background-size: 600px 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+/* ── Section layout ──────────────────────────────────────────── */
+
+.breadcrumbRow {
+  margin-bottom: 1.25rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.headerDesc {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.prose {
+  display: flex;
+  flex-direction: column;
+}
+
+.paraGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.heading {
+  margin-bottom: 1rem;
+}

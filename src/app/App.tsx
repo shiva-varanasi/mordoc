@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Outlet, ScrollRestoration, useLocation, useMatches } from 'react-router';
+import { Outlet, ScrollRestoration, useLocation, useMatches, useNavigation } from 'react-router';
 import { Header } from './header/Header.js';
 import { Sidenav } from './sidenav/Sidenav.js';
 import { SearchModal, switchPagefind } from './header/SearchModal.js';
+import { Skeleton } from './skeleton/Skeleton.js';
 import { useMordocData } from './data-context.js';
 import { detectCurrentLang } from './lang-utils.js';
 import styles from './App.module.css';
@@ -15,6 +16,7 @@ export function App() {
   const { navigation, site, language } = useMordocData();
   const currentLang = detectCurrentLang(location.pathname, language, site.defaultLanguage);
 
+  const routerNav = useNavigation();
   const currentLayout = (matches.at(-1)?.handle as { layout?: string } | undefined)?.layout ?? 'content';
   const isLanding = currentLayout === 'landing';
 
@@ -85,7 +87,7 @@ export function App() {
           />
         )}
         <div className={styles.contentArea}>
-          <Outlet />
+          {routerNav.state === 'loading' ? <Skeleton /> : <Outlet />}
         </div>
       </div>
     </div>

@@ -90,6 +90,17 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
     }
   }, [open]);
 
+  // Global Escape listener — handles dev mode where the disabled input
+  // swallows keyboard events and they never reach the modal's onKeyDown.
+  useEffect(() => {
+    if (!open) return;
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [open, onClose]);
+
   // Debounced search — waits 180 ms after the last keystroke
   useEffect(() => {
     if (!query.trim() || isDev) {

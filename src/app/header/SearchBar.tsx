@@ -1,6 +1,18 @@
+import { useEffect, useState } from 'react';
 import styles from './SearchBar.module.css';
 
 export function SearchBar({ onOpen }: { onOpen: () => void }) {
+  const [shortcut, setShortcut] = useState('Ctrl K');
+
+  // Detect Mac after mount — navigator is unavailable during SSR.
+  // Starting with 'Ctrl K' keeps the server and initial client render
+  // identical, avoiding a hydration mismatch.
+  useEffect(() => {
+    if (/Mac|iPod|iPhone|iPad/.test(navigator.platform)) {
+      setShortcut('⌘K');
+    }
+  }, []);
+
   return (
     <button className={styles.searchBar} onClick={onOpen}>
       <svg
@@ -19,7 +31,7 @@ export function SearchBar({ onOpen }: { onOpen: () => void }) {
         <line x1="21" y1="21" x2="16.65" y2="16.65" />
       </svg>
       <span className={styles.placeholder}>Search...</span>
-      <kbd className={styles.kbd}>⌘K</kbd>
+      <kbd className={styles.kbd}>{shortcut}</kbd>
     </button>
   );
 }

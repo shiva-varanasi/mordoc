@@ -102,12 +102,13 @@ export function Header({ sidenavOpen, onMenuToggle, onSearchOpen, showMenu = tru
   const { site, assets, language, navigation } = useMordocData();
   const location = useLocation();
   const navigate = useNavigate();
-  const [theme, setTheme] = useState<Theme>('light');
-
-  useEffect(() => {
-    const stored = localStorage.getItem('mordoc-theme') as Theme | null;
-    if (stored === 'light' || stored === 'dark') setTheme(stored);
-  }, []);
+  const [theme, setTheme] = useState<Theme>(() => {
+    try {
+      const stored = localStorage.getItem('mordoc-theme');
+      if (stored === 'light' || stored === 'dark') return stored as Theme;
+    } catch (e) {}
+    return 'light';
+  });
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');

@@ -3,7 +3,7 @@
  *
  * Variant is inferred from props: `image` → image card, `icon` → icon card,
  * neither → plain. Compact mode activates automatically when no body text is
- * provided (self-closing tag). When `href` is set the entire card is a link;
+ * provided (self-closing tag). When `path` is set the entire card is a link;
  * internal paths (starting with "/") use React Router Link for SPA navigation,
  * external URLs open in a new tab.
  *
@@ -17,7 +17,7 @@ import styles from './Card.module.css';
 
 interface CardProps {
   title: string;
-  href?: string;
+  path?: string;
   icon?: string;
   image?: string;
   tag?: string;
@@ -44,7 +44,7 @@ function ArrowIcon() {
   );
 }
 
-function CardInner({ title, href, icon, image, tag, children }: CardProps) {
+function CardInner({ title, path, icon, image, tag, children }: CardProps) {
   const hasImage = Boolean(image);
   const hasIcon  = Boolean(icon) && !hasImage;
   const hasBody  = Boolean(children);
@@ -63,7 +63,7 @@ function CardInner({ title, href, icon, image, tag, children }: CardProps) {
         )}
         <div className={styles.titleRow}>
           <span className={styles.title}>{title}</span>
-          {href && <ArrowIcon />}
+          {path && <ArrowIcon />}
         </div>
         {hasBody && <div className={styles.description}>{children}</div>}
       </div>
@@ -71,30 +71,30 @@ function CardInner({ title, href, icon, image, tag, children }: CardProps) {
   );
 }
 
-function isExternal(href: string) {
-  return href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//');
+function isExternal(path: string) {
+  return path.startsWith('http://') || path.startsWith('https://') || path.startsWith('//');
 }
 
 export function Card(props: CardProps) {
-  const { href } = props;
+  const { path } = props;
   const hasImage = Boolean(props.image);
 
   const className = [
     styles.card,
     hasImage ? styles.imageCard : '',
-    href ? styles.linked : '',
+    path ? styles.linked : '',
   ].filter(Boolean).join(' ');
 
-  if (href) {
-    if (isExternal(href)) {
+  if (path) {
+    if (isExternal(path)) {
       return (
-        <a href={href} className={className} target="_blank" rel="noopener noreferrer">
+        <a href={path} className={className} target="_blank" rel="noopener noreferrer">
           <CardInner {...props} />
         </a>
       );
     }
     return (
-      <Link to={href} className={className}>
+      <Link to={path} className={className}>
         <CardInner {...props} />
       </Link>
     );

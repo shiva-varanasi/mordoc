@@ -102,7 +102,7 @@ const callout: Schema = {
  *
  * Variant is inferred from attributes: `image` → image card, `icon` → icon
  * card, neither → plain. Self-closing (no body) → compact mode.
- * Authors use: {% card title="..." href="..." icon="..." %}Description{% /card %}
+ * Authors use: {% card title="..." path="..." icon="..." %}Description{% /card %}
  * Must be used inside {% cardGrid %}.
  */
 const card: Schema = {
@@ -110,7 +110,7 @@ const card: Schema = {
   children: ['paragraph', 'inline', 'list'],
   attributes: {
     title: { type: String, required: true },
-    href:  { type: String },
+    path:  { type: String },
     icon:  { type: String },
     image: { type: String },
     tag:   { type: String },
@@ -139,7 +139,7 @@ const cardGrid: Schema = {
  * `background` accepts an image path or any CSS color value.
  * CTA buttons are passed as children ({% button %} tags).
  * Authors use: {% hero title="..." description="..." image="..." background="..." %}
- *   {% button href="..." %}Label{% /button %}
+ *   {% button path="..." %}Label{% /button %}
  * {% /hero %}
  */
 const hero: Schema = {
@@ -176,14 +176,14 @@ const section: Schema = {
 /**
  * Button tag — styled CTA link, usable in landing pages and content pages.
  *
- * Internal hrefs use React Router Link; external open in a new tab.
- * Authors use: {% button href="..." %}Label{% /button %}
+ * Internal paths use React Router Link; external URLs open in a new tab.
+ * Authors use: {% button path="..." %}Label{% /button %}
  */
 const button: Schema = {
   render: 'Button',
   children: ['paragraph', 'inline', 'text', 'strong', 'em'],
   attributes: {
-    href:    { type: String, required: true },
+    path:    { type: String, required: true },
   },
 };
 

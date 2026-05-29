@@ -11,6 +11,9 @@
  * Registered as a Markdoc tag (`button`) in markdoc-config.ts and in
  * LandingPage.tsx's components map. Also registered in Content.tsx so it
  * can be used in regular content pages.
+ *
+ * The prop is named `path` (not `href`) to match Mordoc's authoring
+ * convention — consistent with sidenav/topnav YAML and card tags.
  */
 
 import { Link } from 'react-router';
@@ -18,27 +21,27 @@ import React from 'react';
 import styles from './Button.module.css';
 
 interface ButtonProps {
-  href: string;
+  path: string;
   children?: React.ReactNode;
 }
 
-function isExternal(href: string) {
-  return href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//');
+function isExternal(path: string) {
+  return path.startsWith('http://') || path.startsWith('https://') || path.startsWith('//');
 }
 
-export function Button({ href, children }: ButtonProps) {
+export function Button({ path, children }: ButtonProps) {
   const className = `${styles.button} ${styles.primary}`;
 
-  if (isExternal(href)) {
+  if (isExternal(path)) {
     return (
-      <a href={href} className={className} target="_blank" rel="noopener noreferrer" data-pagefind-ignore>
+      <a href={path} className={className} target="_blank" rel="noopener noreferrer" data-pagefind-ignore>
         {children}
       </a>
     );
   }
 
   return (
-    <Link to={href} className={className} data-pagefind-ignore>
+    <Link to={path} className={className} data-pagefind-ignore>
       {children}
     </Link>
   );

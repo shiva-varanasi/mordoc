@@ -7,6 +7,7 @@ import { getAppRoot, getPackageRoot } from '../utils/paths.js';
 
 /** Markers in `index.html` replaced at request time. */
 const SSR_LANG_MARKER = '<!--ssr-lang-->';
+const SSR_HEAD_MARKER = '<!--ssr-head-->';
 const SSR_OUTLET_MARKER = '<!--ssr-outlet-->';
 
 export interface DevCommandOptions {
@@ -101,10 +102,21 @@ export async function runDevCommand(options: DevCommandOptions): Promise<void> {
 
       const rawTemplate = await fs.readFile(templatePath, 'utf-8');
       const transformed = await server.transformIndexHtml(url, rawTemplate);
+
+      const faviconPath = path.join(projectRoot, 'config', 'assets', 'favicon.ico');
+      let headHtml = '';
+      try {
+        await fs.access(faviconPath);
+        headHtml = '<link rel="icon" href="/_assets/favicon.ico">';
+      } catch {
+        // no favicon configured
+      }
+
       // In dev, App.tsx's useEffect corrects document.documentElement.lang after hydration.
       // We still replace the marker so the attribute value is valid (empty = unknown language).
       const finalHtml = transformed
         .replace(SSR_LANG_MARKER, '')
+        .replace(SSR_HEAD_MARKER, headHtml)
         .replace(SSR_OUTLET_MARKER, '');
 
       res.statusCode = 200;

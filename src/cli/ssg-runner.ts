@@ -53,8 +53,9 @@ function escapeHtml(value: string): string {
  * Title format matches `Content.tsx`'s `document.title` assignment so
  * dev and prod are consistent: `Page Title — Site Name`.
  * `<meta name="description">` is omitted when frontmatter has no description.
+ * `<link rel="icon">` is omitted when no favicon asset is configured.
  */
-function buildHeadHtml(page: TransformedPage, siteName: string): string {
+function buildHeadHtml(page: TransformedPage, siteName: string, faviconUrl: string | null): string {
   const pageTitle = page.frontmatter.title;
   const title = pageTitle
     ? `${escapeHtml(pageTitle)} — ${escapeHtml(siteName)}`
@@ -64,6 +65,10 @@ function buildHeadHtml(page: TransformedPage, siteName: string): string {
 
   if (page.frontmatter.description) {
     parts.push(`<meta name="description" content="${escapeHtml(page.frontmatter.description)}">`);
+  }
+
+  if (faviconUrl) {
+    parts.push(`<link rel="icon" href="${escapeHtml(faviconUrl)}">`);
   }
 
   return parts.join('\n  ');
@@ -152,7 +157,7 @@ export async function runSsg(options: SsgRunnerOptions): Promise<void> {
     const { html: appHtml } = await ssrModule.render(request, shellData);
 
     const pageLang = detectCurrentLang(routePath, data.language, data.site.defaultLanguage);
-    const headHtml = buildHeadHtml(page, data.site.name);
+    const headHtml = buildHeadHtml(page, data.site.name, data.assets.favicon);
     // lang is a plain ASCII code — string-form replace is safe (no $-patterns)
     const withLang = template.replace(SSR_LANG_MARKER, pageLang);
     const withHead = withLang.replace(SSR_HEAD_MARKER, () => headHtml);

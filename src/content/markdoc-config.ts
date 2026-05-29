@@ -52,7 +52,7 @@ const heading: Schema = {
 
     const { level, id: _ignored, ...rest } = attributes as Record<string, unknown>;
     void _ignored;
-    return new Markdoc.Tag(`h${level}`, { ...rest, id }, children);
+    return new Markdoc.Tag('Heading', { ...rest, id, level }, children);
   },
 };
 

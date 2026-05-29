@@ -24,21 +24,27 @@ function walk(node: RenderableTreeNode, visit: (n: RenderableTreeNode) => void):
 }
 
 /**
- * Walks the transformed renderable tree and extracts heading tags (h2–h6)
- * into TOC entries. Because this runs after the heading transform, the IDs
- * it reads are exactly the IDs that will appear in the rendered HTML.
+ * Walks the transformed renderable tree and extracts Heading component nodes
+ * (level 2–6) into TOC entries. Because this runs after the heading transform,
+ * the IDs it reads are exactly the IDs that will appear in the rendered HTML.
  */
 function extractToc(root: RenderableTreeNode): TocEntry[] {
   const entries: TocEntry[] = [];
   walk(root, (node) => {
     if (!Markdoc.Tag.isTag(node)) return;
-    const match = /^h([2-6])$/.exec(node.name);
-    if (!match) return;
+
+    let level: number | null = null;
+    if (node.name === 'Heading') {
+      const l = node.attributes['level'];
+      if (typeof l === 'number' && l >= 2 && l <= 6) level = l;
+    }
+    if (level === null) return;
+
     const id = typeof node.attributes['id'] === 'string' ? node.attributes['id'] : '';
     if (id === '') return;
     const title = extractText(node.children).trim();
     if (title === '') return;
-    entries.push({ id, title, level: Number(match[1]) });
+    entries.push({ id, title, level });
   });
   return entries;
 }

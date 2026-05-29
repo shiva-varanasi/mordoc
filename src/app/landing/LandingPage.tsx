@@ -29,6 +29,7 @@ import { Callout } from '../content/callout/Callout.js';
 import { Card } from '../content/card/Card.js';
 import { CardGrid } from '../content/card/CardGrid.js';
 import { ContentLink } from '../content/link/ContentLink.js';
+import { Heading } from '../content/heading/Heading.js';
 import { Hero } from './hero/Hero.js';
 import { Section } from './section/Section.js';
 import { Button } from './button/Button.js';
@@ -45,7 +46,7 @@ export function LandingPage() {
   }, [pageData.frontmatter.title, site.name]);
 
   const rendered = Markdoc.renderers.react(pageData.renderable, React, {
-    components: { CodeBlock, Image, Callout, Card, CardGrid, ContentLink, Hero, Section, Button },
+    components: { CodeBlock, Image, Callout, Card, CardGrid, ContentLink, Heading, Hero, Section, Button },
   });
 
   return (

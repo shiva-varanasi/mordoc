@@ -57,6 +57,25 @@ const heading: Schema = {
 };
 
 /**
+ * Custom link node — routes all Markdoc inline links to the ContentLink
+ * React component, which uses React Router <Link> for internal paths and
+ * a plain <a target="_blank"> for external URLs. Anchor-only links (#id)
+ * pass through as plain <a> elements (in-page scroll, no routing needed).
+ *
+ * Without this override Markdoc emits a plain <a href="..."> for every
+ * markdown link, which triggers a full browser navigation instead of
+ * client-side routing.
+ */
+const link: Schema = {
+  render: 'ContentLink',
+  children: ['strong', 'em', 'code', 's', 'html', 'text'],
+  attributes: {
+    href:  { type: String, required: true },
+    title: { type: String },
+  },
+};
+
+/**
  * Routes fenced code blocks to the CodeBlock React component.
  * Markdoc's built-in fence node provides `language` and `content` attributes.
  */
@@ -199,7 +218,7 @@ const button: Schema = {
  */
 export function createDefaultMarkdocConfig(): Config {
   return {
-    nodes: { heading, fence, image },
+    nodes: { heading, link, fence, image },
     tags: { callout, card, cardGrid, hero, section, button },
   };
 }

@@ -13,6 +13,7 @@ import { Image } from './image/Image.js';
 import { Callout } from './callout/Callout.js';
 import { Card } from './card/Card.js';
 import { CardGrid } from './card/CardGrid.js';
+import { ContentLink } from './link/ContentLink.js';
 import { Button } from '../landing/button/Button.js';
 import styles from './Content.module.css';
 
@@ -172,7 +173,7 @@ export function Content() {
   }, [pageData.frontmatter.title, site.name]);
 
   const rendered = Markdoc.renderers.react(pageData.renderable, React, {
-    components: { CodeBlock, Image, Callout, Card, CardGrid, Button },
+    components: { CodeBlock, Image, Callout, Card, CardGrid, ContentLink, Button },
   });
 
   return (

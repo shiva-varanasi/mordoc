@@ -1,0 +1,92 @@
+/* ── Page shell — mirrors the article-column layout from Content ── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: calc(100svh - var(--header-total));
+}
+
+.articleArea {
+  flex: 1;
+}
+
+.article {
+  max-width: var(--content-max-width);
+  width: 100%;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .article {
+    padding: 3rem 2rem;
+  }
+}
+
+/* ── 404 display number ─────────────────────────────────────── */
+
+.code404 {
+  margin: 0 0 0.5rem;
+  font-size: 7rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--color-fg-muted);
+  opacity: 0.3;
+  user-select: none;
+}
+
+/* ── Heading + description ──────────────────────────────────── */
+
+.title {
+  margin: 0 0 0.75rem;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--color-fg);
+}
+
+.description {
+  margin: 0 0 2rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--color-content-fg);
+}
+
+/* Inline code pill for the path — matches prose inline-code style */
+.path {
+  padding: 0.1em 0.375em;
+  background: var(--color-surface);
+  color: var(--color-content-fg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  font-weight: 500;
+}
+
+/* ── Go home button ─────────────────────────────────────────── */
+
+.homeButton {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.125rem;
+  background: var(--accent-emphasis);
+  color: var(--accent-on);
+  border-radius: var(--radius-md);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 150ms ease;
+}
+
+.homeButton:hover {
+  background: var(--accent-strong);
+}
+
+.homeButton:focus-visible {
+  outline: 2px solid var(--accent-emphasis);
+  outline-offset: 2px;
+}

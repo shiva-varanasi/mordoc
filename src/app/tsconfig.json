@@ -1,0 +1,18 @@
+{
+  "//": "TypeScript config for the browser-facing React app. Separate from the root tsconfig because the app ships as source (Vite compiles it at the user's dev/build time) rather than being emitted into dist/. This config exists purely for IDE type-checking and emits nothing. Located inside src/app/ so the TS language server auto-discovers it as the nearest tsconfig for every app file.",
+
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "types": []
+  },
+  "include": ["**/*", "../types/**/*"]
+}

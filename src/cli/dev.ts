@@ -1,188 +1,139 @@
-/**
- * Dev command - Starts development server
- * Serves the pre-built dist/ folder (MVP: no live reload, manual rebuild)
- * Usage: mordoc dev [options]
- */
+import { createServer } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'node:path';
+import fs from 'node:fs/promises';
+import { mordocVitePlugin } from '../vite/plugin.js';
+import { getAppRoot, getPackageRoot } from '../utils/paths.js';
 
-import path from 'path';
-import fs from 'fs';
-import http from 'http';
-import sirv from 'sirv';
+/** Markers in `index.html` replaced at request time. */
+const SSR_LANG_MARKER = '<!--ssr-lang-->';
+const SSR_HEAD_MARKER = '<!--ssr-head-->';
+const SSR_OUTLET_MARKER = '<!--ssr-outlet-->';
 
 export interface DevCommandOptions {
-  projectRoot?: string;
+  /** Absolute path to the user's project root. */
+  projectRoot: string;
+  /** Port to listen on. Defaults to Vite's default (5173). */
   port?: number;
-  host?: string;
-  open?: boolean;
 }
 
 /**
- * Execute the dev command
+ * Starts the Mordoc dev server.
+ *
+ * Dev mode is pure client-side rendering — no SSR per request. Vite's HMR
+ * runtime handles CSS injection and module hot-reloading natively, and React
+ * mounts into the empty `#app` div via `createRoot`. This avoids the FOUC
+ * that arises from SSR HTML arriving before Vite's client runtime has injected
+ * styles, and sidesteps SSR/hydration mismatch noise during development.
+ *
+ * `document.title` is set by `Content.tsx` via `useEffect` once the route
+ * loader resolves — no server-side title injection needed in dev.
+ *
+ * The production `mordoc build` path still runs full SSR + SSG: `entry-server.tsx`
+ * and the static-HTML output are exercised at build time.
+ *
+ * Per-request flow:
+ *   1. Read the raw `index.html` template from disk (re-read each request so
+ *      edits to the shell are picked up without a restart).
+ *   2. `vite.transformIndexHtml` injects the HMR client and any plugin
+ *      transforms (e.g. React refresh preamble).
+ *   3. Replace `<!--ssr-outlet-->` with empty string — React renders the full
+ *      app client-side via `createRoot`.
+ *   4. Send response.
  */
-export async function dev(options: DevCommandOptions = {}): Promise<void> {
-  try {
-    // Get project root
-    const projectRoot = options.projectRoot || process.cwd();
-    const distDir = path.join(projectRoot, 'dist');
+export async function runDevCommand(options: DevCommandOptions): Promise<void> {
+  const { projectRoot, port } = options;
+  const appRoot = getAppRoot();
+  const templatePath = path.join(appRoot, 'index.html');
 
-    // Check if dist/ exists
-    if (!fs.existsSync(distDir)) {
-      console.error('❌ Error: dist/ directory not found');
-      console.error('Please run "mordoc build" first to generate the static site.');
-      process.exit(1);
+  const server = await createServer({
+    configFile: false,
+    root: appRoot,
+    publicDir: path.join(projectRoot, 'public'),
+    appType: 'custom',
+    plugins: [
+      react(),
+      mordocVitePlugin({ projectRoot }),
+    ],
+    server: {
+      port,
+      fs: {
+        allow: [getPackageRoot()],
+      },
+    },
+  });
+
+  // Serve config/assets/* at /_assets/* — same URL shape as build output.
+  server.middlewares.use(async (req, res, next) => {
+    const url = (req.url ?? '').split('?')[0];
+    if (!url.startsWith('/_assets/')) return next();
+    const filename = url.slice('/_assets/'.length);
+    if (!filename || filename.includes('/') || filename.includes('..')) return next();
+    const filePath = path.join(projectRoot, 'config', 'assets', filename);
+    try {
+      const content = await fs.readFile(filePath);
+      const ext = path.extname(filename).slice(1).toLowerCase();
+      const mime: Record<string, string> = {
+        svg: 'image/svg+xml',
+        png: 'image/png',
+        jpg: 'image/jpeg',
+        jpeg: 'image/jpeg',
+        ico: 'image/x-icon',
+        gif: 'image/gif',
+        webp: 'image/webp',
+      };
+      res.setHeader('Content-Type', mime[ext] ?? 'application/octet-stream');
+      res.statusCode = 200;
+      res.end(content);
+    } catch {
+      next();
     }
+  });
 
-    // Server configuration
-    const port = options.port || 3000;
-    const host = options.host || 'localhost';
+  server.middlewares.use(async (req, res, next) => {
+    try {
+      const url = req.url ?? '/';
 
-    // Create static file server using sirv
-    const serve = sirv(distDir, {
-      dev: true, // Development mode (no caching)
-      single: true, // SPA mode: serve index.html for 404s
-      etag: true,
-    });
-
-    // Create HTTP server
-    const server = http.createServer((req, res) => {
-      serve(req, res, () => {
-        // Fallback for 404s
-        res.statusCode = 404;
-        res.end('Not found');
-      });
-    });
-
-    // Start server
-    server.listen(port, host, () => {
-      console.log('\n🚀 Mordoc dev server started\n');
-      console.log(`  Local:   http://${host}:${port}`);
-      console.log(`  Network: http://${getLocalIpAddress()}:${port}`);
-      console.log('\n📝 Note: This is serving the pre-built dist/ folder.');
-      console.log('   Run "mordoc build" to rebuild after making changes.\n');
-      console.log('Press Ctrl+C to stop the server');
-    });
-
-    // Handle server errors
-    server.on('error', (error: NodeJS.ErrnoException) => {
-      if (error.code === 'EADDRINUSE') {
-        console.error(`❌ Error: Port ${port} is already in use`);
-        console.error(`Try a different port: mordoc dev --port ${port + 1}`);
-      } else {
-        console.error('❌ Server error:', error.message);
+      // Let Vite handle asset/module requests (anything with a file extension).
+      const lastSegment = url.split('?')[0]?.split('/').pop() ?? '';
+      if (lastSegment.includes('.')) {
+        return next();
       }
-      process.exit(1);
-    });
 
-    // Graceful shutdown
-    process.on('SIGINT', () => {
-      console.log('\n\n👋 Shutting down dev server...');
-      server.close(() => {
-        console.log('✓ Server stopped');
-        process.exit(0);
-      });
-    });
+      const rawTemplate = await fs.readFile(templatePath, 'utf-8');
+      const transformed = await server.transformIndexHtml(url, rawTemplate);
 
-    process.on('SIGTERM', () => {
-      server.close(() => {
-        process.exit(0);
-      });
-    });
-  } catch (error) {
-    console.error('\n❌ Failed to start dev server:');
-    console.error((error as Error).message);
-    process.exit(1);
-  }
-}
-
-/**
- * Parse command-line arguments for dev command
- */
-export function parseDevArgs(args: string[]): DevCommandOptions {
-  const options: DevCommandOptions = {};
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-
-    switch (arg) {
-      case '--port':
-      case '-p':
-        const portValue = parseInt(args[++i], 10);
-        if (isNaN(portValue)) {
-          console.error('Error: Invalid port number');
-          process.exit(1);
-        }
-        options.port = portValue;
-        break;
-
-      case '--host':
-      case '-h':
-        options.host = args[++i];
-        break;
-
-      case '--open':
-      case '-o':
-        options.open = true;
-        break;
-
-      case '--help':
-        showDevHelp();
-        process.exit(0);
-        break;
-
-      default:
-        if (arg.startsWith('-')) {
-          console.warn(`Warning: Unknown option ${arg}`);
-        }
-        break;
-    }
-  }
-
-  return options;
-}
-
-/**
- * Show help text for dev command
- */
-function showDevHelp(): void {
-  console.log(`
-mordoc dev - Start development server
-
-Usage:
-  mordoc dev [options]
-
-Options:
-  -p, --port <number>   Port number (default: 3000)
-  -h, --host <host>     Host address (default: localhost)
-  -o, --open            Open browser automatically
-  --help                Show this help message
-
-Note:
-  The dev server serves the pre-built dist/ folder.
-  Run "mordoc build" first to generate the site.
-  Rebuild manually after making changes.
-
-Examples:
-  mordoc dev
-  mordoc dev --port 8080
-  mordoc dev --host 0.0.0.0
-  `);
-}
-
-/**
- * Get local IP address for network access
- */
-function getLocalIpAddress(): string {
-  const { networkInterfaces } = require('os');
-  const nets = networkInterfaces();
-
-  for (const name of Object.keys(nets)) {
-    for (const net of nets[name]) {
-      // Skip internal and non-IPv4 addresses
-      if (net.family === 'IPv4' && !net.internal) {
-        return net.address;
+      const faviconPath = path.join(projectRoot, 'config', 'assets', 'favicon.ico');
+      let headHtml = '';
+      try {
+        await fs.access(faviconPath);
+        headHtml = '<link rel="icon" href="/_assets/favicon.ico">';
+      } catch {
+        // no favicon configured
       }
-    }
-  }
 
-  return 'localhost';
+      // In dev, App.tsx's useEffect corrects document.documentElement.lang after hydration.
+      // We still replace the marker so the attribute value is valid (empty = unknown language).
+      const finalHtml = transformed
+        .replace(SSR_LANG_MARKER, '')
+        .replace(SSR_HEAD_MARKER, headHtml)
+        .replace(SSR_OUTLET_MARKER, '');
+
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'text/html');
+      res.end(finalHtml);
+    } catch (err) {
+      if (err instanceof Error) {
+        server.ssrFixStacktrace(err);
+      }
+      next(err);
+    }
+  });
+
+  await server.listen();
+
+  const resolvedPort = server.config.server.port ?? 5173;
+  console.log(`\n  Mordoc dev server running`);
+  console.log(`  → http://localhost:${resolvedPort}/`);
+  console.log(`  Project: ${projectRoot}\n`);
 }

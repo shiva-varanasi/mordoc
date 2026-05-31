@@ -1,81 +1,34 @@
 #!/usr/bin/env node
 
-const path = require('path');
-const fs = require('fs');
+// Entry point for the Mordoc CLI. This file is intentionally plain JS (not TS)
+// so it can be executed directly by Node without a build step.
+// The actual logic lives in compiled output under dist/.
 
-// Get the command from arguments
-const args = process.argv.slice(2);
-const command = args[0];
-const commandArgs = args.slice(1); // Arguments after the command
+import { runDevCommand } from '../dist/cli/dev.js';
+import { runBuildCommand } from '../dist/cli/build.js';
 
-// Display help text
-function showHelp() {
-  console.log(`
-Mordoc - Static Site Generator for Documentation
+const command = process.argv[2];
 
-Usage:
-  mordoc <command> [options]
-
-Commands:
-  build      Build the documentation site
-  dev        Start the development server
-  
-Options:
-  --help     Show this help message
-
-Examples:
-  mordoc build
-  mordoc build --verbose --drafts
-  mordoc dev
-  mordoc dev --port 8080
-  `);
-}
-
-// Main CLI logic
-async function main() {
-  // Show help if no command or --help flag
-  if (!command || command === '--help' || command === '-h') {
-    showHelp();
-    process.exit(0);
-  }
-
-  // Check if dist folder exists (TypeScript must be compiled first)
-  const distPath = path.join(__dirname, '../dist/cli');
-  if (!fs.existsSync(distPath)) {
-    console.error('Error: Mordoc is not built. Please run "tsc" first to compile TypeScript.');
-    process.exit(1);
-  }
-
-  // Route to appropriate command handler
+if (command === 'dev') {
   try {
-    switch (command) {
-      case 'build': {
-        const buildHandler = require('../dist/cli/build.js');
-        const options = buildHandler.parseBuildArgs(commandArgs);
-        await buildHandler.build(options);
-        break;
-      }
-      
-      case 'dev': {
-        const devHandler = require('../dist/cli/dev.js');
-        const options = devHandler.parseDevArgs(commandArgs);
-        await devHandler.dev(options);
-        break;
-      }
-      
-      default:
-        console.error(`Unknown command: ${command}`);
-        showHelp();
-        process.exit(1);
-    }
-  } catch (error) {
-    console.error('Error:', error.message);
-    if (process.env.DEBUG) {
-      console.error(error.stack);
-    }
+    await runDevCommand({ projectRoot: process.cwd() });
+  } catch (err) {
+    console.error('\n✘ Dev server failed to start:\n');
+    console.error(err.message);
     process.exit(1);
   }
+} else if (command === 'build') {
+  try {
+    await runBuildCommand({ projectRoot: process.cwd() });
+  } catch (err) {
+    console.error('\n✘ Build failed:\n');
+    console.error(err.stack ?? err.message);
+    process.exit(1);
+  }
+} else {
+  console.log('Usage: mordoc <command>');
+  console.log('\nCommands:');
+  console.log('  dev      Start the Mordoc dev server');
+  console.log('  build    Render the project to static HTML in dist/');
+  process.exit(1);
 }
-
-// Run the CLI
-main();

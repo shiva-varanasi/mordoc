@@ -1,0 +1,237 @@
+/* ============================================================
+   CODE BLOCK TOKENS
+   ============================================================ */
+:root {
+  --cb-bg:     var(--color-surface);
+  --cb-border: var(--color-border);
+}
+
+/* ── Wrapper ────────────────────────────────────────────────── */
+
+.wrapper {
+  position: relative;
+  margin: 1.25rem 0;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--cb-border);
+  overflow: hidden;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: var(--cb-bg);
+  border-bottom: 1px solid var(--cb-border);
+}
+
+.language {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-fg-muted);
+  text-transform: capitalize;
+  font-family: var(--font-sans);
+}
+
+/* ── Copy button ─────────────────────────────────────────────── */
+
+.copyButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  background: transparent;
+  border: none;
+  color: var(--color-fg-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.copyButton:hover {
+  background-color: var(--color-bg-hover);
+  color: var(--color-fg);
+}
+
+.copyButton:active {
+  transform: scale(0.95);
+}
+
+/* ── Pre / code ──────────────────────────────────────────────── */
+
+.pre {
+  margin: 0;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--color-bg);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: 400;
+  color: var(--color-fg);
+  border-radius: 0;
+}
+
+/* Plain (no language) fallback */
+.plain {
+  margin: 1.25rem 0;
+  padding: 1.25rem 1.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--cb-border);
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.plain code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: 400;
+  color: var(--color-fg);
+}
+
+/* ============================================================
+   PRISM TOKEN COLORS
+   Light values are default; dark values under .dark
+   ============================================================ */
+
+:global(.token.comment),
+:global(.token.prolog),
+:global(.token.doctype),
+:global(.token.cdata) {
+  color: #6a737d;
+}
+
+:global(.dark) :global(.token.comment),
+:global(.dark) :global(.token.prolog),
+:global(.dark) :global(.token.doctype),
+:global(.dark) :global(.token.cdata) {
+  color: #8b949e;
+}
+
+:global(.token.punctuation) {
+  color: #383a42;
+}
+
+:global(.dark) :global(.token.punctuation) {
+  color: #cdd9e5;
+}
+
+:global(.token.namespace) {
+  opacity: 0.7;
+}
+
+:global(.token.property),
+:global(.token.tag),
+:global(.token.boolean),
+:global(.token.number),
+:global(.token.constant),
+:global(.token.symbol),
+:global(.token.deleted) {
+  color: #0184bc;
+}
+
+:global(.dark) :global(.token.property),
+:global(.dark) :global(.token.tag),
+:global(.dark) :global(.token.boolean),
+:global(.dark) :global(.token.number),
+:global(.dark) :global(.token.constant),
+:global(.dark) :global(.token.symbol),
+:global(.dark) :global(.token.deleted) {
+  color: #79c0ff;
+}
+
+:global(.token.selector),
+:global(.token.attr-name),
+:global(.token.string),
+:global(.token.char),
+:global(.token.builtin),
+:global(.token.inserted) {
+  color: #50a14f;
+}
+
+:global(.dark) :global(.token.selector),
+:global(.dark) :global(.token.attr-name),
+:global(.dark) :global(.token.string),
+:global(.dark) :global(.token.char),
+:global(.dark) :global(.token.builtin),
+:global(.dark) :global(.token.inserted) {
+  color: #7ee787;
+}
+
+:global(.token.operator),
+:global(.token.entity),
+:global(.token.url),
+:global(.language-css) :global(.token.string),
+:global(.style) :global(.token.string) {
+  color: #a626a4;
+}
+
+:global(.dark) :global(.token.operator),
+:global(.dark) :global(.token.entity),
+:global(.dark) :global(.token.url),
+:global(.dark) :global(.language-css) :global(.token.string),
+:global(.dark) :global(.style) :global(.token.string) {
+  color: #d2a8ff;
+}
+
+:global(.token.atrule),
+:global(.token.attr-value),
+:global(.token.keyword) {
+  color: #a626a4;
+}
+
+:global(.dark) :global(.token.atrule),
+:global(.dark) :global(.token.attr-value),
+:global(.dark) :global(.token.keyword) {
+  color: #ff7b72;
+}
+
+:global(.token.function),
+:global(.token.class-name) {
+  color: #c18401;
+}
+
+:global(.dark) :global(.token.function),
+:global(.dark) :global(.token.class-name) {
+  color: #d29922;
+}
+
+:global(.token.regex),
+:global(.token.important),
+:global(.token.variable) {
+  color: #e45649;
+}
+
+:global(.dark) :global(.token.regex),
+:global(.dark) :global(.token.important),
+:global(.dark) :global(.token.variable) {
+  color: #ffa657;
+}
+
+:global(.token.bold) {
+  font-weight: 700;
+}
+
+:global(.token.italic) {
+  font-style: italic;
+}
+
+:global(.token.entity) {
+  cursor: help;
+}

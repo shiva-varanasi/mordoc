@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ============================================================
+   ROOT TOKENS — global design primitives only.
+   Component-specific tokens live at the top of each component's
+   CSS module file (e.g. Sidenav.module.css, Header.module.css).
+   ============================================================ */
+:root {
+  /* Surfaces */
+  --color-bg:            #ffffff;
+  --color-surface:       #fafafa;
+  --color-border:        #e5e5e5;
+  --color-header-bg:     rgba(255, 255, 255);
+
+  /* Text */
+  --color-fg:            #1c1c1c;
+  --color-content-fg:    rgb(46, 46, 46);
+  --color-fg-muted:      #6b7280;
+
+  /* Interaction */
+  --color-bg-hover: #f3f4f6;
+
+  /* Accent — single configurable token; all other accent vars are derived.
+     Users override --accent (and optionally dark) in config/theme.css. */
+  --accent:          #D64518;
+  --accent-subtle:   color-mix(in oklch, var(--accent) 8%, white);
+  --accent-muted:    color-mix(in oklch, var(--accent) 20%, white);
+  --accent-emphasis: var(--accent);
+  --accent-strong:   color-mix(in oklch, var(--accent) 80%, black);
+  --accent-on:       white;
+
+  /* Layout — shared across multiple components */
+  --header-height:      4rem;
+  --topnav-height:      0px;
+  --header-total:       calc(var(--header-height) + var(--topnav-height));
+  --sidebar-width:      16rem;
+  --sidebar-width-icon: 3.5rem;
+  --toc-width:          16rem;
+  --content-max-width:  48rem;
+  --page-gutter:        2.5rem;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+
+  /* Shape */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+}
+
+/* Dark mode overrides — global primitives only */
+.dark {
+  --color-bg:        #121212;
+  --color-surface:   #0f0f0f;
+  --color-border:    #2e2e2e;
+  --color-header-bg: rgba(18, 18, 18);
+
+  --color-fg:         #e2e8f0;
+  --color-content-fg: rgb(214, 214, 214);
+  --color-fg-muted:   #94a3b8;
+
+  --color-bg-hover: #1e2432;
+
+  /* Accent — re-derived for dark surfaces; --accent base stays the same */
+  --accent-subtle:   color-mix(in oklch, var(--accent) 12%, #121212);
+  --accent-muted:    color-mix(in oklch, var(--accent) 25%, #121212);
+  --accent-emphasis: color-mix(in oklch, var(--accent) 70%, white);
+  --accent-strong:   color-mix(in oklch, var(--accent) 50%, white);
+}
+
+/* ============================================================
+   BASE RESET
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-fg-muted);
+}

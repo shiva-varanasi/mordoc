@@ -1,0 +1,108 @@
+/* ============================================================
+   HERO TOKENS
+   ============================================================ */
+:root {
+  --hero-inner-max:  72rem;
+  --hero-title-size: clamp(2rem, 4vw, 3.125rem);
+  --hero-desc-size:  1.125rem;
+  --hero-v-padding:  7rem;
+}
+
+/* ── Base ─────────────────────────────────────────────────────── */
+
+.hero {
+  position: relative;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* ── Inner — always a centered column ────────────────────────── */
+
+.inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: var(--hero-inner-max);
+  margin: 0 auto;
+  padding: var(--hero-v-padding) var(--page-gutter);
+  gap: 2.5rem;
+}
+
+/* ── Text block — narrower than inner for readability ─────────── */
+
+.heroText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.25rem;
+  max-width: 42rem;
+  width: 100%;
+}
+
+/* ── Title ────────────────────────────────────────────────────── */
+
+.heroTitle {
+  font-size: var(--hero-title-size);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: var(--hero-title-color, var(--color-fg));
+  margin: 0;
+}
+
+/* Second title line — accent color by default, overridable per-hero */
+.titleAccent {
+  color: var(--hero-title-accent-color, var(--accent-emphasis));
+}
+
+/* ── Description ──────────────────────────────────────────────── */
+
+.heroDescription {
+  font-size: var(--hero-desc-size);
+  line-height: 1.7;
+  color: var(--hero-desc-color, var(--color-fg-muted));
+  margin: 0;
+}
+
+/* ── CTAs ─────────────────────────────────────────────────────── */
+
+.heroCtas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Markdoc may wrap button tags in a <p> — collapse it */
+.heroCtas :global(p) {
+  display: contents;
+}
+
+/* ── Foreground image — full inner width, below CTAs ─────────── */
+
+.heroImageWrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.heroImage {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  display: block;
+}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  :root {
+    --hero-v-padding: 4rem;
+  }
+}

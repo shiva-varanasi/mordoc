@@ -1,0 +1,110 @@
+/* ============================================================
+   CALLOUT TOKENS
+   ============================================================ */
+:root {
+  --callout-note-accent:    #47a3d1;
+  --callout-warning-accent: #e6911a;
+  --callout-danger-accent:  #d22d2d;
+  --callout-tip-accent:     #22a569;
+
+  /* Subtle per-type background tints (light mode) */
+  --callout-note-bg:    color-mix(in oklch, #47a3d1 8%, white);
+  --callout-warning-bg: color-mix(in oklch, #e6911a 8%, white);
+  --callout-danger-bg:  color-mix(in oklch, #d22d2d 8%, white);
+  --callout-tip-bg:     color-mix(in oklch, #22a569 8%, white);
+
+  --callout-title-color:   #0f172a;
+  --callout-body-color:    #475569;
+}
+
+:global(.dark) {
+  /* Subtle per-type background tints (dark mode) */
+  --callout-note-bg:    color-mix(in oklch, #47a3d1 10%, #1a1a1a);
+  --callout-warning-bg: color-mix(in oklch, #e6911a 10%, #1a1a1a);
+  --callout-danger-bg:  color-mix(in oklch, #d22d2d 10%, #1a1a1a);
+  --callout-tip-bg:     color-mix(in oklch, #22a569 10%, #1a1a1a);
+
+  --callout-title-color:   #f1f5f9;
+  --callout-body-color:    #94a3b8;
+}
+
+/* ── Base callout ────────────────────────────────────────────── */
+
+.callout {
+  display: flex;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-md);
+  border-left: 4px solid transparent;
+}
+
+/* ── Type variants ───────────────────────────────────────────── */
+
+.note {
+  background-color: var(--callout-note-bg);
+  border-left-color: var(--callout-note-accent);
+}
+
+.warning {
+  background-color: var(--callout-warning-bg);
+  border-left-color: var(--callout-warning-accent);
+}
+
+.danger {
+  background-color: var(--callout-danger-bg);
+  border-left-color: var(--callout-danger-accent);
+}
+
+.tip {
+  background-color: var(--callout-tip-bg);
+  border-left-color: var(--callout-tip-accent);
+}
+
+/* ── Icon ────────────────────────────────────────────────────── */
+
+.iconWrap {
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+}
+
+/* Icon color matches the type accent so the variant is immediately obvious */
+.note    .iconWrap { color: var(--callout-note-accent); }
+.warning .iconWrap { color: var(--callout-warning-accent); }
+.danger  .iconWrap { color: var(--callout-danger-accent); }
+.tip     .iconWrap { color: var(--callout-tip-accent); }
+
+/* ── Body ────────────────────────────────────────────────────── */
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  margin-bottom: 0.25rem;
+  color: var(--callout-title-color);
+}
+
+.content {
+  font-size: 0.9375rem;
+  line-height: 1.625;
+  color: var(--callout-body-color);
+}
+
+/* Markdoc wraps callout body text in <p> tags — remove bottom margin on the
+   last paragraph so the callout padding provides the visual spacing instead */
+.content :global(p) {
+  margin-bottom: 0;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.content :global(p + p) {
+  margin-top: 0.5rem;
+}

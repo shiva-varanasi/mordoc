@@ -1,0 +1,205 @@
+/* ============================================================
+   HEADER TOKENS
+   ============================================================ */
+:root {
+  --header-px:        16px;
+  --header-gap:       12px;
+  --actions-gap:      4px;
+  --brand-gap:        8px;
+  --brand-logo-size:  28px;
+  --brand-logo-radius: 6px;
+  --menu-btn-size:    36px;
+  --menu-btn-radius:  6px;
+  --menu-btn-icon:    20px;
+  --toggle-size:      40px;
+  --toggle-radius:    8px;
+  --toggle-icon-size: 20px;
+  --toggle-bg:        #ffffff;
+  --toggle-bg-hover:  #f5f5f5;
+  --toggle-border:    #e5e5e5;
+  --toggle-fg:        #1c1c1c;
+}
+
+:global(.dark) {
+  --toggle-bg:       #1a1a1a;
+  --toggle-bg-hover: #242424;
+  --toggle-border:   #2e2e2e;
+  --toggle-fg:       #ebebeb;
+}
+
+@media (max-width: 479px) {
+  :root {
+    --header-gap:       8px;
+    --actions-gap:      2px;
+    --toggle-size:      36px;
+    --toggle-icon-size: 18px;
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-gap: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --header-gap: 20px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --header-gap: 24px;
+  }
+}
+
+/* Aesthetic + internal layout only.
+   Structural placement (position: sticky, z-index, height) lives in App.module.css .headerArea */
+.header {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--color-header-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* ── Top bar ────────────────────────────────────────────── */
+.inner {
+  width: 100%;
+  height: var(--header-height);
+  padding: 0 var(--header-px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--header-gap);
+}
+
+/* Three regions */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--brand-gap);
+  flex-shrink: 0;
+}
+
+.search {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--actions-gap);
+  flex-shrink: 0;
+}
+
+/* ── Logo / brand link ──────────────────────────────────── */
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  flex-shrink: 0;
+  border-radius: var(--brand-logo-radius);
+}
+
+.logoImage {
+  height: var(--brand-logo-size);
+  width: auto;
+}
+
+.logoText {
+  font-weight: 700;
+  font-size: 1.25rem;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+/* ── Hamburger ──────────────────────────────────────────── */
+.menuBtn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--menu-btn-size);
+  height: var(--menu-btn-size);
+  border: 0;
+  background: transparent;
+  border-radius: var(--menu-btn-radius);
+  color: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.menuBtn:hover {
+  background: var(--lang-bg-hover);
+}
+
+.menuBtn:focus-visible {
+  outline: 2px solid var(--accent-emphasis);
+  outline-offset: 2px;
+}
+
+/* ── Theme toggle ───────────────────────────────────────── */
+.themeToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--toggle-size);
+  height: var(--toggle-size);
+  background: var(--toggle-bg);
+  color: var(--toggle-fg);
+  border: 1px solid var(--toggle-border);
+  border-radius: var(--toggle-radius);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.themeToggle:hover {
+  background: var(--toggle-bg-hover);
+}
+
+.themeToggle:focus-visible {
+  outline: 2px solid var(--accent-emphasis);
+  outline-offset: 2px;
+}
+
+/* ── Topnav second row ──────────────────────────────────── */
+.topnavRow {
+  width: 100%;
+  height: 2.75rem;
+  padding: 0 var(--header-px);
+  display: flex;
+  align-items: stretch;
+}
+
+/* ── Focus ring on logo ─────────────────────────────────── */
+.logo:focus-visible {
+  outline: 2px solid var(--accent-emphasis);
+  outline-offset: 2px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   Responsive
+   ════════════════════════════════════════════════════════════ */
+
+/* < 768px: hamburger visible, search + topnav row hidden */
+@media (max-width: 767.98px) {
+  .menuBtn {
+    display: inline-flex;
+  }
+
+  .search {
+    display: none;
+  }
+
+  .topnavRow {
+    display: none;
+  }
+}

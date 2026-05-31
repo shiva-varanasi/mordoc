@@ -1,0 +1,357 @@
+/* ============================================================
+   CONTENT TOKENS
+   ============================================================ */
+:root {
+  --breadcrumb-link:       #6b6b6b;
+  --breadcrumb-link-hover: #1c1c1c;
+  --breadcrumb-current:    #1c1c1c;
+  --breadcrumb-sep:        #6b6b6b;
+}
+
+:global(.dark) {
+  --breadcrumb-link:       #a0a0a0;
+  --breadcrumb-link-hover: #eaeaea;
+  --breadcrumb-current:    #eaeaea;
+  --breadcrumb-sep:        #6b6b6b;
+}
+
+/* ── Content area grid ──────────────────────────────────────
+   Grid areas: [contentColumn | tocColumn]
+                [footerRow     |     .    ]
+   ─────────────────────────────────────────────────────────── */
+.contentAreaGrid {
+  display: grid;
+  grid-template-columns: 1fr var(--toc-width);
+  grid-template-rows: 1fr auto;
+  grid-template-areas:
+    "content  toc"
+    "footer   .  ";
+  min-height: calc(100svh - var(--header-total));
+}
+
+/* ── Article area ────────────────────────────────────────── */
+.articleArea {
+  grid-area: content;
+  min-width: 0;
+}
+
+/* Reading column — centered within contentColumn */
+.article {
+  max-width: var(--content-max-width);
+  width: 100%;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .article {
+    padding: 3rem 2rem;
+  }
+}
+
+/* ── TOC area ────────────────────────────────────────────── */
+.tocArea {
+  grid-area: toc;
+  position: sticky;
+  top: var(--header-total);
+  align-self: start;
+  max-height: calc(100svh - var(--header-total));
+  overflow-y: auto;
+  padding: 3rem 1.5rem 2rem 1.5rem;
+}
+
+/* ── Footer area — spans only under article, never under TOC ─ */
+.footerArea {
+  grid-area: footer;
+}
+
+/* ── Responsive — hide TOC below xl ─────────────────────── */
+@media (max-width: 1279.98px) {
+  .contentAreaGrid {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    grid-template-areas:
+      "content"
+      "footer";
+  }
+
+  .tocArea {
+    display: none;
+  }
+}
+
+/* ── Breadcrumb ─────────────────────────────────────────── */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 1.25rem;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.breadcrumbItem {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.breadcrumbSep {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--breadcrumb-sep);
+}
+
+.breadcrumbLink {
+  color: var(--breadcrumb-link);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+
+.breadcrumbLink:hover {
+  color: var(--breadcrumb-link-hover);
+}
+
+.breadcrumbLink:focus-visible {
+  outline: 2px solid var(--accent-emphasis);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.breadcrumbMuted {
+  color: var(--breadcrumb-link);
+}
+
+.breadcrumbCurrent {
+  color: var(--breadcrumb-current);
+  font-weight: 400;
+}
+
+/* ── Article header ─────────────────────────────────────── */
+
+.articleHeader {
+  margin-bottom: 2.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+  opacity: 1;
+}
+
+.title {
+  margin: 0 0 16px;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--color-fg);
+}
+
+.description {
+  margin: 0 0 16px;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--color-content-fg);
+  max-width: 42rem;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.readTime {
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-fg-muted);
+  opacity: 0.7;
+}
+
+/* ── Prose — Markdoc-rendered content ──────────────────── */
+
+.prose :global(h2) {
+  margin: 40px 0 16px;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--color-fg);
+  scroll-margin-top: calc(var(--header-total) + 1.5rem);
+}
+
+.prose :global(h3) {
+  margin: 32px 0 12px;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: var(--color-fg);
+  scroll-margin-top: calc(var(--header-total) + 1.5rem);
+}
+
+.prose :global(h4) {
+  margin: 24px 0 8px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: var(--color-fg);
+  scroll-margin-top: calc(var(--header-total) + 1.5rem);
+}
+
+.prose :global(h5) {
+  margin: 20px 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: var(--color-fg);
+  scroll-margin-top: calc(var(--header-total) + 1.5rem);
+}
+
+.prose :global(h6) {
+  margin: 16px 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--color-fg);
+  scroll-margin-top: calc(var(--header-total) + 1.5rem);
+}
+
+.prose :global(p) {
+  margin: 0 0 16px;
+  font-size: 16px;
+  line-height: 1.7;
+  font-weight: 400;
+  color: var(--color-content-fg);
+}
+
+.prose :global(ul),
+.prose :global(ol) {
+  margin: 0 0 16px 16px;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--color-content-fg);
+}
+
+.prose :global(ul) {
+  list-style: disc inside;
+}
+
+.prose :global(ol) {
+  list-style: decimal inside;
+}
+
+.prose :global(li) {
+  margin-bottom: 0;
+}
+
+.prose :global(li + li) {
+  margin-top: 8px;
+}
+
+.prose :global(li > ul),
+.prose :global(li > ol) {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.prose :global(blockquote) {
+  margin: 1.25rem 0;
+  padding: 0.75rem 1.25rem;
+  border-left: 3px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  color: var(--color-fg-muted);
+  font-style: italic;
+}
+
+.prose :global(blockquote p) {
+  margin: 0;
+}
+
+.prose :global(hr) {
+  margin: 2rem 0;
+  border: none;
+  border-top: 1px solid var(--color-border);
+}
+
+/* Target only plain inline links (no class) — component links like cards manage
+   their own decoration and must not be underlined by prose styles. */
+.prose :global(a:not([class])) {
+  color: var(--accent-emphasis);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.15s;
+}
+
+.prose :global(a:not([class]):hover) {
+  color: var(--accent-strong);
+  text-decoration-color: var(--accent-strong);
+}
+
+.prose :global(strong) {
+  font-weight: 600;
+  color: var(--color-fg);
+}
+
+.prose :global(em) {
+  font-style: italic;
+}
+
+/* Inline code */
+.prose :global(code) {
+  padding: 0.1em 0.375em;
+  background: var(--color-surface);
+  color: var(--color-content-fg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  font-weight: 500;
+}
+
+/* Reset inline-code styles for code inside a pre — the CodeBlock component owns that styling */
+.prose :global(pre code) {
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+  font-size: inherit;
+  font-weight: 400;
+}
+
+/* Tables */
+.prose :global(table) {
+  width: 100%;
+  margin: 1.25rem 0;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.prose :global(th) {
+  padding: 0.625rem 0.875rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  color: var(--color-fg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.prose :global(td) {
+  padding: 0.625rem 0.875rem;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+
+.prose :global(tr:last-child td) {
+  border-bottom: none;
+}

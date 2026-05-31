@@ -9,7 +9,7 @@
     "src/app/"
   ],
   "bin": {
-    "mordoc": "./bin/cli.js"
+    "mordoc": "bin/cli.js"
   },
   "engines": {
     "node": ">=18.0.0"

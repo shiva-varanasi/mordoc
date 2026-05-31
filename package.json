@@ -3,9 +3,18 @@
   "version": "1.0.0",
   "description": "A modern documentation site generator powered by Vite, React, and Markdoc.",
   "type": "module",
+  "files": [
+    "dist/",
+    "bin/",
+    "src/app/"
+  ],
   "bin": {
     "mordoc": "./bin/cli.js"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "Shiva Varanasi",
   "scripts": {
     "build": "tsc"
   },
@@ -23,11 +32,11 @@
     "@types/prismjs": "^1.26.6",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^4.7.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {
     "@markdoc/markdoc": "^0.5.7",
+    "@vitejs/plugin-react": "^4.7.0",
     "js-yaml": "^4.1.1",
     "pagefind": "^1.5.2",
     "prismjs": "^1.30.0",

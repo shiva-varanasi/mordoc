@@ -45,6 +45,24 @@ function validateSiteConfig(raw: unknown): SiteConfig {
     throw new Error(`site.json: "baseUrl" must not end with a trailing slash. Got: "${baseUrl}"`);
   }
 
+  const meta = obj['metadata'];
+  if (meta !== undefined) {
+    if (typeof meta !== 'object' || meta === null || Array.isArray(meta)) {
+      throw new Error('site.json: "metadata" must be an object.');
+    }
+    const metaObj = meta as Record<string, unknown>;
+    if (metaObj['ogImage'] !== undefined) {
+      if (typeof metaObj['ogImage'] !== 'string') {
+        throw new Error('site.json: "metadata.ogImage" must be a string.');
+      }
+      if (!metaObj['ogImage'].startsWith('/')) {
+        throw new Error(
+          `site.json: "metadata.ogImage" must be a root-relative path starting with "/" (e.g. "/images/og-cover.png"). Got: "${metaObj['ogImage']}"`,
+        );
+      }
+    }
+  }
+
   return raw as SiteConfig;
 }
 

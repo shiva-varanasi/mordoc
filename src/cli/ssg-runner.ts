@@ -5,6 +5,7 @@ import { toShellData } from '../pipeline.js';
 import { detectCurrentLang } from '../utils/lang-utils.js';
 import type { MordocData, ShellData } from '../types/pipeline.js';
 import type { TransformedPage } from '../types/content.js';
+import type { SiteConfig } from '../types/site.js';
 
 /** Markers in `index.html` substituted at SSG time. */
 const SSR_LANG_MARKER = '<!--ssr-lang-->';
@@ -52,23 +53,74 @@ function escapeHtml(value: string): string {
  *
  * Title format matches `Content.tsx`'s `document.title` assignment so
  * dev and prod are consistent: `Page Title — Site Name`.
- * `<meta name="description">` is omitted when frontmatter has no description.
- * `<link rel="icon">` is omitted when no favicon asset is configured.
+ *
+ * Always emits:
+ *   - `<title>`, `<meta name="description">` (if available), `<link rel="icon">` (if configured)
+ *   - `<link rel="canonical">` and `og:url` using `site.baseUrl + routePath`
+ *   - `og:title`, `og:description` (falls back to site description when page has none)
+ *
+ * Emits conditionally from `site.metadata`:
+ *   - `og:type` and `og:image` if declared
+ *   - Full Twitter Card block (`twitter:card`, `twitter:site`, `twitter:title`,
+ *     `twitter:description`, `twitter:image`) when `twitterCard` is declared — without
+ *     `twitter:card` the other twitter tags have no effect, so the whole block is gated on it.
  */
-function buildHeadHtml(page: TransformedPage, siteName: string, faviconUrl: string | null): string {
+function buildHeadHtml(
+  page: TransformedPage,
+  site: SiteConfig,
+  faviconUrl: string | null,
+  routePath: string,
+): string {
   const pageTitle = page.frontmatter.title;
   const title = pageTitle
-    ? `${escapeHtml(pageTitle)} — ${escapeHtml(siteName)}`
-    : escapeHtml(siteName);
+    ? `${escapeHtml(pageTitle)} — ${escapeHtml(site.name)}`
+    : escapeHtml(site.name);
+
+  // Page description with fallback to site description for social tags only.
+  const pageDescription = page.frontmatter.description;
+  const socialDescription = pageDescription ?? site.description;
+
+  const canonicalUrl = `${site.baseUrl}${routePath}`;
+  const meta = site.metadata;
 
   const parts = [`<title>${title}</title>`];
 
-  if (page.frontmatter.description) {
-    parts.push(`<meta name="description" content="${escapeHtml(page.frontmatter.description)}">`);
+  if (pageDescription) {
+    parts.push(`<meta name="description" content="${escapeHtml(pageDescription)}">`);
   }
 
   if (faviconUrl) {
     parts.push(`<link rel="icon" href="${escapeHtml(faviconUrl)}">`);
+  }
+
+  parts.push(`<link rel="canonical" href="${escapeHtml(canonicalUrl)}">`);
+
+  // OpenGraph
+  parts.push(`<meta property="og:url" content="${escapeHtml(canonicalUrl)}">`);
+  parts.push(`<meta property="og:title" content="${escapeHtml(title)}">`);
+  if (socialDescription) {
+    parts.push(`<meta property="og:description" content="${escapeHtml(socialDescription)}">`);
+  }
+  if (meta?.ogType) {
+    parts.push(`<meta property="og:type" content="${escapeHtml(meta.ogType)}">`);
+  }
+  if (meta?.ogImage) {
+    parts.push(`<meta property="og:image" content="${escapeHtml(site.baseUrl + meta.ogImage)}">`);
+  }
+
+  // Twitter Card — the full block is only useful when twitter:card is present.
+  if (meta?.twitterCard) {
+    parts.push(`<meta name="twitter:card" content="${escapeHtml(meta.twitterCard)}">`);
+    if (meta.twitterSite) {
+      parts.push(`<meta name="twitter:site" content="${escapeHtml(meta.twitterSite)}">`);
+    }
+    parts.push(`<meta name="twitter:title" content="${escapeHtml(title)}">`);
+    if (socialDescription) {
+      parts.push(`<meta name="twitter:description" content="${escapeHtml(socialDescription)}">`);
+    }
+    if (meta.ogImage) {
+      parts.push(`<meta name="twitter:image" content="${escapeHtml(site.baseUrl + meta.ogImage)}">`);
+    }
   }
 
   return parts.join('\n  ');
@@ -157,7 +209,7 @@ export async function runSsg(options: SsgRunnerOptions): Promise<void> {
     const { html: appHtml } = await ssrModule.render(request, shellData);
 
     const pageLang = detectCurrentLang(routePath, data.language, data.site.defaultLanguage);
-    const headHtml = buildHeadHtml(page, data.site.name, data.assets.favicon);
+    const headHtml = buildHeadHtml(page, data.site, data.assets.favicon, routePath);
     // lang is a plain ASCII code — string-form replace is safe (no $-patterns)
     const withLang = template.replace(SSR_LANG_MARKER, pageLang);
     const withHead = withLang.replace(SSR_HEAD_MARKER, () => headHtml);

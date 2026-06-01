@@ -9,9 +9,10 @@ import pagesIndex from 'virtual:mordoc/pages-index';
 import translations from 'virtual:mordoc/translations';
 import type { ShellData } from '../types/pipeline.js';
 import './index.css';
-import 'virtual:mordoc/theme';
 import { MordocDataContext } from './data-context.js';
 import { createAppRouter } from './routes.js';
+// theme.css must be last so user overrides win over component-level :root tokens
+import 'virtual:mordoc/theme';
 
 /**
  * Browser entry. Assembles `ShellData` from the eager virtual modules

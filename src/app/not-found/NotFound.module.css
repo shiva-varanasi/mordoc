@@ -66,27 +66,3 @@
   font-size: 0.875em;
   font-weight: 500;
 }
-
-/* ── Go home button ─────────────────────────────────────────── */
-
-.homeButton {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.5rem 1.125rem;
-  background: var(--accent-emphasis);
-  color: var(--accent-on);
-  border-radius: var(--radius-md);
-  font-size: 0.9375rem;
-  font-weight: 500;
-  text-decoration: none;
-  transition: background 150ms ease;
-}
-
-.homeButton:hover {
-  background: var(--accent-strong);
-}
-
-.homeButton:focus-visible {
-  outline: 2px solid var(--accent-emphasis);
-  outline-offset: 2px;
-}

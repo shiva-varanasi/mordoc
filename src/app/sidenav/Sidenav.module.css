@@ -2,30 +2,30 @@
    SIDENAV TOKENS
    ============================================================ */
 :root {
-  --sidebar-bg:             #FAFAFA;
-  --sidebar-fg:             #383838;
-  --sidebar-fg-muted:       #666666;
-  --sidebar-border:         #E5E5E5;
-  --sidebar-accent:         #EFEFEF;
-  --sidebar-accent-fg:      #1C1C1C;
-  --sidebar-group-label-fg: rgba(56, 56, 56, 0.7);
-  --sidebar-gap-y:          4px;
-  --sidebar-item-h:         36px;
-  --sidebar-group-h:        36px;
-  --sidebar-pad-x:          8px;
-  --sidebar-pad-y:          16px;
-  --sidebar-item-pad-x:     8px;
-  --sidebar-item-pad-y:     6px;
+  --sidenav-bg:             #FAFAFA;
+  --sidenav-fg:             #383838;
+  --sidenav-fg-muted:       #666666;
+  --sidenav-border:         #E5E5E5;
+  --sidenav-accent:         #EFEFEF;
+  --sidenav-accent-fg:      #1C1C1C;
+  --sidenav-group-label-fg: rgba(56, 56, 56, 0.7);
+  --sidenav-gap-y:          4px;
+  --sidenav-item-h:         36px;
+  --sidenav-group-h:        36px;
+  --sidenav-pad-x:          8px;
+  --sidenav-pad-y:          16px;
+  --sidenav-item-pad-x:     8px;
+  --sidenav-item-pad-y:     6px;
 }
 
 :global(.dark) {
-  --sidebar-bg:             #0F0F0F;
-  --sidebar-fg:             #D6D6D6;
-  --sidebar-fg-muted:       #9E9E9E;
-  --sidebar-border:         #292929;
-  --sidebar-accent:         #1F1F1F;
-  --sidebar-accent-fg:      #EBEBEB;
-  --sidebar-group-label-fg: rgba(214, 214, 214, 0.7);
+  --sidenav-bg:             #0F0F0F;
+  --sidenav-fg:             #D6D6D6;
+  --sidenav-fg-muted:       #9E9E9E;
+  --sidenav-border:         #292929;
+  --sidenav-accent:         #1F1F1F;
+  --sidenav-accent-fg:      #EBEBEB;
+  --sidenav-group-label-fg: rgba(214, 214, 214, 0.7);
 }
 
 /* ============================================================
@@ -34,7 +34,7 @@
    ============================================================ */
 
 .sidenav {
-  padding: var(--sidebar-pad-y) var(--sidebar-pad-x);
+  padding: var(--sidenav-pad-y) var(--sidenav-pad-x);
 }
 
 /* ── Menu list ───────────────────────────────────────────────── */
@@ -64,8 +64,8 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  min-height: var(--sidebar-group-h);
-  padding: var(--sidebar-item-pad-y) var(--sidebar-item-pad-x);
+  min-height: var(--sidenav-group-h);
+  padding: var(--sidenav-item-pad-y) var(--sidenav-item-pad-x);
   margin-top: 10px;
   border-radius: var(--radius-md);
   background: none;
@@ -74,7 +74,7 @@
   font-weight: 500;
   line-height: 1.25;
   letter-spacing: 0;
-  color: var(--sidebar-group-label-fg);
+  color: var(--sidenav-group-label-fg);
   font-family: var(--font-sans);
   cursor: pointer;
   text-align: left;
@@ -86,7 +86,7 @@
 }
 
 .groupLabelTrigger:hover {
-  background: var(--sidebar-accent);
+  background: var(--sidenav-accent);
 }
 
 .groupLabelText {
@@ -103,13 +103,13 @@
   justify-content: space-between;
   gap: 8px;
   width: 100%;
-  min-height: var(--sidebar-group-h);
-  padding: var(--sidebar-item-pad-y) var(--sidebar-item-pad-x);
+  min-height: var(--sidenav-group-h);
+  padding: var(--sidenav-item-pad-y) var(--sidenav-item-pad-x);
   border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 500;
   line-height: 1.25;
-  color: var(--sidebar-fg);
+  color: var(--sidenav-fg);
   text-decoration: none;
   cursor: pointer;
   margin-top: 10px;
@@ -121,7 +121,7 @@
 }
 
 .linkedGroupLabel:hover {
-  background: var(--sidebar-accent);
+  background: var(--sidenav-accent);
 }
 
 .linkedGroupLabel.linkActive {
@@ -138,19 +138,19 @@
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: var(--sidebar-group-h);
-  padding: var(--sidebar-item-pad-y) var(--sidebar-item-pad-x);
+  min-height: var(--sidenav-group-h);
+  padding: var(--sidenav-item-pad-y) var(--sidenav-item-pad-x);
   border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 500;
   line-height: 1.25;
-  color: var(--sidebar-fg);
+  color: var(--sidenav-fg);
   text-decoration: none;
   transition: color 150ms ease, background-color 150ms ease;
 }
 
 .topLink:hover {
-  background: var(--sidebar-accent);
+  background: var(--sidenav-accent);
 }
 
 .topLink.topLinkActive {
@@ -168,19 +168,19 @@
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: var(--sidebar-item-h);
-  padding: var(--sidebar-item-pad-y) 8px var(--sidebar-item-pad-y) 24px;
+  min-height: var(--sidenav-item-h);
+  padding: var(--sidenav-item-pad-y) 8px var(--sidenav-item-pad-y) 24px;
   border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 400;
   line-height: 1.4;
-  color: var(--sidebar-fg);
+  color: var(--sidenav-fg);
   text-decoration: none;
   transition: color 150ms ease, background-color 150ms ease;
 }
 
 .navLink:hover {
-  background: var(--sidebar-accent);
+  background: var(--sidenav-accent);
 }
 
 .navLink.navLinkActive {
@@ -203,7 +203,7 @@
 
 .chevron {
   flex-shrink: 0;
-  color: var(--sidebar-fg-muted);
+  color: var(--sidenav-fg-muted);
   transition: transform 200ms ease;
 }
 

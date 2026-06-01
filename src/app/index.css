@@ -27,14 +27,13 @@
   --accent-muted:    color-mix(in oklch, var(--accent) 20%, white);
   --accent-emphasis: var(--accent);
   --accent-strong:   color-mix(in oklch, var(--accent) 80%, black);
-  --accent-on:       white;
 
   /* Layout — shared across multiple components */
   --header-height:      4rem;
   --topnav-height:      0px;
   --header-total:       calc(var(--header-height) + var(--topnav-height));
-  --sidebar-width:      16rem;
-  --sidebar-width-icon: 3.5rem;
+  --sidenav-width:      16rem;
+  --sidenav-width-icon: 3.5rem;
   --toc-width:          16rem;
   --content-max-width:  48rem;
   --page-gutter:        2.5rem;

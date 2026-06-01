@@ -1,3 +1,9 @@
+/* ── Button tokens ────────────────────────────────────────────── */
+
+:root {
+  --button-primary-fg: white;
+}
+
 /* ── Button ───────────────────────────────────────────────────── */
 
 .button {
@@ -21,7 +27,7 @@
 
 .primary {
   background: var(--accent);
-  color: var(--accent-on);
+  color: var(--button-primary-fg);
   border-color: var(--accent);
 }
 

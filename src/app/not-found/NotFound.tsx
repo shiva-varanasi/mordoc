@@ -10,7 +10,8 @@
  * rendering this component.
  */
 
-import { Link, useLocation } from 'react-router';
+import { useLocation } from 'react-router';
+import { Button } from '../landing/button/Button.js';
 import { Footer } from '../footer/Footer.js';
 import styles from './NotFound.module.css';
 
@@ -25,7 +26,7 @@ export function NotFound() {
           <p className={styles.description}>
             No page exists at <code className={styles.path}>{location.pathname}</code>.
           </p>
-          <Link to="/" className={styles.homeButton}>Go home</Link>
+          <Button path="/">Go home</Button>
         </div>
       </div>
       <Footer />

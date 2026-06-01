@@ -31,7 +31,7 @@
   position: sticky;
   top: var(--header-total);
   align-self: flex-start;
-  width: var(--sidebar-width);
+  width: var(--sidenav-width);
   height: calc(100svh - var(--header-total));
   overflow-y: auto;
   flex-shrink: 0;

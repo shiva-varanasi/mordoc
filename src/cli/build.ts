@@ -8,6 +8,7 @@ import { getAppRoot } from '../utils/paths.js';
 import { runSsg } from './ssg-runner.js';
 import { copyAndRewriteAssets } from './asset-rewrite.js';
 import { runPagefindIndexer } from './pagefind-indexer.js';
+import type { MordocData } from '../types/pipeline.js';
 
 export interface BuildCommandOptions {
   /** Absolute path to the user's project root. */
@@ -183,11 +184,52 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
   console.log('\n→ verifying output...');
   await verifyBuildOutput(data, clientOutDir);
 
+  console.log('\n→ writing sitemap and robots.txt...');
+  await writeSitemapAndRobots(data, clientOutDir);
+
   console.log('\n→ building search index...');
   await runPagefindIndexer(data, clientOutDir);
 
   console.log('\n✔ build complete');
   console.log(`  output → ${clientOutDir}\n`);
+}
+
+/**
+ * Writes `sitemap.xml` and `robots.txt` into the client output directory.
+ *
+ * Every page discovered by the pipeline gets a `<loc>` entry — the sitemap
+ * is filesystem-driven, not sidenav-driven, so orphaned pages are included.
+ * Both files reference `site.baseUrl`, which is validated to be a full URL
+ * with no trailing slash.
+ */
+async function writeSitemapAndRobots(data: MordocData, clientOutDir: string): Promise<void> {
+  const { baseUrl } = data.site;
+
+  // XML spec requires & to be encoded as &amp; in attribute/text content.
+  // routePaths are always slash-only ASCII paths so this is academic, but correct.
+  const escapeXml = (v: string) => v.replace(/&/g, '&amp;');
+
+  const urlEntries = data.pages
+    .map((page) => `  <url>\n    <loc>${escapeXml(baseUrl + page.entry.routePath)}</loc>\n  </url>`)
+    .join('\n');
+
+  const sitemap =
+    '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+    urlEntries + '\n' +
+    '</urlset>\n';
+
+  await fs.writeFile(path.join(clientOutDir, 'sitemap.xml'), sitemap, 'utf-8');
+  console.log(`  sitemap.xml  (${data.pages.length} URL${data.pages.length === 1 ? '' : 's'})`);
+
+  const robots =
+    'User-agent: *\n' +
+    'Allow: /\n' +
+    '\n' +
+    `Sitemap: ${baseUrl}/sitemap.xml\n`;
+
+  await fs.writeFile(path.join(clientOutDir, 'robots.txt'), robots, 'utf-8');
+  console.log('  robots.txt');
 }
 
 /**

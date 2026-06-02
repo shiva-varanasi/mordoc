@@ -234,32 +234,61 @@
 
 .prose :global(ul),
 .prose :global(ol) {
-  margin: 0 0 16px 16px;
-  padding: 0;
+  margin: 1rem 0;
+  padding-left: 1.5rem;
   font-size: 16px;
   line-height: 1.7;
   color: var(--color-content-fg);
 }
 
 .prose :global(ul) {
-  list-style: disc inside;
+  list-style: disc;
+  list-style-position: outside;
 }
 
 .prose :global(ol) {
-  list-style: decimal inside;
+  list-style: decimal;
+  list-style-position: outside;
+}
+
+.prose :global(ul ul) {
+  list-style-type: circle;
+}
+
+.prose :global(ul ul ul) {
+  list-style-type: square;
+}
+
+.prose :global(ol ol) {
+  list-style-type: lower-alpha;
+}
+
+.prose :global(ol ol ol) {
+  list-style-type: lower-roman;
 }
 
 .prose :global(li) {
+  margin-bottom: 0.5rem;
+  line-height: 1.7;
+}
+
+.prose :global(li:last-child) {
   margin-bottom: 0;
 }
 
-.prose :global(li + li) {
-  margin-top: 8px;
+/* Markdoc loose lists wrap item text in <p> — override global .prose p margins */
+.prose :global(li > p) {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.prose :global(li > p:last-child) {
+  margin-bottom: 0;
 }
 
 .prose :global(li > ul),
 .prose :global(li > ol) {
-  margin-top: 8px;
+  margin-top: 0.5rem;
   margin-bottom: 0;
 }
 

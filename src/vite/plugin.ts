@@ -51,9 +51,9 @@ export const PAGE_MODULE_PREFIX = 'virtual:mordoc/page';
 /** Vite/Rollup convention: virtual modules are addressed with a leading null byte. */
 const RESOLVED_PREFIX = '\0';
 
-/** Virtual module ID for the user's optional config/theme.css. */
+/** Virtual module ID for the user's optional config/styles/theme.css. */
 const THEME_CSS_ID = 'virtual:mordoc/theme';
-/** Resolved ID used when config/theme.css does not exist — load returns empty. */
+/** Resolved ID used when config/styles/theme.css does not exist — load returns empty. */
 const RESOLVED_THEME_CSS_EMPTY = '\0virtual:mordoc/theme';
 
 const EAGER_SET: ReadonlySet<string> = new Set(EAGER_VIRTUAL_IDS);
@@ -483,7 +483,7 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
 
     resolveId(id) {
       if (id === THEME_CSS_ID) {
-        const themePath = path.join(options.projectRoot, 'config', 'theme.css');
+        const themePath = path.join(options.projectRoot, 'config', 'styles', 'theme.css');
         return fs.existsSync(themePath) ? themePath : RESOLVED_THEME_CSS_EMPTY;
       }
       if (EAGER_SET.has(id) || isPageModuleId(id)) {

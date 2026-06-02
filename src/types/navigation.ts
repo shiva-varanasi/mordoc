@@ -6,6 +6,11 @@ export interface SidenavItem {
   path?: string;
   /** Nested child items. Present for both group-only and navigable parents. */
   children?: SidenavItem[];
+  /**
+   * When true, this group is expanded on initial page load. Has no effect on leaf items.
+   * User can still collapse it during the session; state is not persisted across reloads.
+   */
+  expanded?: boolean;
 }
 
 /** Shape of a sidenav YAML file (sidenav.yaml or any topnav-referenced file). */

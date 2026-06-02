@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router';
 import { useMordocData } from '../data-context.js';
 import { detectCurrentLang, buildLangPrefix, stripLangPrefix, resolveLabel } from '../lang-utils.js';
@@ -50,6 +50,10 @@ function SidenavNode({ item, depth }: { item: SidenavItem; depth: number }) {
     : false;
   const isLabelActive = item.path ? location.pathname === item.path : false;
   const [open, setOpen] = useState(isGroupActive || isLabelActive);
+
+  useEffect(() => {
+    if (isGroupActive || isLabelActive) setOpen(true);
+  }, [isGroupActive, isLabelActive]);
 
   // Leaf item — path only, no children
   if (item.path && !item.children) {

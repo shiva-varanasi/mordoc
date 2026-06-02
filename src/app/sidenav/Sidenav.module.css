@@ -169,7 +169,7 @@
   align-items: center;
   width: 100%;
   min-height: var(--sidenav-item-h);
-  padding: var(--sidenav-item-pad-y) 8px var(--sidenav-item-pad-y) 24px;
+  padding: var(--sidenav-item-pad-y) 8px var(--sidenav-item-pad-y) 8px;
   border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 500;
@@ -195,6 +195,7 @@
 
 .groupContent {
   padding-top: 4px;
+  padding-left: 16px;
 }
 
 /* ============================================================

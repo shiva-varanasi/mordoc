@@ -49,7 +49,7 @@ function SidenavNode({ item, depth }: { item: SidenavItem; depth: number }) {
     ? groupContainsActive(item.children, location.pathname)
     : false;
   const isLabelActive = item.path ? location.pathname === item.path : false;
-  const [open, setOpen] = useState(isGroupActive || isLabelActive);
+  const [open, setOpen] = useState(isGroupActive || isLabelActive || item.expanded === true);
 
   useEffect(() => {
     if (isGroupActive || isLabelActive) setOpen(true);

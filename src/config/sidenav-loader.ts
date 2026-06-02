@@ -21,6 +21,10 @@ function validateItem(item: unknown, location: string, fileName: string): Sidena
     throw new Error(`${fileName}: ${location}.path must be a non-empty string when provided.`);
   }
 
+  if (obj['expanded'] !== undefined && typeof obj['expanded'] !== 'boolean') {
+    throw new Error(`${fileName}: ${location}.expanded must be a boolean when provided.`);
+  }
+
   if (obj['children'] !== undefined) {
     if (!Array.isArray(obj['children'])) {
       throw new Error(`${fileName}: ${location}.children must be an array.`);

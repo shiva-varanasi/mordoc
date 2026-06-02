@@ -345,7 +345,7 @@
   border-radius: var(--radius-sm);
   font-family: var(--font-mono);
   font-size: 0.875em;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 /* Reset inline-code styles for code inside a pre — the CodeBlock component owns that styling */

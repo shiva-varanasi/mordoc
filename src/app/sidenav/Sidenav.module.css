@@ -226,6 +226,29 @@
 }
 
 /* ============================================================
+   MOBILE TOPNAV SECTION (drawer only)
+   Hidden on desktop — the Topnav row handles that breakpoint.
+   Rendered above the sidenav tree inside the off-canvas drawer.
+   ============================================================ */
+
+.mobileTopnav {
+  display: none;
+  padding: var(--sidenav-pad-y) var(--sidenav-pad-x) 0;
+}
+
+@media (max-width: 767.98px) {
+  .mobileTopnav {
+    display: block;
+  }
+}
+
+.mobileTopnavDivider {
+  border: none;
+  border-top: 1px solid var(--sidenav-border);
+  margin: var(--sidenav-pad-y) 0 0;
+}
+
+/* ============================================================
    REDUCED MOTION
    ============================================================ */
 

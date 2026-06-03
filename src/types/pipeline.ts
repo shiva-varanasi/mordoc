@@ -1,6 +1,6 @@
 import type { SiteConfig } from './site.js';
 import type { LanguageConfig } from './language.js';
-import type { ResolvedTopnavConfig, SidenavConfig } from './navigation.js';
+import type { ResolvedTopnavConfig, SidenavConfig, HeaderLink } from './navigation.js';
 import type { ResolvedAssets } from './assets.js';
 import type { PageMeta, TransformedPage } from './content.js';
 
@@ -39,6 +39,8 @@ export interface MordocData {
   pages: TransformedPage[];
   /** Nav label translations keyed by language code. Empty for single-language projects. */
   translations: Record<string, Record<string, string>>;
+  /** Header action links from config/navigation/headernav.yaml. Empty array when file is absent. */
+  headerLinks: HeaderLink[];
 }
 
 /**
@@ -65,4 +67,6 @@ export interface ShellData {
   pagesIndex: PageMeta[];
   /** Nav label translations keyed by language code. Empty for single-language projects. */
   translations: Record<string, Record<string, string>>;
+  /** Header action links from config/navigation/headernav.yaml. Empty array when file is absent. */
+  headerLinks: HeaderLink[];
 }

@@ -57,6 +57,11 @@ declare module 'virtual:mordoc/translations' {
   export default value;
 }
 
+declare module 'virtual:mordoc/header-links' {
+  const value: import('../types/navigation.js').HeaderLink[];
+  export default value;
+}
+
 // CSS-only side-effect import; resolves to config/styles/theme.css when present.
 declare module 'virtual:mordoc/theme' {}
 

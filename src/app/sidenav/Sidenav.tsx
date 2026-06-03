@@ -157,6 +157,41 @@ function resolveActiveSidenav(
   return match?.sidenav ?? [];
 }
 
+/**
+ * Renders the topnav section links inside the mobile off-canvas drawer.
+ * Hidden on desktop (display:none) — the `<Topnav>` row handles desktop.
+ * Only rendered when navigation.kind === 'topnav'; returns null otherwise.
+ */
+export function MobileTopnavSection() {
+  const { navigation, language, site, translations } = useMordocData();
+  const { pathname } = useLocation();
+
+  if (navigation.kind !== 'topnav') return null;
+
+  const currentLang = detectCurrentLang(pathname, language, site.defaultLanguage);
+  const prefix = buildLangPrefix(currentLang, site.defaultLanguage);
+
+  return (
+    <div className={styles.mobileTopnav}>
+      <ul className={styles.menu}>
+        {navigation.topnav.map((item) => (
+          <li key={item.path} className={styles.menuItem}>
+            <NavLink
+              to={`${prefix}${item.path}`}
+              className={({ isActive }) =>
+                isActive ? `${styles.topLink} ${styles.topLinkActive}` : styles.topLink
+              }
+            >
+              {resolveLabel(item.label, currentLang, site.defaultLanguage, translations)}
+            </NavLink>
+          </li>
+        ))}
+      </ul>
+      <hr className={styles.mobileTopnavDivider} />
+    </div>
+  );
+}
+
 export function Sidenav() {
   const { navigation, language, site, translations } = useMordocData();
   const { pathname } = useLocation();

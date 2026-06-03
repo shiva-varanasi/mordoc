@@ -170,6 +170,114 @@
   outline-offset: 2px;
 }
 
+/* ── Header links (from headernav.yaml) ─────────────────── */
+
+/* Overrides --button-* tokens so Button renders at compact header size. */
+.headerLinks {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 8px;
+  margin-right: 4px;
+  border-right: 1px solid var(--color-border);
+  --button-height: 2rem;
+  --button-px: 0.875rem;
+  --button-font-size: 0.875rem;
+}
+
+/* Plain 'link' variant — matches article prose link style */
+.headerLink {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.25rem;
+  height: 2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--accent-emphasis);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: transparent;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  transition: color 0.15s, text-decoration-color 0.15s;
+}
+
+.headerLink:hover {
+  color: var(--accent-strong);
+  text-decoration-color: var(--accent-strong);
+}
+
+/* ── Mobile overflow menu (≤ 767px) ────────────────────── */
+
+/* Wrapper for the ellipsis trigger + dropdown — hidden on desktop */
+.headerLinksMenu {
+  display: none;
+  position: relative;
+}
+
+.headerLinksMenuBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--toggle-size);
+  height: var(--toggle-size);
+  background: transparent;
+  border: 0;
+  border-radius: var(--toggle-radius);
+  color: var(--color-fg);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.headerLinksMenuBtn:hover {
+  background: var(--color-bg-hover);
+}
+
+.headerLinksMenuBtn:focus-visible {
+  outline: 2px solid var(--accent-emphasis);
+  outline-offset: 2px;
+}
+
+.headerLinksDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 160px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  padding: 4px;
+  z-index: 200;
+}
+
+:global(.dark) .headerLinksDropdown {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Each row in the dropdown */
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-fg);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  transition: background 0.12s, color 0.12s;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.dropdownItem:hover {
+  background: var(--color-bg-hover);
+}
+
 /* ── Topnav second row ──────────────────────────────────── */
 .topnavRow {
   width: 100%;
@@ -189,7 +297,8 @@
    Responsive
    ════════════════════════════════════════════════════════════ */
 
-/* < 768px: hamburger visible, search + topnav row hidden */
+/* < 768px: hamburger visible, search + topnav row hidden;
+   header links strip hidden, overflow menu button visible */
 @media (max-width: 767.98px) {
   .menuBtn {
     display: inline-flex;
@@ -201,5 +310,13 @@
 
   .topnavRow {
     display: none;
+  }
+
+  .headerLinks {
+    display: none;
+  }
+
+  .headerLinksMenu {
+    display: block;
   }
 }

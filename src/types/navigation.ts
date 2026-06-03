@@ -40,3 +40,19 @@ export interface ResolvedTopnavItem {
 }
 
 export type ResolvedTopnavConfig = ResolvedTopnavItem[];
+
+/** A single link or button-styled link in the header's right-hand action area. */
+export interface HeaderLink {
+  /** Display text. */
+  label: string;
+  /** Internal route path or external absolute URL. */
+  path: string;
+  /**
+   * Visual treatment. 'link' = plain text (default), 'primary' = filled
+   * accent button, 'secondary' = outlined accent button.
+   */
+  variant?: 'link' | 'primary' | 'secondary';
+}
+
+/** Shape of the config/navigation/headernav.yaml file. */
+export type HeaderLinksConfig = HeaderLink[];

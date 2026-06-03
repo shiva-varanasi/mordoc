@@ -7,6 +7,7 @@ import { loadSiteConfig } from '../config/site-loader.js';
 import {
   loadNavigation,
   loadNavTranslations,
+  loadHeaderLinks,
   pagesRouteSignature,
   replaceTransformedPage,
   reparsePage,
@@ -34,6 +35,7 @@ export const EAGER_VIRTUAL_IDS = [
   'virtual:mordoc/pages-index',
   'virtual:mordoc/page-loaders',
   'virtual:mordoc/translations',
+  'virtual:mordoc/header-links',
 ] as const;
 
 export type EagerVirtualId = typeof EAGER_VIRTUAL_IDS[number];
@@ -177,6 +179,8 @@ export function generateVirtualModule(id: string, data: MordocData): string | nu
       return generatePageLoadersSource(data);
     case 'virtual:mordoc/translations':
       return `export default ${JSON.stringify(data.translations)};`;
+    case 'virtual:mordoc/header-links':
+      return `export default ${JSON.stringify(data.headerLinks)};`;
     default:
       return null;
   }
@@ -298,7 +302,9 @@ async function applyMordocWatchBatch(
 
   if (isNavStructureChange) {
     data.navigation = await loadNavigation(projectRoot);
+    data.headerLinks = await loadHeaderLinks(projectRoot);
     await reloadVirtualModule(server, 'virtual:mordoc/navigation');
+    await reloadVirtualModule(server, 'virtual:mordoc/header-links');
   }
 
   if (isTranslationsChange) {

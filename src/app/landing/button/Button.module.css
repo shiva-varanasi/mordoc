@@ -2,6 +2,9 @@
 
 :root {
   --button-primary-fg: white;
+  --button-height:     2.625rem;
+  --button-px:         1.375rem;
+  --button-font-size:  0.9375rem;
 }
 
 /* ── Button ───────────────────────────────────────────────────── */
@@ -10,10 +13,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 2.625rem;
-  padding: 0 1.375rem;
+  height: var(--button-height);
+  padding: 0 var(--button-px);
   border-radius: var(--radius-md);
-  font-size: 0.9375rem;
+  font-size: var(--button-font-size);
   font-weight: 600;
   line-height: 1;
   text-decoration: none;
@@ -34,6 +37,18 @@
 .primary:hover {
   background: var(--accent-strong);
   border-color: var(--accent-strong);
+}
+
+/* ── Secondary ────────────────────────────────────────────── */
+
+.secondary {
+  background: transparent;
+  color: var(--accent);
+  border-color: transparent;
+}
+
+.secondary:hover {
+  background: var(--accent-subtle);
 }
 
 /* Markdoc wraps button body text in <p> — collapse it so the button

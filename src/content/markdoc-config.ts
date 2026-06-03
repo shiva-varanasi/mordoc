@@ -203,6 +203,7 @@ const button: Schema = {
   children: ['paragraph', 'inline', 'text', 'strong', 'em'],
   attributes: {
     path:    { type: String, required: true },
+    variant: { type: String, default: 'primary', matches: ['primary', 'secondary'] },
   },
 };
 

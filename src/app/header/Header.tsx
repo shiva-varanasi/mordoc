@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { useMordocData } from '../data-context.js';
-import { detectCurrentLang, buildLangPrefix, stripLangPrefix } from '../lang-utils.js';
+import { detectCurrentLang, buildLangPrefix, stripLangPrefix, resolveLabel } from '../lang-utils.js';
 import { SearchBar } from './SearchBar.js';
 import { Topnav } from './Topnav.js';
 import { LanguagePicker } from './LanguagePicker.js';
+import { Button } from '../landing/button/Button.js';
+import type { HeaderLink } from '../../types/navigation.js';
 import styles from './Header.module.css';
 
 type Theme = 'light' | 'dark';
@@ -98,8 +100,135 @@ function SunIcon() {
   );
 }
 
+function EllipsisIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      style={{ width: 20, height: 20 }}
+    >
+      <circle cx="5" cy="12" r="2" />
+      <circle cx="12" cy="12" r="2" />
+      <circle cx="19" cy="12" r="2" />
+    </svg>
+  );
+}
+
+/**
+ * Renders a single headernav.yaml entry. 'link' variant = plain text link;
+ * 'primary'/'secondary' delegate to the shared Button component.
+ * External paths (http/https) open in a new tab regardless of variant.
+ */
+function HeaderLinkItem({ item }: { item: HeaderLink }) {
+  const variant = item.variant ?? 'link';
+  const isExternal =
+    item.path.startsWith('http://') ||
+    item.path.startsWith('https://') ||
+    item.path.startsWith('//');
+
+  if (variant === 'primary' || variant === 'secondary') {
+    return <Button path={item.path} variant={variant}>{item.label}</Button>;
+  }
+
+  if (isExternal) {
+    return (
+      <a
+        href={item.path}
+        className={styles.headerLink}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {item.label}
+      </a>
+    );
+  }
+
+  return (
+    <Link to={item.path} className={styles.headerLink}>
+      {item.label}
+    </Link>
+  );
+}
+
+/**
+ * Mobile overflow menu — renders a '...' button that opens a dropdown
+ * listing all header links. Shown only on small screens via CSS; the
+ * horizontal strip is shown on desktop via the sibling `.headerLinks` div.
+ *
+ * Click-outside closes the dropdown via a ref attached to the wrapper.
+ */
+function HeaderLinksOverflowMenu({ links }: { links: HeaderLink[] }) {
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(e: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [open]);
+
+  const isExternal = (path: string) =>
+    path.startsWith('http://') || path.startsWith('https://') || path.startsWith('//');
+
+  return (
+    <div className={styles.headerLinksMenu} ref={wrapperRef}>
+      <button
+        className={styles.headerLinksMenuBtn}
+        onClick={() => setOpen((o) => !o)}
+        aria-label="More links"
+        aria-expanded={open}
+        aria-haspopup="true"
+      >
+        <EllipsisIcon />
+      </button>
+      {open && (
+        <div className={styles.headerLinksDropdown} role="menu">
+          {links.map((item) => {
+            const isPrimary = item.variant === 'primary';
+            const className = `${styles.dropdownItem}${isPrimary ? ` ${styles.dropdownItemPrimary}` : ''}`;
+
+            if (isExternal(item.path)) {
+              return (
+                <a
+                  key={item.path}
+                  href={item.path}
+                  className={className}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  role="menuitem"
+                  onClick={() => setOpen(false)}
+                >
+                  {item.label}
+                </a>
+              );
+            }
+
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={className}
+                role="menuitem"
+                onClick={() => setOpen(false)}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function Header({ sidenavOpen, onMenuToggle, onSearchOpen, showMenu = true, className }: HeaderProps) {
-  const { site, assets, language, navigation } = useMordocData();
+  const { site, assets, language, navigation, headerLinks, translations } = useMordocData();
   const location = useLocation();
   const navigate = useNavigate();
   const [theme, setTheme] = useState<Theme>(() => {
@@ -117,6 +246,10 @@ export function Header({ sidenavOpen, onMenuToggle, onSearchOpen, showMenu = tru
 
   const currentLang = detectCurrentLang(location.pathname, language, site.defaultLanguage);
   const currentContentPath = stripLangPrefix(location.pathname, currentLang, site.defaultLanguage);
+  const translatedHeaderLinks = headerLinks.map((item) => ({
+    ...item,
+    label: resolveLabel(item.label, currentLang, site.defaultLanguage, translations),
+  }));
   const logo = theme === 'dark' ? (assets.logoDark ?? assets.logo) : assets.logo;
 
   function handleLangChange(newLang: string) {
@@ -160,6 +293,18 @@ export function Header({ sidenavOpen, onMenuToggle, onSearchOpen, showMenu = tru
 
         {/* Right actions */}
         <div className={styles.actions}>
+          {translatedHeaderLinks.length > 0 && (
+            <>
+              {/* Desktop: horizontal strip of links/buttons */}
+              <div className={styles.headerLinks}>
+                {translatedHeaderLinks.map((item) => (
+                  <HeaderLinkItem key={item.path} item={item} />
+                ))}
+              </div>
+              {/* Mobile: collapses into a '...' dropdown */}
+              <HeaderLinksOverflowMenu links={translatedHeaderLinks} />
+            </>
+          )}
           {language && language.languages.length > 1 && (
             <LanguagePicker
               languages={language.languages}

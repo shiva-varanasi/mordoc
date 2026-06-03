@@ -22,6 +22,7 @@ import styles from './Button.module.css';
 
 interface ButtonProps {
   path: string;
+  variant?: 'primary' | 'secondary';
   children?: React.ReactNode;
 }
 
@@ -29,8 +30,8 @@ function isExternal(path: string) {
   return path.startsWith('http://') || path.startsWith('https://') || path.startsWith('//');
 }
 
-export function Button({ path, children }: ButtonProps) {
-  const className = `${styles.button} ${styles.primary}`;
+export function Button({ path, variant = 'primary', children }: ButtonProps) {
+  const className = `${styles.button} ${styles[variant]}`;
 
   if (isExternal(path)) {
     return (

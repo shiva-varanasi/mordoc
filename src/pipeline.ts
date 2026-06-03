@@ -5,10 +5,11 @@ import { loadSidenavConfig } from './config/sidenav-loader.js';
 import { loadAssets } from './config/assets-loader.js';
 import { loadContent } from './content/content-loader.js';
 import { loadNavTranslations } from './config/translations-loader.js';
+import { loadHeaderLinks } from './config/header-loader.js';
 import { parseContent } from './content/content-parser.js';
 import { transformContent } from './content/content-transformer.js';
 import path from 'node:path';
-export { loadNavTranslations };
+export { loadNavTranslations, loadHeaderLinks };
 import type { ContentEntry, TransformedPage } from './types/content.js';
 import type { MordocData, NavigationConfig, ShellData } from './types/pipeline.js';
 
@@ -66,11 +67,12 @@ export async function runPipeline(projectRoot: string): Promise<MordocData> {
     language?.languages ?? [site.defaultLanguage],
     site.defaultLanguage,
   );
+  const headerLinks = await loadHeaderLinks(projectRoot);
 
   const parsedContent = await parseContent(contentMap);
   const transformedContent = transformContent(parsedContent);
 
-  return { site, language, navigation, assets, pages: transformedContent, translations };
+  return { site, language, navigation, assets, pages: transformedContent, translations, headerLinks };
 }
 
 /**
@@ -123,6 +125,7 @@ export function toShellData(data: MordocData): ShellData {
       language: p.entry.language,
     })),
     translations: data.translations,
+    headerLinks: data.headerLinks,
   };
 }
 

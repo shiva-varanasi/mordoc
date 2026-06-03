@@ -7,6 +7,7 @@ import navigation from 'virtual:mordoc/navigation';
 import assets from 'virtual:mordoc/assets';
 import pagesIndex from 'virtual:mordoc/pages-index';
 import translations from 'virtual:mordoc/translations';
+import headerLinks from 'virtual:mordoc/header-links';
 import type { ShellData } from '../types/pipeline.js';
 import './index.css';
 import { MordocDataContext } from './data-context.js';
@@ -45,6 +46,7 @@ const shellData: ShellData = {
   assets,
   pagesIndex,
   translations,
+  headerLinks,
 };
 
 const hydrationData = window.__staticRouterHydrationData;

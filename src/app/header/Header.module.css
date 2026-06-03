@@ -278,15 +278,6 @@
   background: var(--color-bg-hover);
 }
 
-/* Primary variant in dropdown — accent color to signal importance */
-.dropdownItemPrimary {
-  color: var(--accent-emphasis);
-}
-
-.dropdownItemPrimary:hover {
-  background: var(--accent-subtle);
-}
-
 /* ── Topnav second row ──────────────────────────────────── */
 .topnavRow {
   width: 100%;

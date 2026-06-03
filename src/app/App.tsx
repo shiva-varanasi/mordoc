@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Outlet, ScrollRestoration, useLocation, useMatches, useNavigation } from 'react-router';
 import { Header } from './header/Header.js';
-import { Sidenav } from './sidenav/Sidenav.js';
+import { Sidenav, MobileTopnavSection } from './sidenav/Sidenav.js';
 import { SearchModal, switchPagefind } from './header/SearchModal.js';
 import { Skeleton } from './skeleton/Skeleton.js';
 import { useMordocData } from './data-context.js';
@@ -50,13 +50,11 @@ export function App() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Keep --topnav-height in sync so sticky offsets (sidenav, TOC, scroll-margin)
-  // stay correct whether or not a topnav row is present.
+  // Toggle a class instead of an inline style so that CSS media queries can
+  // override --topnav-height to 0px on mobile (inline styles win the cascade
+  // unconditionally, making the @media override impossible).
   useEffect(() => {
-    document.documentElement.style.setProperty(
-      '--topnav-height',
-      navigation.kind === 'topnav' ? '2.75rem' : '0px',
-    );
+    document.documentElement.classList.toggle('has-topnav', navigation.kind === 'topnav');
   }, [navigation.kind]);
 
   return (
@@ -76,6 +74,7 @@ export function App() {
             className={`${styles.sidenavArea} ${sidenavOpen ? styles.sidenavAreaOpen : ''}`}
             aria-label="Side navigation"
           >
+            <MobileTopnavSection />
             <Sidenav />
           </aside>
         )}

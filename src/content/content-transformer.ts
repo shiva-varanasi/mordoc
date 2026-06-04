@@ -56,22 +56,32 @@ function extractToc(root: RenderableTreeNode): TocEntry[] {
  *   1. A fresh slugger is created and attached to a per-page Markdoc config
  *      as `variables.slugger`. The heading node transform pulls it out to
  *      generate unique anchor IDs within that page.
- *   2. `Markdoc.transform()` runs the AST through the default config.
- *   3. The TOC is derived from the resulting renderable tree so its IDs
+ *   2. User-defined variables from config/variables.yaml are merged in so
+ *      authors can use `{{ $VAR_NAME }}` expressions in content.
+ *   3. `Markdoc.transform()` runs the AST through the default config.
+ *   4. The TOC is derived from the resulting renderable tree so its IDs
  *      stay in sync with the rendered headings.
  *
  * The function is synchronous — no I/O happens here; the AST is already
  * in memory from the parse stage.
+ *
+ * @param variables - Flat key-value map from config/variables.yaml. Merged
+ *   before `slugger` so internal variables always take precedence.
  */
-export function transformContent(pages: ParsedPage[]): TransformedPage[] {
+export function transformContent(
+  pages: ParsedPage[],
+  variables: Record<string, unknown> = {},
+): TransformedPage[] {
   const base = createDefaultMarkdocConfig();
   const out: TransformedPage[] = [];
 
   for (const page of pages) {
     const slugger = createSlugger();
+    // `slugger` is spread last so a user variable named "slugger" can't
+    // accidentally shadow the internal heading-ID generator.
     const config: Config = {
       ...base,
-      variables: { ...(base.variables ?? {}), slugger },
+      variables: { ...(base.variables ?? {}), ...variables, slugger },
     };
 
     const raw = Markdoc.transform(page.ast, config);

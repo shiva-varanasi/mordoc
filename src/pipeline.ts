@@ -3,6 +3,7 @@ import { loadLanguageConfig } from './config/language-loader.js';
 import { loadTopnavConfig } from './config/topnav-loader.js';
 import { loadSidenavConfig } from './config/sidenav-loader.js';
 import { loadAssets } from './config/assets-loader.js';
+import { loadVariables } from './config/variables-loader.js';
 import { loadContent } from './content/content-loader.js';
 import { loadNavTranslations } from './config/translations-loader.js';
 import { loadHeaderLinks } from './config/header-loader.js';
@@ -69,10 +70,11 @@ export async function runPipeline(projectRoot: string): Promise<MordocData> {
   );
   const headerLinks = await loadHeaderLinks(projectRoot);
 
+  const variables = await loadVariables(projectRoot);
   const parsedContent = await parseContent(contentMap);
-  const transformedContent = transformContent(parsedContent);
+  const transformedContent = transformContent(parsedContent, variables);
 
-  return { site, language, navigation, assets, pages: transformedContent, translations, headerLinks };
+  return { site, language, navigation, assets, pages: transformedContent, translations, headerLinks, variables };
 }
 
 /**
@@ -85,13 +87,20 @@ export async function runPipeline(projectRoot: string): Promise<MordocData> {
  *
  * The wrapping `ContentMap` is synthetic; `parseContent` only iterates
  * `entries`, so a one-element list is sufficient.
+ *
+ * @param variables - Current variables map from `MordocData.variables`.
+ *   Must match what was used in the last full pipeline run so that
+ *   `{{ $VAR }}` expressions resolve consistently during HMR.
  */
-export async function reparsePage(entry: ContentEntry): Promise<TransformedPage> {
+export async function reparsePage(
+  entry: ContentEntry,
+  variables: Record<string, unknown> = {},
+): Promise<TransformedPage> {
   const parsed = await parseContent({
     entries: [entry],
     languages: [entry.language],
   });
-  const [transformed] = transformContent(parsed);
+  const [transformed] = transformContent(parsed, variables);
   if (!transformed) {
     // parseContent + transformContent both produce one output per input
     // entry, so this branch should be unreachable. Guarded so a future

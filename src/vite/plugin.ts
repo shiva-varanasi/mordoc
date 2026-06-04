@@ -280,6 +280,13 @@ async function applyMordocWatchBatch(
     return;
   }
 
+  // variables.yaml change invalidates every page's transform output, so a
+  // targeted single-page reparse isn't safe here — re-run the full pipeline.
+  if (configEvents.some(({ rel }) => rel === 'config/variables.yaml')) {
+    await rerunPipelineForDev(server, projectRoot, getData, setData);
+    return;
+  }
+
   const siteRel = 'config/site.json';
   if (configEvents.some(({ rel }) => rel === siteRel)) {
     const site = await loadSiteConfig(projectRoot);
@@ -336,7 +343,7 @@ async function applyMordocWatchBatch(
       await rerunPipelineForDev(server, projectRoot, getData, setData);
       return;
     }
-    const reparsed = await reparsePage(page.entry);
+    const reparsed = await reparsePage(page.entry, data.variables);
     replaceTransformedPage(data, reparsed);
     reparsedVirtualIds.push(`${PAGE_MODULE_PREFIX}${reparsed.entry.routePath}`);
   }

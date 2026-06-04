@@ -41,6 +41,12 @@ export interface MordocData {
   translations: Record<string, Record<string, string>>;
   /** Header action links from config/navigation/headernav.yaml. Empty array when file is absent. */
   headerLinks: HeaderLink[];
+  /**
+   * User-defined variables from config/variables.yaml, injected into every
+   * Markdoc transform so authors can write `{{ $VAR_NAME }}` in content.
+   * Empty object when the file is absent.
+   */
+  variables: Record<string, unknown>;
 }
 
 /**

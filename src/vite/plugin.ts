@@ -99,6 +99,9 @@ function toPageMeta(page: TransformedPage): PageMeta {
   if (page.frontmatter.layout === 'landing') {
     meta.layout = 'landing';
   }
+  if (page.entry.isFallback) {
+    meta.isFallback = true;
+  }
   return meta;
 }
 
@@ -338,14 +341,21 @@ async function applyMordocWatchBatch(
     if (batch.get(abs) !== 'change') continue;
     if (!rel.toLowerCase().endsWith('.md')) continue;
 
-    const page = data.pages.find((p) => path.normalize(p.entry.filePath) === abs);
-    if (!page) {
+    // A default-language file may serve as the filePath for multiple entries:
+    // the real entry plus any synthetic fallback entries for other languages.
+    // Find all of them so HMR stays consistent across the whole fallback set.
+    const matchingPages = data.pages.filter(
+      (p) => path.normalize(p.entry.filePath) === abs,
+    );
+    if (matchingPages.length === 0) {
       await rerunPipelineForDev(server, projectRoot, getData, setData);
       return;
     }
-    const reparsed = await reparsePage(page.entry, data.variables);
-    replaceTransformedPage(data, reparsed);
-    reparsedVirtualIds.push(`${PAGE_MODULE_PREFIX}${reparsed.entry.routePath}`);
+    for (const page of matchingPages) {
+      const reparsed = await reparsePage(page.entry, data.variables);
+      replaceTransformedPage(data, reparsed);
+      reparsedVirtualIds.push(`${PAGE_MODULE_PREFIX}${reparsed.entry.routePath}`);
+    }
   }
   if (reparsedVirtualIds.length > 0) {
     for (const virtualId of reparsedVirtualIds) {

@@ -11,7 +11,7 @@ import { parseContent } from './content/content-parser.js';
 import { transformContent } from './content/content-transformer.js';
 import path from 'node:path';
 export { loadNavTranslations, loadHeaderLinks };
-import type { ContentEntry, TransformedPage } from './types/content.js';
+import type { ContentEntry, PageMeta, TransformedPage } from './types/content.js';
 import type { MordocData, NavigationConfig, ShellData } from './types/pipeline.js';
 
 /**
@@ -129,10 +129,15 @@ export function toShellData(data: MordocData): ShellData {
     language: data.language,
     navigation: data.navigation,
     assets: data.assets,
-    pagesIndex: data.pages.map((p) => ({
-      routePath: p.entry.routePath,
-      language: p.entry.language,
-    })),
+    pagesIndex: data.pages.map((p) => {
+      const meta: PageMeta = {
+        routePath: p.entry.routePath,
+        language: p.entry.language,
+      };
+      if (p.frontmatter.layout === 'landing') meta.layout = 'landing';
+      if (p.entry.isFallback) meta.isFallback = true;
+      return meta;
+    }),
     translations: data.translations,
     headerLinks: data.headerLinks,
   };
@@ -140,14 +145,14 @@ export function toShellData(data: MordocData): ShellData {
 
 /**
  * Replaces one page in an in-memory `MordocData` after `reparsePage`.
- * Matches by normalized absolute `filePath` so Windows drives and
- * separators stay consistent with the dev watcher.
+ * Matches by `routePath`, which is always unique (enforced by detectCollisions).
+ * Using filePath would be ambiguous once synthetic fallback entries share the
+ * same filePath as the real default-language entry.
  */
 export function replaceTransformedPage(data: MordocData, page: TransformedPage): void {
-  const target = path.normalize(page.entry.filePath);
-  const idx = data.pages.findIndex((p) => path.normalize(p.entry.filePath) === target);
+  const idx = data.pages.findIndex((p) => p.entry.routePath === page.entry.routePath);
   if (idx === -1) {
-    throw new Error(`replaceTransformedPage: no page for ${page.entry.filePath}`);
+    throw new Error(`replaceTransformedPage: no page for route "${page.entry.routePath}"`);
   }
   data.pages[idx] = page;
   data.pages.sort((a, b) => a.entry.routePath.localeCompare(b.entry.routePath));

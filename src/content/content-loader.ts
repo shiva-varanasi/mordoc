@@ -160,6 +160,41 @@ export async function loadContent(
     activeLanguages.push(lang);
   }
 
+  // For multi-language projects, inject synthetic fallback entries for every
+  // default-language route that has no counterpart in an active non-default
+  // language. The synthetic entry carries the non-default language route path
+  // but points at the default-language file so the full pipeline (parse →
+  // transform → virtual module → SSG) treats it as a real page.
+  if (languages !== null) {
+    const defaultEntries = allEntries.filter((e) => e.language === defaultLanguage);
+
+    for (const lang of activeLanguages) {
+      if (lang === defaultLanguage) continue;
+
+      const existingRoutePaths = new Set(
+        allEntries.filter((e) => e.language === lang).map((e) => e.routePath),
+      );
+
+      for (const defaultEntry of defaultEntries) {
+        const prefix = `/${lang}`;
+        const langRoutePath =
+          defaultEntry.routePath === '/' ? prefix : `${prefix}${defaultEntry.routePath}`;
+
+        if (!existingRoutePaths.has(langRoutePath)) {
+          allEntries.push({
+            language: lang,
+            segments: defaultEntry.segments,
+            routePath: langRoutePath,
+            filePath: defaultEntry.filePath,
+            slug: defaultEntry.slug,
+            isIndex: defaultEntry.isIndex,
+            isFallback: true,
+          });
+        }
+      }
+    }
+  }
+
   allEntries.sort((a, b) => a.routePath.localeCompare(b.routePath));
 
   return { entries: allEntries, languages: activeLanguages };

@@ -80,7 +80,15 @@ function buildHeadHtml(
   const pageDescription = page.frontmatter.description;
   const socialDescription = pageDescription ?? site.description;
 
-  const canonicalUrl = `${site.baseUrl}${routePath}`;
+  // Fallback pages duplicate default-language content at a language-prefixed
+  // URL. Point their canonical at the authoritative default-language URL so
+  // search engines consolidate ranking signals there instead of splitting them.
+  let canonicalRoutePath = routePath;
+  if (page.entry.isFallback) {
+    const prefix = `/${page.entry.language}`;
+    canonicalRoutePath = routePath === prefix ? '/' : routePath.slice(prefix.length);
+  }
+  const canonicalUrl = `${site.baseUrl}${canonicalRoutePath}`;
   const meta = site.metadata;
 
   const parts = [`<title>${title}</title>`];

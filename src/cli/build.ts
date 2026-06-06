@@ -218,7 +218,11 @@ async function writeSitemapAndRobots(data: MordocData, clientOutDir: string): Pr
   // routePaths are always slash-only ASCII paths so this is academic, but correct.
   const escapeXml = (v: string) => v.replace(/&/g, '&amp;');
 
-  const urlEntries = data.pages
+  // Fallback pages serve default-language content at a language-prefixed URL;
+  // their canonical already points elsewhere, so omitting them from the sitemap
+  // avoids advertising duplicate URLs to crawlers.
+  const indexedPages = data.pages.filter((page) => !page.entry.isFallback);
+  const urlEntries = indexedPages
     .map((page) => `  <url>\n    <loc>${escapeXml(baseUrl + page.entry.routePath)}</loc>\n  </url>`)
     .join('\n');
 
@@ -229,7 +233,7 @@ async function writeSitemapAndRobots(data: MordocData, clientOutDir: string): Pr
     '</urlset>\n';
 
   await fs.writeFile(path.join(clientOutDir, 'sitemap.xml'), sitemap, 'utf-8');
-  console.log(`  sitemap.xml  (${data.pages.length} URL${data.pages.length === 1 ? '' : 's'})`);
+  console.log(`  sitemap.xml  (${indexedPages.length} URL${indexedPages.length === 1 ? '' : 's'})`);
 
   const robots =
     'User-agent: *\n' +

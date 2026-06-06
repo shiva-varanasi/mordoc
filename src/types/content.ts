@@ -18,6 +18,12 @@ export interface ContentEntry {
   slug: string;
   /** Whether this is an index page (index.md). */
   isIndex: boolean;
+  /**
+   * True when this is a synthetic entry that serves the default language's
+   * content file at a non-default language route — i.e. a translation gap
+   * where no `content/<lang>/...` file exists.
+   */
+  isFallback?: boolean;
 }
 
 /** The full result of content discovery: every page and which languages have content. */
@@ -132,4 +138,6 @@ export interface PageMeta {
   language: string;
   /** Present only when the page opts into the landing layout via `layout: landing` in frontmatter. */
   layout?: 'landing';
+  /** True when this page's content falls back to the default language because no translation exists. */
+  isFallback?: boolean;
 }

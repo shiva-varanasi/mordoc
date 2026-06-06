@@ -147,6 +147,15 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
       emptyOutDir: false,
       ssr: 'entry-server.tsx',
     },
+    ssr: {
+      // Bundle all node_modules into the SSR output so the throwaway
+      // intermediate is self-contained. Without this, Vite leaves bare
+      // `import 'react'` etc. in entry-server.js; Node then resolves them
+      // from node_modules/.mordoc/ssr/ and cannot find packages that are
+      // transitive dependencies of mordoc but not hoisted into the consumer
+      // project's top-level node_modules.
+      noExternal: true,
+    },
   });
 
   // Declare the SSR output directory as an ESM scope.

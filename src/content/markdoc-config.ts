@@ -76,6 +76,35 @@ const link: Schema = {
 };
 
 /**
+ * Link tag — variable-capable counterpart to the plain `[text](url)` syntax.
+ *
+ * Markdoc parses a Markdown link's destination as a raw string, so a `$VAR`
+ * inside `[text]($VAR)` is never resolved against `config.variables` (this
+ * is a documented Markdoc limitation, not a Mordoc bug). Authors who need a
+ * variable in a link target use this tag instead:
+ * `{% link path=$VAR %}Text{% /link %}`.
+ *
+ * Renders through the same ContentLink component as the native `link` node
+ * above, so SPA-routing behavior is identical regardless of which syntax
+ * produced it. The attribute is named `path` (matching the `button` tag's
+ * convention) rather than `href`, so it's renamed back to `href` here before
+ * building the Tag.
+ */
+const linkTag: Schema = {
+  render: 'ContentLink',
+  children: ['strong', 'em', 'code', 's', 'html', 'text'],
+  attributes: {
+    path:  { type: String, required: true },
+    title: { type: String },
+  },
+  transform(node, config) {
+    const { path, ...rest } = node.transformAttributes(config) as Record<string, unknown>;
+    const children = node.transformChildren(config);
+    return new Markdoc.Tag('ContentLink', { ...rest, href: path }, children);
+  },
+};
+
+/**
  * Routes fenced code blocks to the CodeBlock React component.
  * Markdoc's built-in fence node provides `language` and `content` attributes.
  */
@@ -95,6 +124,29 @@ const image: Schema = {
   render: 'Image',
   attributes: {
     src:   { type: String },
+    alt:   { type: String },
+    title: { type: String },
+  },
+};
+
+/**
+ * Image tag — variable-capable counterpart to the plain `![alt](src)` syntax.
+ *
+ * Same limitation as the `link` tag above: `![alt]($VAR)`'s destination is a
+ * raw string, so `$VAR` never resolves there. Authors who need a variable in
+ * an image source use this tag instead: `{% image src=$VAR alt="..." /%}`.
+ *
+ * Self-closing — `alt`/`title` are attributes, not children, because `<img>`
+ * is a void element and can't render nested content. `children: []` enforces
+ * that at validation time rather than leaving it merely unused.
+ *
+ * Renders through the same Image component as the native `image` node above.
+ */
+const imageTag: Schema = {
+  render: 'Image',
+  children: [],
+  attributes: {
+    src:   { type: String, required: true },
     alt:   { type: String },
     title: { type: String },
   },
@@ -216,10 +268,12 @@ const button: Schema = {
  *   - Custom `image` node (routes to Image for lightbox support).
  *   - Custom `callout` tag (routes to Callout for note/warning/danger boxes).
  *   - Custom `card` / `cardGrid` tags (routes to Card / CardGrid components).
+ *   - `link` / `image` tags (variable-capable counterparts to the native
+ *     `link` / `image` nodes above — see their own doc comments).
  */
 export function createDefaultMarkdocConfig(): Config {
   return {
     nodes: { heading, link, fence, image },
-    tags: { callout, card, cardGrid, hero, section, button },
+    tags: { callout, card, cardGrid, hero, section, button, link: linkTag, image: imageTag },
   };
 }

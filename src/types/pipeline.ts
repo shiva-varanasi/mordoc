@@ -47,6 +47,12 @@ export interface MordocData {
    * Empty object when the file is absent.
    */
   variables: Record<string, unknown>;
+  /**
+   * Raw HTML from config/custom-head.html, injected verbatim into every
+   * page's <head> after Mordoc's own meta/title tags. Null when the file
+   * is absent. Typical use: third-party analytics or cookie-consent scripts.
+   */
+  customHead: string | null;
 }
 
 /**

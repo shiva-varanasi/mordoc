@@ -218,9 +218,10 @@ export async function runSsg(options: SsgRunnerOptions): Promise<void> {
 
     const pageLang = detectCurrentLang(routePath, data.language, data.site.defaultLanguage);
     const headHtml = buildHeadHtml(page, data.site, data.assets.favicon, routePath);
+    const fullHeadHtml = data.customHead ? `${headHtml}\n  ${data.customHead}` : headHtml;
     // lang is a plain ASCII code — string-form replace is safe (no $-patterns)
     const withLang = template.replace(SSR_LANG_MARKER, pageLang);
-    const withHead = withLang.replace(SSR_HEAD_MARKER, () => headHtml);
+    const withHead = withLang.replace(SSR_HEAD_MARKER, () => fullHeadHtml);
     const finalHtml = withHead.replace(SSR_OUTLET_MARKER, () => appHtml);
 
     const outPath = toOutputPath(routePath, clientOutDir);

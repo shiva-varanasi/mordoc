@@ -112,6 +112,18 @@ export async function runDevCommand(options: DevCommandOptions): Promise<void> {
         // no favicon configured
       }
 
+      try {
+        const customHead = (await fs.readFile(
+          path.join(projectRoot, 'config', 'custom-head.html'),
+          'utf-8',
+        )).trim();
+        if (customHead) {
+          headHtml += (headHtml ? '\n  ' : '') + customHead;
+        }
+      } catch {
+        // optional file
+      }
+
       // In dev, App.tsx's useEffect corrects document.documentElement.lang after hydration.
       // We still replace the marker so the attribute value is valid (empty = unknown language).
       const finalHtml = transformed

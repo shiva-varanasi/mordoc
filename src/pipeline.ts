@@ -10,6 +10,7 @@ import { loadHeaderLinks } from './config/header-loader.js';
 import { parseContent } from './content/content-parser.js';
 import { transformContent } from './content/content-transformer.js';
 import path from 'node:path';
+import fs from 'node:fs/promises';
 export { loadNavTranslations, loadHeaderLinks };
 import type { ContentEntry, PageMeta, TransformedPage } from './types/content.js';
 import type { MordocData, NavigationConfig, ShellData } from './types/pipeline.js';
@@ -74,7 +75,15 @@ export async function runPipeline(projectRoot: string): Promise<MordocData> {
   const parsedContent = await parseContent(contentMap);
   const transformedContent = transformContent(parsedContent, variables);
 
-  return { site, language, navigation, assets, pages: transformedContent, translations, headerLinks, variables };
+  let customHead: string | null = null;
+  try {
+    const raw = await fs.readFile(path.join(projectRoot, 'config', 'custom-head.html'), 'utf-8');
+    customHead = raw.trim() || null;
+  } catch {
+    // optional file — absent is the normal case
+  }
+
+  return { site, language, navigation, assets, pages: transformedContent, translations, headerLinks, variables, customHead };
 }
 
 /**

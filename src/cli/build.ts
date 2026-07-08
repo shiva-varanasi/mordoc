@@ -117,7 +117,7 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
     publicDir,
     plugins: [
       react(),
-      mordocVitePlugin({ projectRoot, data }),
+      mordocVitePlugin({ projectRoot, mode: 'build', data }),
     ],
     build: {
       outDir: clientOutDir,
@@ -140,7 +140,7 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
     publicDir: false,
     plugins: [
       react(),
-      mordocVitePlugin({ projectRoot, data }),
+      mordocVitePlugin({ projectRoot, mode: 'build', data }),
     ],
     build: {
       outDir: ssrOutDir,

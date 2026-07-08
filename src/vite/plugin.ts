@@ -388,19 +388,30 @@ export interface MordocVitePluginOptions {
   /** Absolute path to the user's project root. */
   projectRoot: string;
   /**
+   * Whether the plugin is running in dev or build mode.
+   *
+   * Controls two behaviours:
+   *  - `configureServer` (file watching / HMR) is registered only in dev.
+   *    In build mode Vite runs once and exits, so watching is never needed.
+   *  - `virtual:mordoc/assets` rewrites disk paths to `/_assets/<basename>`
+   *    web URLs only in dev, where the dev-server middleware serves them.
+   *    In build mode `copyAndRewriteAssets` handles the rewrite before the
+   *    plugin receives the data, so no further rewriting is needed here.
+   */
+  mode: 'dev' | 'build';
+  /**
    * Pre-loaded pipeline output. When provided, the plugin skips its own
    * `runPipeline(projectRoot)` call in `buildStart` and uses this value
    * directly.
    *
-   * The build command runs Vite twice (once for the client, once for the
-   * SSR entry) and both passes need the same `MordocData`. Letting the
-   * caller compute it once and inject it here avoids running the pipeline
-   * twice per build, and gives the build command a single point at which
-   * to mutate the data (e.g. rewriting asset paths) before either Vite
-   * pass starts.
+   * The build command runs Vite twice (once for the client bundle, once for
+   * the SSR entry) and both passes need the same `MordocData`. Computing it
+   * once and injecting it here avoids running the pipeline twice, and gives
+   * the build command a single point at which to mutate the data (e.g.
+   * rewriting asset paths) before either Vite pass starts.
    *
-   * Dev path passes `projectRoot` only; this remains unset and the
-   * plugin runs the pipeline itself, exactly as before.
+   * In dev mode this is always omitted — the plugin runs the pipeline itself
+   * inside `buildStart` and keeps the result in memory for HMR updates.
    */
   data?: MordocData;
 }
@@ -411,42 +422,41 @@ export interface MordocVitePluginOptions {
  *
  * Lifecycle:
  *   - `buildStart`: runs the pipeline once and caches the result.
- *     Fires in both dev (when the server starts) and prod (before bundling).
+ *     Fires in both dev (when the server starts) and build (before bundling).
+ *     In build mode the caller pre-loads `data` so the pipeline is skipped.
  *   - `resolveId` / `load`: serves the cached data as virtual ES modules.
  *     Eager modules (configs, route index, loader map) resolve by exact id.
  *     Lazy per-route page modules resolve by `PAGE_MODULE_PREFIX` match.
- *   - `configureServer` (dev only, when `data` is not injected): watches
- *     `content/` and `config/`, refreshes the in-memory pipeline cache,
- *     triggers `reloadModule` for config-only eager updates, runs `runPipeline`
- *     when the route set may change, and sends a **full document reload** after
- *     granular `.md` edits so React Router picks up fresh loader data (invalidate
- *     lazy virtuals for SSR, then **full document reload**).
+ *   - `configureServer` (dev mode only): watches `content/` and `config/`,
+ *     refreshes the in-memory pipeline cache, triggers `reloadModule` for
+ *     config-only eager updates, re-runs `runPipeline` when the route set may
+ *     change, and sends a **full document reload** after granular `.md` edits
+ *     so React Router picks up fresh loader data.
  *
- * Asset paths: in dev, `virtual:mordoc/assets` emits `/_assets/<basename>`
- * web URLs and `configureServer` registers a middleware that serves those
- * files from `<projectRoot>/config/assets/`. In build, `copyAndRewriteAssets`
+ * Asset paths: in dev mode `virtual:mordoc/assets` emits `/_assets/<basename>`
+ * web URLs and `configureServer` registers a middleware that serves those files
+ * from `<projectRoot>/config/assets/`. In build mode `copyAndRewriteAssets`
  * handles the rewrite before the plugin receives the data.
  */
 export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
-  // Seed the cache from the caller if data was injected; otherwise it
-  // gets filled by buildStart's own runPipeline call. Either way, every
-  // hook below sees a populated `data` by the time it runs.
+  // In build mode the caller pre-loads data so both Vite passes share one
+  // pipeline result. In dev mode this starts null and buildStart fills it.
   let data: MordocData | null = options.data ?? null;
 
   return {
     name: 'mordoc',
 
     async buildStart() {
-      // Skip the pipeline if the caller already supplied data — the build
-      // command does this so the client and SSR Vite passes share one
-      // pipeline result. Dev (no `data`) still runs it here.
+      // In dev mode the caller does not supply data, so run the pipeline now.
+      // In build mode the caller pre-loads data (shared across both Vite
+      // passes) so we skip the pipeline entirely.
       if (!data) {
         data = await runPipeline(options.projectRoot);
       }
     },
 
     configureServer(server) {
-      if (options.data) {
+      if (options.mode === 'build') {
         return;
       }
       const projectRoot = options.projectRoot;
@@ -531,9 +541,10 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
         );
       }
       if (isEager) {
-        // In dev (no injected data), rewrite asset disk paths to /_assets/ URLs
-        // so the browser can fetch them via the dev asset middleware.
-        if (virtualId === 'virtual:mordoc/assets' && !options.data) {
+        // In dev mode, rewrite asset disk paths to /_assets/ web URLs so the
+        // browser can fetch them via the dev-server asset middleware.
+        // In build mode copyAndRewriteAssets already handled this rewrite.
+        if (virtualId === 'virtual:mordoc/assets' && options.mode === 'dev') {
           return generateVirtualModule(virtualId, {
             ...data,
             assets: rewriteAssetsForDev(data.assets),

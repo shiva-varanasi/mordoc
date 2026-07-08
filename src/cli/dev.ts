@@ -53,7 +53,7 @@ export async function runDevCommand(options: DevCommandOptions): Promise<void> {
     appType: 'custom',
     plugins: [
       react(),
-      mordocVitePlugin({ projectRoot }),
+      mordocVitePlugin({ projectRoot, mode: 'dev' }),
     ],
     server: {
       port,

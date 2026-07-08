@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { mordocVitePlugin } from '../vite/plugin.js';
-import { getAppRoot, getPackageRoot } from '../utils/paths.js';
+import { getMordocAppRoot, getPackageRoot } from '../utils/paths.js';
 
 /** Markers in `index.html` replaced at request time. */
 const SSR_LANG_MARKER = '<!--ssr-lang-->';
@@ -43,12 +43,12 @@ export interface DevCommandOptions {
  */
 export async function runDevCommand(options: DevCommandOptions): Promise<void> {
   const { projectRoot, port } = options;
-  const appRoot = getAppRoot();
-  const templatePath = path.join(appRoot, 'index.html');
+  const mordocAppRoot = getMordocAppRoot();
+  const templatePath = path.join(mordocAppRoot, 'index.html');
 
   const server = await createServer({
     configFile: false,
-    root: appRoot,
+    root: mordocAppRoot,
     publicDir: path.join(projectRoot, 'public'),
     appType: 'custom',
     plugins: [

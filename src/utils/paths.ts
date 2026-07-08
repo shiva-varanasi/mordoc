@@ -18,15 +18,14 @@ export function getPackageRoot(): string {
 }
 
 /**
- * Resolves the absolute path to the app source root that Vite uses as its
- * `root` for both dev serving and production builds.
+ * Resolves the absolute path to mordoc's own app source directory, which
+ * Vite uses as its `root` for both dev serving and production builds.
  *
  * This is where `index.html`, `main.tsx`, and `entry-server.tsx` live
- * inside the mordoc package — all application source that Vite compiles
- * in the user's environment. The user's project never points Vite at any
- * of its own files; everything user-side flows through the mordoc plugin's
- * virtual modules.
+ * inside the mordoc package — all application source that Vite compiles.
+ * The user's project never points Vite at any of its own files; everything
+ * user-side flows through the mordoc plugin's virtual modules.
  */
-export function getAppRoot(): string {
+export function getMordocAppRoot(): string {
   return path.join(getPackageRoot(), 'src', 'app');
 }

@@ -63,11 +63,28 @@ export async function runDevCommand(options: DevCommandOptions): Promise<void> {
     },
   });
 
-  // Serve config/assets/* at /_assets/* — same URL shape as build output.
+  // Serves `config/assets/*` at `/_assets/*`, matching the URL shape the
+  // production build uses (`copyAndRewriteAssets` in build.ts physically
+  // copies files into `dist/_assets/`). Dev mode never runs that copy step,
+  // so there is no real file backing these URLs anywhere Vite's own static
+  // serving would look (root is `mordocAppRoot`, publicDir is
+  // `<projectRoot>/public` — neither is `config/assets/`). This handler
+  // fakes the URL's existence by reading straight from the real source
+  // directory on every request instead.
   server.middlewares.use(async (req, res, next) => {
     const url = (req.url ?? '').split('?')[0];
     if (!url.startsWith('/_assets/')) return next();
     const filename = url.slice('/_assets/'.length);
+    // `filename` is attacker-controllable (it comes straight from the
+    // request URL) and is about to be joined into a filesystem path, so it
+    // must be validated before that happens, not after:
+    //   - reject '/': keeps this directory flat (assets are only ever
+    //     discovered directly under config/assets/, never nested) and
+    //     blocks multi-segment traversal like `/_assets/../config/x.json`.
+    //   - reject '..': catches traversal that uses '\' instead of '/' as
+    //     the separator (e.g. `..\..\..\Windows\win.ini`). `path.join`
+    //     treats backslash as a separator on Windows too, so the '/' check
+    //     above would not by itself catch this case.
     if (!filename || filename.includes('/') || filename.includes('..')) return next();
     const filePath = path.join(projectRoot, 'config', 'assets', filename);
     try {
@@ -90,6 +107,30 @@ export async function runDevCommand(options: DevCommandOptions): Promise<void> {
     }
   });
 
+  // Serves the app shell (`index.html`) for page/route requests. This is the
+  // catch-all at the bottom of the middleware stack: everything with a file
+  // extension (`.tsx`, `.css`, virtual modules, etc.) is declined via
+  // `next()` above and handled by Vite's own already-registered middleware,
+  // so only extensionless route URLs (e.g. `/getting-started`) reach here.
+  //
+  // What this handler actually owns, per request:
+  //   1. Re-read the raw template from disk every time (not cached), so
+  //      edits to `src/app/index.html` show up without a server restart.
+  //   2. Hand it to `server.transformIndexHtml()` — this is Vite's own
+  //      pipeline, not something we implement: it injects the HMR client
+  //      script, the React Fast Refresh preamble, and rewrites the
+  //      `/main.tsx` entry script tag. None of that is our logic.
+  //   3. Splice user-project-specific data into the three markers the
+  //      template defines (`<!--ssr-lang-->`, `<!--ssr-head-->`,
+  //      `<!--ssr-outlet-->`): favicon `<link>` + `config/custom-head.html`
+  //      go into ssr-head; lang and outlet are left empty because dev mode
+  //      is pure CSR (no per-request SSR here — see file-level comment above).
+  //
+  // Notably absent: <title> and all <style> tags you'd see in DevTools.
+  // Those are never part of this response — <title> is set client-side by
+  // Content.tsx's useEffect once route data resolves, and styles are
+  // injected into the live DOM by Vite's CSS-HMR runtime after main.tsx
+  // executes. This handler only ever produces the initial empty-bodied shell.
   server.middlewares.use(async (req, res, next) => {
     try {
       const url = req.url ?? '/';

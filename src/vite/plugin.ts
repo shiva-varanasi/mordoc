@@ -384,37 +384,43 @@ async function rerunPipelineForDev(
   await reloadAllMordocVirtualModules(server, next.pages);
 }
 
-export interface MordocVitePluginOptions {
-  /** Absolute path to the user's project root. */
+/**
+ * Options for dev mode. The plugin runs the pipeline itself inside
+ * `buildStart` and keeps the result in memory for HMR updates.
+ */
+interface MordocVitePluginDevOptions {
   projectRoot: string;
-  /**
-   * Whether the plugin is running in dev or build mode.
-   *
-   * Controls two behaviours:
-   *  - `configureServer` (file watching / HMR) is registered only in dev.
-   *    In build mode Vite runs once and exits, so watching is never needed.
-   *  - `virtual:mordoc/assets` rewrites disk paths to `/_assets/<basename>`
-   *    web URLs only in dev, where the dev-server middleware serves them.
-   *    In build mode `copyAndRewriteAssets` handles the rewrite before the
-   *    plugin receives the data, so no further rewriting is needed here.
-   */
-  mode: 'dev' | 'build';
-  /**
-   * Pre-loaded pipeline output. When provided, the plugin skips its own
-   * `runPipeline(projectRoot)` call in `buildStart` and uses this value
-   * directly.
-   *
-   * The build command runs Vite twice (once for the client bundle, once for
-   * the SSR entry) and both passes need the same `MordocData`. Computing it
-   * once and injecting it here avoids running the pipeline twice, and gives
-   * the build command a single point at which to mutate the data (e.g.
-   * rewriting asset paths) before either Vite pass starts.
-   *
-   * In dev mode this is always omitted — the plugin runs the pipeline itself
-   * inside `buildStart` and keeps the result in memory for HMR updates.
-   */
-  data?: MordocData;
+  mode: 'dev';
 }
+
+/**
+ * Options for build mode. The caller must pre-load `data` by running the
+ * pipeline once and passing the result here.
+ *
+ * The build command runs Vite twice (once for the client bundle, once for
+ * the SSR entry) and both passes need the same `MordocData`. Pre-loading
+ * avoids running the pipeline twice and gives the build command a single
+ * point at which to mutate the data (e.g. rewriting asset paths) before
+ * either Vite pass starts.
+ */
+interface MordocVitePluginBuildOptions {
+  projectRoot: string;
+  mode: 'build';
+  data: MordocData;
+}
+
+/**
+ * Options for {@link mordocVitePlugin}.
+ *
+ * The `mode` field is a discriminant that controls two behaviours:
+ *  - `configureServer` (file watching / HMR) is registered only in dev.
+ *    In build mode Vite runs once and exits, so watching is never needed.
+ *  - `virtual:mordoc/assets` rewrites disk paths to `/_assets/<basename>`
+ *    web URLs only in dev, where the dev-server middleware serves them.
+ *    In build mode `copyAndRewriteAssets` handles the rewrite before the
+ *    plugin receives the data.
+ */
+export type MordocVitePluginOptions = MordocVitePluginDevOptions | MordocVitePluginBuildOptions;
 
 /**
  * Vite plugin that exposes a Mordoc project's data to the React client
@@ -439,18 +445,18 @@ export interface MordocVitePluginOptions {
  * handles the rewrite before the plugin receives the data.
  */
 export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
-  // In build mode the caller pre-loads data so both Vite passes share one
-  // pipeline result. In dev mode this starts null and buildStart fills it.
-  let data: MordocData | null = options.data ?? null;
+  // Build mode always provides data upfront; dev mode starts null and
+  // buildStart populates it. The discriminated union on `mode` enforces this.
+  let data: MordocData | null = options.mode === 'dev' ? null : options.data;
 
   return {
     name: 'mordoc',
 
     async buildStart() {
-      // In dev mode the caller does not supply data, so run the pipeline now.
-      // In build mode the caller pre-loads data (shared across both Vite
-      // passes) so we skip the pipeline entirely.
-      if (!data) {
+      // Dev mode: run the pipeline now. The result is kept in memory and
+      // updated incrementally by the file watcher throughout the session.
+      // Build mode: data was pre-loaded by the caller — nothing to do here.
+      if (options.mode === 'dev') {
         data = await runPipeline(options.projectRoot);
       }
     },

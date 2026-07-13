@@ -24,8 +24,7 @@ import 'virtual:mordoc/theme';
  * component reads them via `useMordocData()`. Keeping the imports
  * pinned here is what guarantees CSR/SSR symmetry: the server entry
  * doesn't need any virtual imports because its `render(request, data)`
- * receives the same `ShellData` from the dev middleware (or, later,
- * from the SSG runner).
+ * receives the same `ShellData` directly from the SSG runner at build time.
  *
  * `createBrowserRouter` is given `hydrationData` from the
  * `<script>window.__staticRouterHydrationData = ...</script>` tag that

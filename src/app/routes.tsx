@@ -21,17 +21,15 @@ import { NotFound } from './not-found/NotFound.js';
  * `page-loaders` map. The map is what lets Vite statically code-split:
  * every specifier inside it is a literal `import("...")` string.
  *
- * The same loader function runs in three contexts; only the runtime
+ * The same loader function runs in two contexts; only the runtime
  * resolving the dynamic `import('virtual:mordoc/page/...')` differs:
  *   - Browser (CSR / post-hydration): native `import()` fetches the
  *     lazy chunk over HTTP (Vite-served virtual in dev, hashed JS in
  *     prod).
- *   - Dev SSR: Vite's `ssrLoadModule` resolves it through the plugin's
- *     `load` hook — the generated JS source is evaluated in Node.
- *   - SSG (later step): the bundled SSR output's module map resolves
- *     it at build time.
+ *   - SSG (build time): the bundled SSR output's module map resolves
+ *     it directly.
  * The component code (`useLoaderData()`) and the data shape (`PageData`)
- * are identical in all three; only the resolution mechanism changes.
+ * are identical in both; only the resolution mechanism changes.
  *
  * Kept as its own module so the SSR entry reuses the same route list
  * against `createStaticHandler`/`createStaticRouter` without duplicating

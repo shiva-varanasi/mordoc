@@ -215,7 +215,7 @@ function resolvedVirtualId(virtualId: string): string {
 }
 
 /**
- * Invalidates a virtual module in both the client and SSR module graphs.
+ * Invalidates a virtual module in the client module graph.
  *
  * Every dev-mode update in this file ends in an explicit `full-reload`
  * (see {@link applyMordocWatchBatch} and {@link rerunPipelineForDev}) rather
@@ -235,11 +235,6 @@ function invalidateVirtualModule(server: ViteDevServer, virtualId: string): void
   const clientMod = server.moduleGraph.getModuleById(resolvedId);
   if (clientMod) {
     server.moduleGraph.invalidateModule(clientMod);
-  }
-
-  const ssrMod = server.environments.ssr.moduleGraph.getModuleById(resolvedId);
-  if (ssrMod) {
-    server.environments.ssr.moduleGraph.invalidateModule(ssrMod);
   }
 }
 

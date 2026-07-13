@@ -8,7 +8,6 @@ import {
   loadNavigation,
   loadNavTranslations,
   loadHeaderLinks,
-  pagesRouteSignature,
   replaceTransformedPage,
   reparsePage,
   runPipeline,
@@ -215,36 +214,50 @@ function resolvedVirtualId(virtualId: string): string {
   return RESOLVED_PREFIX + virtualId;
 }
 
-async function reloadVirtualModule(server: ViteDevServer, virtualId: string): Promise<void> {
+/**
+ * Invalidates a virtual module in both the client and SSR module graphs.
+ *
+ * Every dev-mode update in this file ends in an explicit `full-reload`
+ * (see {@link applyMordocWatchBatch} and {@link rerunPipelineForDev}) rather
+ * than granular Vite HMR, so this only needs to mark the module stale —
+ * it does *not* call `server.reloadModule()`, which would trigger Vite's
+ * own HMR propagation and, finding no `import.meta.hot.accept()` boundary
+ * for any of these modules, send its own premature `full-reload` from
+ * inside that call. Invalidation is still required even though we're about
+ * to hard-reload: Vite's transform cache lives on the long-running dev
+ * server process, not the browser tab, so without it the post-reload page
+ * would be served the same stale cached output despite `data` having been
+ * updated.
+ */
+function invalidateVirtualModule(server: ViteDevServer, virtualId: string): void {
   const resolvedId = resolvedVirtualId(virtualId);
 
-  // Invalidate in the client module graph + trigger HMR
   const clientMod = server.moduleGraph.getModuleById(resolvedId);
   if (clientMod) {
     server.moduleGraph.invalidateModule(clientMod);
   }
 
-  // Invalidate in the SSR module graph so ssrLoadModule re-runs load()
   const ssrMod = server.environments.ssr.moduleGraph.getModuleById(resolvedId);
   if (ssrMod) {
     server.environments.ssr.moduleGraph.invalidateModule(ssrMod);
   }
-
-  // Trigger HMR for the client side
-  if (clientMod) {
-    await server.reloadModule(clientMod);
-  }
 }
 
-async function reloadAllMordocVirtualModules(
+/**
+ * Invalidates every known virtual module — all eager ids plus every page's
+ * lazy module. Used after a full pipeline re-run, where potentially
+ * anything (route set, navigation, every page) may have changed, so there's
+ * no cheaper way to know which specific ids are now stale.
+ */
+function invalidateAllMordocVirtualModules(
   server: ViteDevServer,
   pages: TransformedPage[],
-): Promise<void> {
+): void {
   for (const id of EAGER_VIRTUAL_IDS) {
-    await reloadVirtualModule(server, id);
+    invalidateVirtualModule(server, id);
   }
   for (const page of pages) {
-    await reloadVirtualModule(server, `${PAGE_MODULE_PREFIX}${page.entry.routePath}`);
+    invalidateVirtualModule(server, `${PAGE_MODULE_PREFIX}${page.entry.routePath}`);
   }
 }
 
@@ -272,23 +285,30 @@ async function applyMordocWatchBatch(
     ({ abs }) => batch.get(abs) !== 'change',
   );
 
-  // Any new/removed path under content ⇒ re-run pipeline.
-  if (hasContentStructural) {
+  // Structural content changes (route set may differ), language.json
+  // (can add/remove fallback pages), and variables.yaml (invalidates every
+  // page's transform output) all require re-running the full pipeline —
+  // a targeted reparse isn't safe/sufficient for any of these.
+  const needsFullPipeline =
+    hasContentStructural ||
+    configEvents.some(
+      ({ rel }) => rel === 'config/language.json' || rel === 'config/variables.yaml',
+    );
+
+  if (needsFullPipeline) {
     await rerunPipelineForDev(server, projectRoot, getData, setData);
     return;
   }
 
-  if (configEvents.some(({ rel }) => rel === 'config/language.json')) {
-    await rerunPipelineForDev(server, projectRoot, getData, setData);
-    return;
-  }
-
-  // variables.yaml change invalidates every page's transform output, so a
-  // targeted single-page reparse isn't safe here — re-run the full pipeline.
-  if (configEvents.some(({ rel }) => rel === 'config/variables.yaml')) {
-    await rerunPipelineForDev(server, projectRoot, getData, setData);
-    return;
-  }
+  // Below this point, every branch recomputes only the specific slice of
+  // `data` its file(s) affect and invalidates only the matching virtual
+  // id(s) — cheaper than a full pipeline re-run. `changed` tracks whether
+  // any branch actually did work, since a batch may contain only
+  // unrecognized config paths. Every update, targeted or not, ends in the
+  // same explicit `full-reload` (see the module-level comment on
+  // `invalidateVirtualModule` for why this is a deliberate simplification
+  // rather than granular Vite HMR).
+  let changed = false;
 
   const siteRel = 'config/site.json';
   if (configEvents.some(({ rel }) => rel === siteRel)) {
@@ -298,7 +318,8 @@ async function applyMordocWatchBatch(
       return;
     }
     data.site = site;
-    await reloadVirtualModule(server, 'virtual:mordoc/site');
+    invalidateVirtualModule(server, 'virtual:mordoc/site');
+    changed = true;
   }
 
   const isNavStructureChange = configEvents.some(
@@ -313,8 +334,9 @@ async function applyMordocWatchBatch(
   if (isNavStructureChange) {
     data.navigation = await loadNavigation(projectRoot);
     data.headerLinks = await loadHeaderLinks(projectRoot);
-    await reloadVirtualModule(server, 'virtual:mordoc/navigation');
-    await reloadVirtualModule(server, 'virtual:mordoc/header-links');
+    invalidateVirtualModule(server, 'virtual:mordoc/navigation');
+    invalidateVirtualModule(server, 'virtual:mordoc/header-links');
+    changed = true;
   }
 
   if (isTranslationsChange) {
@@ -323,27 +345,26 @@ async function applyMordocWatchBatch(
       data.language?.languages ?? [data.site.defaultLanguage],
       data.site.defaultLanguage,
     );
-    await reloadVirtualModule(server, 'virtual:mordoc/translations');
+    invalidateVirtualModule(server, 'virtual:mordoc/translations');
+    changed = true;
   }
 
   const isAssetsPath = (rel: string) =>
     rel === 'config/assets' || rel.startsWith('config/assets/');
   if (configEvents.some(({ rel }) => isAssetsPath(rel))) {
     data.assets = await loadAssets(projectRoot);
-    await reloadVirtualModule(server, 'virtual:mordoc/assets');
+    invalidateVirtualModule(server, 'virtual:mordoc/assets');
+    changed = true;
   }
 
-  // Invalidate the lazy virtual module so Vite drops the stale cached version,
-  // then trigger a full browser reload so React Router re-runs the route loader
-  // against the freshly patched data.
-  const reparsedVirtualIds: string[] = [];
   for (const { abs, rel } of contentEvents) {
     if (batch.get(abs) !== 'change') continue;
     if (!rel.toLowerCase().endsWith('.md')) continue;
 
     // A default-language file may serve as the filePath for multiple entries:
     // the real entry plus any synthetic fallback entries for other languages.
-    // Find all of them so HMR stays consistent across the whole fallback set.
+    // Find all of them so the reparse stays consistent across the whole
+    // fallback set.
     const matchingPages = data.pages.filter(
       (p) => path.normalize(p.entry.filePath) === abs,
     );
@@ -354,17 +375,25 @@ async function applyMordocWatchBatch(
     for (const page of matchingPages) {
       const reparsed = await reparsePage(page.entry, data.variables);
       replaceTransformedPage(data, reparsed);
-      reparsedVirtualIds.push(`${PAGE_MODULE_PREFIX}${reparsed.entry.routePath}`);
+      invalidateVirtualModule(server, `${PAGE_MODULE_PREFIX}${reparsed.entry.routePath}`);
     }
+    changed = true;
   }
-  if (reparsedVirtualIds.length > 0) {
-    for (const virtualId of reparsedVirtualIds) {
-      await reloadVirtualModule(server, virtualId);
-    }
+
+  if (changed) {
     server.ws.send({ type: 'full-reload', path: '*' });
   }
 }
 
+/**
+ * Re-runs the full pipeline and reloads the browser.
+ *
+ * Used whenever a change is broad enough that a targeted recompute isn't
+ * safe (new/removed content, language.json, variables.yaml, a default
+ * language change, or an edited file that doesn't match any known page).
+ * Since potentially everything changed, every virtual module is
+ * invalidated rather than computing a precise subset.
+ */
 async function rerunPipelineForDev(
   server: ViteDevServer,
   projectRoot: string,
@@ -373,15 +402,10 @@ async function rerunPipelineForDev(
 ): Promise<void> {
   const prev = getData();
   if (!prev) return;
-  const prevSig = pagesRouteSignature(prev.pages);
   const next = await runPipeline(projectRoot);
-  const nextSig = pagesRouteSignature(next.pages);
   setData(next);
-  if (prevSig !== nextSig) {
-    server.ws.send({ type: 'full-reload', path: '*' });
-    return;
-  }
-  await reloadAllMordocVirtualModules(server, next.pages);
+  invalidateAllMordocVirtualModules(server, next.pages);
+  server.ws.send({ type: 'full-reload', path: '*' });
 }
 
 /**
@@ -434,10 +458,12 @@ export type MordocVitePluginOptions = MordocVitePluginDevOptions | MordocVitePlu
  *     Eager modules (configs, route index, loader map) resolve by exact id.
  *     Lazy per-route page modules resolve by `PAGE_MODULE_PREFIX` match.
  *   - `configureServer` (dev mode only): watches `content/` and `config/`,
- *     refreshes the in-memory pipeline cache, triggers `reloadModule` for
- *     config-only eager updates, re-runs `runPipeline` when the route set may
- *     change, and sends a **full document reload** after granular `.md` edits
- *     so React Router picks up fresh loader data.
+ *     refreshes the in-memory pipeline cache — either a targeted recompute
+ *     (single-page reparse, a single config loader) or a full `runPipeline`
+ *     re-run when the change is broad enough that a targeted update isn't
+ *     safe — invalidates the affected virtual module(s) so Vite's transform
+ *     cache doesn't serve stale output, and always ends in an explicit
+ *     `full-reload`. See {@link applyMordocWatchBatch}.
  *
  * Asset paths: in dev mode `virtual:mordoc/assets` emits `/_assets/<basename>`
  * web URLs and `configureServer` registers a middleware that serves those files
@@ -493,7 +519,7 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
           try {
             const recovered = await runPipeline(projectRoot);
             data = recovered;
-            await reloadAllMordocVirtualModules(server, recovered.pages);
+            invalidateAllMordocVirtualModules(server, recovered.pages);
             server.ws.send({ type: 'full-reload', path: '*' });
           } catch (recoverErr) {
             console.error('[mordoc] watch recovery failed:', recoverErr);

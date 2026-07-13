@@ -495,13 +495,21 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
       let debounceTimer: ReturnType<typeof setTimeout> | null = null;
       const pending = new Map<string, WatchEvent>();
 
+      // Processes whatever file events have accumulated in `pending` since
+      // the last flush. Runs on a timer (see `schedule` below), not per-event.
       const flush = async () => {
         debounceTimer = null;
         if (pending.size === 0) return;
         if (!data) {
+          // buildStart's runPipeline() hasn't resolved yet — reschedule
+          // instead of dropping these events, since applyMordocWatchBatch
+          // needs the current MordocData snapshot to diff against.
           debounceTimer = setTimeout(flush, 50);
           return;
         }
+        // Snapshot + clear immediately so any events that arrive while
+        // applyMordocWatchBatch is awaiting go into a fresh `pending` map
+        // for the *next* flush, rather than being lost or mutated mid-batch.
         const batch = new Map(pending);
         pending.clear();
         try {
@@ -515,6 +523,10 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
             },
           );
         } catch (err) {
+          // A targeted incremental update failed — fall back to rebuilding
+          // everything from scratch and forcing the browser to reload, so a
+          // bug in the incremental path can't leave the dev server serving
+          // stale or inconsistent data.
           console.error('[mordoc] watch update failed:', err);
           try {
             const recovered = await runPipeline(projectRoot);
@@ -527,20 +539,33 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
         }
       };
 
+      // Records an event and (re)starts the debounce timer. Called once per
+      // matching file-system event; `flush` only fires 75ms after the last
+      // one, so a burst of saves (editors often write several times per
+      // save) collapses into a single flush.
       const schedule = (absPath: string, event: WatchEvent) => {
         pending.set(absPath, event);
         if (debounceTimer) clearTimeout(debounceTimer);
         debounceTimer = setTimeout(flush, 75);
       };
 
+      // Vite's watcher only covers files already part of the module graph
+      // by default; content/config files are read directly off disk rather
+      // than imported, so they must be added explicitly to be watched.
       server.watcher.add(path.join(projectRoot, 'content'));
       server.watcher.add(path.join(projectRoot, 'config'));
 
       server.watcher.on('all', (event, rawPath) => {
+        // Ignore watcher events we don't handle (e.g. directory add/unlink).
         if (event !== 'add' && event !== 'change' && event !== 'unlink') return;
         const absPath = path.normalize(String(rawPath));
         const rel = forwardProjectRel(projectRoot, absPath);
+        // Path is outside the project root, or otherwise not expressible
+        // as a forward-slash relative path.
         if (!rel) return;
+        // Only content/config changes affect MordocData; ignore anything
+        // else the watcher happens to report (e.g. from a broader chokidar
+        // config elsewhere).
         if (!rel.startsWith('content/') && !rel.startsWith('config/')) return;
         schedule(absPath, event as WatchEvent);
       });

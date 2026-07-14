@@ -524,10 +524,14 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
           // stale or inconsistent data.
           console.error('[mordoc] watch update failed:', err);
           try {
-            const recovered = await runPipeline(projectRoot);
-            data = recovered;
-            invalidateAllMordocVirtualModules(server, recovered.pages);
-            server.ws.send({ type: 'full-reload', path: '*' });
+            await rerunPipelineForDev(
+              server,
+              projectRoot,
+              () => data,
+              (next) => {
+                data = next;
+              },
+            );
           } catch (recoverErr) {
             console.error('[mordoc] watch recovery failed:', recoverErr);
           }

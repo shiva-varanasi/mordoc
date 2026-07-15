@@ -35,9 +35,7 @@ export const EAGER_VIRTUAL_IDS = [
   'virtual:mordoc/page-loaders',
   'virtual:mordoc/translations',
   'virtual:mordoc/header-links',
-] as const;
-
-export type EagerVirtualId = typeof EAGER_VIRTUAL_IDS[number];
+];
 
 /**
  * Prefix for lazy per-route page modules.
@@ -56,8 +54,6 @@ const RESOLVED_PREFIX = '\0';
 const THEME_CSS_ID = 'virtual:mordoc/theme';
 /** Resolved ID used when config/styles/theme.css does not exist — load returns empty. */
 const RESOLVED_THEME_CSS_EMPTY = '\0virtual:mordoc/theme';
-
-const EAGER_SET: ReadonlySet<string> = new Set(EAGER_VIRTUAL_IDS);
 
 /**
  * Rewrites absolute disk paths in `ResolvedAssets` to `/_assets/<basename>`
@@ -575,7 +571,7 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
         const themePath = path.join(options.projectRoot, 'config', 'styles', 'theme.css');
         return fs.existsSync(themePath) ? themePath : RESOLVED_THEME_CSS_EMPTY;
       }
-      if (EAGER_SET.has(id) || isPageModuleId(id)) {
+      if (EAGER_VIRTUAL_IDS.includes(id) || isPageModuleId(id)) {
         return RESOLVED_PREFIX + id;
       }
       return null;
@@ -585,7 +581,7 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
       if (id === RESOLVED_THEME_CSS_EMPTY) return '';
       if (!id.startsWith(RESOLVED_PREFIX)) return null;
       const virtualId = id.slice(RESOLVED_PREFIX.length);
-      const isEager = EAGER_SET.has(virtualId);
+      const isEager = EAGER_VIRTUAL_IDS.includes(virtualId);
       const isPage = isPageModuleId(virtualId);
       if (!isEager && !isPage) return null;
       if (!data) {

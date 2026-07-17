@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router';
 import { useMordocData } from '../data-context.js';
-import { detectCurrentLang, buildLangPrefix, stripLangPrefix, resolveLabel } from '../lang-utils.js';
+import { detectCurrentLang, buildLangPrefix, stripLangPrefix, resolveLabel, applyLangToSidenav } from '../lang-utils.js';
 import type { SidenavConfig, SidenavItem } from '../../types/navigation.js';
 import styles from './Sidenav.module.css';
 
@@ -125,23 +125,6 @@ function SidenavNode({ item, depth }: { item: SidenavItem; depth: number }) {
       )}
     </li>
   );
-}
-
-function applyLangToSidenav(
-  items: SidenavConfig,
-  prefix: string,
-  lang: string,
-  defaultLanguage: string,
-  translations: Record<string, Record<string, string>>,
-): SidenavConfig {
-  return items.map((item) => ({
-    ...item,
-    label: resolveLabel(item.label, lang, defaultLanguage, translations),
-    path: item.path !== undefined ? `${prefix}${item.path}` : undefined,
-    children: item.children
-      ? applyLangToSidenav(item.children, prefix, lang, defaultLanguage, translations)
-      : undefined,
-  }));
 }
 
 function resolveActiveSidenav(

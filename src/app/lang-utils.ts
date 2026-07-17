@@ -1,4 +1,5 @@
 import type { LanguageConfig } from '../types/language.js';
+import type { SidenavConfig } from '../types/navigation.js';
 
 /**
  * Lang utilities for the React app. Self-contained so that src/app/ has no
@@ -41,4 +42,21 @@ export function resolveLabel(
 ): string {
   if (lang === defaultLanguage) return defaultLabel;
   return translations[lang]?.[defaultLabel] ?? defaultLabel;
+}
+
+export function applyLangToSidenav(
+  items: SidenavConfig,
+  prefix: string,
+  lang: string,
+  defaultLanguage: string,
+  translations: Record<string, Record<string, string>>,
+): SidenavConfig {
+  return items.map((item) => ({
+    ...item,
+    label: resolveLabel(item.label, lang, defaultLanguage, translations),
+    path: item.path !== undefined ? `${prefix}${item.path}` : undefined,
+    children: item.children
+      ? applyLangToSidenav(item.children, prefix, lang, defaultLanguage, translations)
+      : undefined,
+  }));
 }

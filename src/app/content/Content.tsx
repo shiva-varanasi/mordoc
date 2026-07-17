@@ -5,7 +5,7 @@ import Markdoc from '@markdoc/markdoc';
 import { useMordocData } from '../data-context.js';
 import { Toc } from '../toc/Toc.js';
 import { Footer } from '../footer/Footer.js';
-import { detectCurrentLang, buildLangPrefix, stripLangPrefix, resolveLabel } from '../lang-utils.js';
+import { detectCurrentLang, buildLangPrefix, stripLangPrefix, resolveLabel, applyLangToSidenav } from '../lang-utils.js';
 import type { PageData } from '../../types/content.js';
 import type { SidenavConfig } from '../../types/navigation.js';
 import { CodeBlock } from './code-block/CodeBlock.js';
@@ -69,23 +69,6 @@ function resolveActiveSidenavRaw(
     sectionPath: match?.path ?? null,
     sidenav: match?.sidenav ?? [],
   };
-}
-
-function applyLangToSidenav(
-  items: SidenavConfig,
-  prefix: string,
-  lang: string,
-  defaultLanguage: string,
-  translations: Record<string, Record<string, string>>,
-): SidenavConfig {
-  return items.map((item) => ({
-    ...item,
-    label: resolveLabel(item.label, lang, defaultLanguage, translations),
-    path: item.path !== undefined ? `${prefix}${item.path}` : undefined,
-    children: item.children
-      ? applyLangToSidenav(item.children, prefix, lang, defaultLanguage, translations)
-      : undefined,
-  }));
 }
 
 function estimateReadTime(renderable: unknown): number {

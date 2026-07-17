@@ -51,7 +51,7 @@ export function buildRoutes(): RouteObject[] {
     const common = {
       loader: async () => (await pageLoader()).default,
       Component: pageIndex.layout === 'landing' ? LandingPage : Content,
-      handle: { language: pageIndex.language, routePath: pageIndex.routePath, layout: pageIndex.layout ?? 'content' },
+      handle: { layout: pageIndex.layout ?? 'content' },
     };
     return pageIndex.routePath === '/'
       ? { index: true, ...common }

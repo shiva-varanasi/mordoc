@@ -12,7 +12,7 @@ export function Footer() {
           © {year} {site.name}
         </span>
         <span className={styles.built}>
-          Built with{' '}
+          Powered by{' '}
           <a
             href="https://mordoc.dev"
             target="_blank"

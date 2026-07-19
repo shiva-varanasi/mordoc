@@ -206,7 +206,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
 
         {isDev && (
           <div className={styles.notice}>
-            Search is only available after running <code>mordoc build</code>.
+            Build your site to enable search.
           </div>
         )}
 

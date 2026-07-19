@@ -4,7 +4,7 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 import { runPipeline } from '../pipeline.js';
 import { mordocVitePlugin } from '../vite/plugin.js';
-import { getAppRoot } from '../utils/paths.js';
+import { getMordocAppRoot } from '../utils/paths.js';
 import { runSsg } from './ssg-runner.js';
 import { copyAndRewriteAssets } from './asset-rewrite.js';
 import { runPagefindIndexer } from './pagefind-indexer.js';
@@ -43,9 +43,9 @@ function getOutDirs(projectRoot: string): BuildOutDirs {
  * Runs the full Mordoc production build for a project.
  *
  * Architecture mirrors `dev.ts`:
- *   - Vite's `root` is mordoc's own `src/app/` — the user's project
- *     contains no TSX/HTML that Vite ever sees as code. All user-side
- *     data flows through the mordoc plugin's virtual modules.
+ *   - Vite's `root` is `mordocAppRoot` (mordoc's own `src/app/`) — the
+ *     user's project contains no TSX/HTML that Vite ever sees as code.
+ *     All user-side data flows through the mordoc plugin's virtual modules.
  *   - `publicDir` is pointed at `<projectRoot>/public/` for the client
  *     build so that author assets (referenced from markdown as
  *     `/images/foo.png` etc.) get copied into `dist/` verbatim. The SSR
@@ -85,7 +85,7 @@ function getOutDirs(projectRoot: string): BuildOutDirs {
  */
 export async function runBuildCommand(options: BuildCommandOptions): Promise<void> {
   const { projectRoot } = options;
-  const appRoot = getAppRoot();
+  const mordocAppRoot = getMordocAppRoot();
   const publicDir = path.join(projectRoot, 'public');
   const { clientOutDir, ssrOutDir } = getOutDirs(projectRoot);
 
@@ -113,11 +113,11 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
   console.log('→ building client bundle...');
   await viteBuild({
     configFile: false,
-    root: appRoot,
+    root: mordocAppRoot,
     publicDir,
     plugins: [
       react(),
-      mordocVitePlugin({ projectRoot, data }),
+      mordocVitePlugin({ projectRoot, mode: 'build', data }),
     ],
     build: {
       outDir: clientOutDir,
@@ -132,7 +132,7 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
   console.log('→ building SSR bundle...');
   await viteBuild({
     configFile: false,
-    root: appRoot,
+    root: mordocAppRoot,
     // The SSR pass produces a Node-loadable bundle in a throwaway
     // intermediate; copying author assets into it is wasted I/O and
     // would put them under `node_modules/.mordoc/ssr/` rather than
@@ -140,7 +140,7 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
     publicDir: false,
     plugins: [
       react(),
-      mordocVitePlugin({ projectRoot, data }),
+      mordocVitePlugin({ projectRoot, mode: 'build', data }),
     ],
     build: {
       outDir: ssrOutDir,

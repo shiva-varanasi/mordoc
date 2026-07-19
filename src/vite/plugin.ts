@@ -8,7 +8,6 @@ import {
   loadNavigation,
   loadNavTranslations,
   loadHeaderLinks,
-  pagesRouteSignature,
   replaceTransformedPage,
   reparsePage,
   runPipeline,
@@ -36,9 +35,7 @@ export const EAGER_VIRTUAL_IDS = [
   'virtual:mordoc/page-loaders',
   'virtual:mordoc/translations',
   'virtual:mordoc/header-links',
-] as const;
-
-export type EagerVirtualId = typeof EAGER_VIRTUAL_IDS[number];
+];
 
 /**
  * Prefix for lazy per-route page modules.
@@ -57,8 +54,6 @@ const RESOLVED_PREFIX = '\0';
 const THEME_CSS_ID = 'virtual:mordoc/theme';
 /** Resolved ID used when config/styles/theme.css does not exist — load returns empty. */
 const RESOLVED_THEME_CSS_EMPTY = '\0virtual:mordoc/theme';
-
-const EAGER_SET: ReadonlySet<string> = new Set(EAGER_VIRTUAL_IDS);
 
 /**
  * Rewrites absolute disk paths in `ResolvedAssets` to `/_assets/<basename>`
@@ -215,36 +210,45 @@ function resolvedVirtualId(virtualId: string): string {
   return RESOLVED_PREFIX + virtualId;
 }
 
-async function reloadVirtualModule(server: ViteDevServer, virtualId: string): Promise<void> {
+/**
+ * Invalidates a virtual module in the client module graph.
+ *
+ * Every dev-mode update in this file ends in an explicit `full-reload`
+ * (see {@link applyMordocWatchBatch} and {@link rerunPipelineForDev}) rather
+ * than granular Vite HMR, so this only needs to mark the module stale —
+ * it does *not* call `server.reloadModule()`, which would trigger Vite's
+ * own HMR propagation and, finding no `import.meta.hot.accept()` boundary
+ * for any of these modules, send its own premature `full-reload` from
+ * inside that call. Invalidation is still required even though we're about
+ * to hard-reload: Vite's transform cache lives on the long-running dev
+ * server process, not the browser tab, so without it the post-reload page
+ * would be served the same stale cached output despite `data` having been
+ * updated.
+ */
+function invalidateVirtualModule(server: ViteDevServer, virtualId: string): void {
   const resolvedId = resolvedVirtualId(virtualId);
 
-  // Invalidate in the client module graph + trigger HMR
   const clientMod = server.moduleGraph.getModuleById(resolvedId);
   if (clientMod) {
     server.moduleGraph.invalidateModule(clientMod);
   }
-
-  // Invalidate in the SSR module graph so ssrLoadModule re-runs load()
-  const ssrMod = server.environments.ssr.moduleGraph.getModuleById(resolvedId);
-  if (ssrMod) {
-    server.environments.ssr.moduleGraph.invalidateModule(ssrMod);
-  }
-
-  // Trigger HMR for the client side
-  if (clientMod) {
-    await server.reloadModule(clientMod);
-  }
 }
 
-async function reloadAllMordocVirtualModules(
+/**
+ * Invalidates every known virtual module — all eager ids plus every page's
+ * lazy module. Used after a full pipeline re-run, where potentially
+ * anything (route set, navigation, every page) may have changed, so there's
+ * no cheaper way to know which specific ids are now stale.
+ */
+function invalidateAllMordocVirtualModules(
   server: ViteDevServer,
   pages: TransformedPage[],
-): Promise<void> {
+): void {
   for (const id of EAGER_VIRTUAL_IDS) {
-    await reloadVirtualModule(server, id);
+    invalidateVirtualModule(server, id);
   }
   for (const page of pages) {
-    await reloadVirtualModule(server, `${PAGE_MODULE_PREFIX}${page.entry.routePath}`);
+    invalidateVirtualModule(server, `${PAGE_MODULE_PREFIX}${page.entry.routePath}`);
   }
 }
 
@@ -272,23 +276,30 @@ async function applyMordocWatchBatch(
     ({ abs }) => batch.get(abs) !== 'change',
   );
 
-  // Any new/removed path under content ⇒ re-run pipeline.
-  if (hasContentStructural) {
+  // Structural content changes (route set may differ), language.json
+  // (can add/remove fallback pages), and variables.yaml (invalidates every
+  // page's transform output) all require re-running the full pipeline —
+  // a targeted reparse isn't safe/sufficient for any of these.
+  const needsFullPipeline =
+    hasContentStructural ||
+    configEvents.some(
+      ({ rel }) => rel === 'config/language.json' || rel === 'config/variables.yaml',
+    );
+
+  if (needsFullPipeline) {
     await rerunPipelineForDev(server, projectRoot, getData, setData);
     return;
   }
 
-  if (configEvents.some(({ rel }) => rel === 'config/language.json')) {
-    await rerunPipelineForDev(server, projectRoot, getData, setData);
-    return;
-  }
-
-  // variables.yaml change invalidates every page's transform output, so a
-  // targeted single-page reparse isn't safe here — re-run the full pipeline.
-  if (configEvents.some(({ rel }) => rel === 'config/variables.yaml')) {
-    await rerunPipelineForDev(server, projectRoot, getData, setData);
-    return;
-  }
+  // Below this point, every branch recomputes only the specific slice of
+  // `data` its file(s) affect and invalidates only the matching virtual
+  // id(s) — cheaper than a full pipeline re-run. `changed` tracks whether
+  // any branch actually did work, since a batch may contain only
+  // unrecognized config paths. Every update, targeted or not, ends in the
+  // same explicit `full-reload` (see the module-level comment on
+  // `invalidateVirtualModule` for why this is a deliberate simplification
+  // rather than granular Vite HMR).
+  let changed = false;
 
   const siteRel = 'config/site.json';
   if (configEvents.some(({ rel }) => rel === siteRel)) {
@@ -298,7 +309,8 @@ async function applyMordocWatchBatch(
       return;
     }
     data.site = site;
-    await reloadVirtualModule(server, 'virtual:mordoc/site');
+    invalidateVirtualModule(server, 'virtual:mordoc/site');
+    changed = true;
   }
 
   const isNavStructureChange = configEvents.some(
@@ -313,8 +325,9 @@ async function applyMordocWatchBatch(
   if (isNavStructureChange) {
     data.navigation = await loadNavigation(projectRoot);
     data.headerLinks = await loadHeaderLinks(projectRoot);
-    await reloadVirtualModule(server, 'virtual:mordoc/navigation');
-    await reloadVirtualModule(server, 'virtual:mordoc/header-links');
+    invalidateVirtualModule(server, 'virtual:mordoc/navigation');
+    invalidateVirtualModule(server, 'virtual:mordoc/header-links');
+    changed = true;
   }
 
   if (isTranslationsChange) {
@@ -323,27 +336,26 @@ async function applyMordocWatchBatch(
       data.language?.languages ?? [data.site.defaultLanguage],
       data.site.defaultLanguage,
     );
-    await reloadVirtualModule(server, 'virtual:mordoc/translations');
+    invalidateVirtualModule(server, 'virtual:mordoc/translations');
+    changed = true;
   }
 
   const isAssetsPath = (rel: string) =>
     rel === 'config/assets' || rel.startsWith('config/assets/');
   if (configEvents.some(({ rel }) => isAssetsPath(rel))) {
     data.assets = await loadAssets(projectRoot);
-    await reloadVirtualModule(server, 'virtual:mordoc/assets');
+    invalidateVirtualModule(server, 'virtual:mordoc/assets');
+    changed = true;
   }
 
-  // Invalidate the lazy virtual module so Vite drops the stale cached version,
-  // then trigger a full browser reload so React Router re-runs the route loader
-  // against the freshly patched data.
-  const reparsedVirtualIds: string[] = [];
   for (const { abs, rel } of contentEvents) {
     if (batch.get(abs) !== 'change') continue;
     if (!rel.toLowerCase().endsWith('.md')) continue;
 
     // A default-language file may serve as the filePath for multiple entries:
     // the real entry plus any synthetic fallback entries for other languages.
-    // Find all of them so HMR stays consistent across the whole fallback set.
+    // Find all of them so the reparse stays consistent across the whole
+    // fallback set.
     const matchingPages = data.pages.filter(
       (p) => path.normalize(p.entry.filePath) === abs,
     );
@@ -354,17 +366,25 @@ async function applyMordocWatchBatch(
     for (const page of matchingPages) {
       const reparsed = await reparsePage(page.entry, data.variables);
       replaceTransformedPage(data, reparsed);
-      reparsedVirtualIds.push(`${PAGE_MODULE_PREFIX}${reparsed.entry.routePath}`);
+      invalidateVirtualModule(server, `${PAGE_MODULE_PREFIX}${reparsed.entry.routePath}`);
     }
+    changed = true;
   }
-  if (reparsedVirtualIds.length > 0) {
-    for (const virtualId of reparsedVirtualIds) {
-      await reloadVirtualModule(server, virtualId);
-    }
+
+  if (changed) {
     server.ws.send({ type: 'full-reload', path: '*' });
   }
 }
 
+/**
+ * Re-runs the full pipeline and reloads the browser.
+ *
+ * Used whenever a change is broad enough that a targeted recompute isn't
+ * safe (new/removed content, language.json, variables.yaml, a default
+ * language change, or an edited file that doesn't match any known page).
+ * Since potentially everything changed, every virtual module is
+ * invalidated rather than computing a precise subset.
+ */
 async function rerunPipelineForDev(
   server: ViteDevServer,
   projectRoot: string,
@@ -373,37 +393,49 @@ async function rerunPipelineForDev(
 ): Promise<void> {
   const prev = getData();
   if (!prev) return;
-  const prevSig = pagesRouteSignature(prev.pages);
   const next = await runPipeline(projectRoot);
-  const nextSig = pagesRouteSignature(next.pages);
   setData(next);
-  if (prevSig !== nextSig) {
-    server.ws.send({ type: 'full-reload', path: '*' });
-    return;
-  }
-  await reloadAllMordocVirtualModules(server, next.pages);
+  invalidateAllMordocVirtualModules(server, next.pages);
+  server.ws.send({ type: 'full-reload', path: '*' });
 }
 
-export interface MordocVitePluginOptions {
-  /** Absolute path to the user's project root. */
+/**
+ * Options for dev mode. The plugin runs the pipeline itself inside
+ * `buildStart` and keeps the result in memory for HMR updates.
+ */
+interface MordocVitePluginDevOptions {
   projectRoot: string;
-  /**
-   * Pre-loaded pipeline output. When provided, the plugin skips its own
-   * `runPipeline(projectRoot)` call in `buildStart` and uses this value
-   * directly.
-   *
-   * The build command runs Vite twice (once for the client, once for the
-   * SSR entry) and both passes need the same `MordocData`. Letting the
-   * caller compute it once and inject it here avoids running the pipeline
-   * twice per build, and gives the build command a single point at which
-   * to mutate the data (e.g. rewriting asset paths) before either Vite
-   * pass starts.
-   *
-   * Dev path passes `projectRoot` only; this remains unset and the
-   * plugin runs the pipeline itself, exactly as before.
-   */
-  data?: MordocData;
+  mode: 'dev';
 }
+
+/**
+ * Options for build mode. The caller must pre-load `data` by running the
+ * pipeline once and passing the result here.
+ *
+ * The build command runs Vite twice (once for the client bundle, once for
+ * the SSR entry) and both passes need the same `MordocData`. Pre-loading
+ * avoids running the pipeline twice and gives the build command a single
+ * point at which to mutate the data (e.g. rewriting asset paths) before
+ * either Vite pass starts.
+ */
+interface MordocVitePluginBuildOptions {
+  projectRoot: string;
+  mode: 'build';
+  data: MordocData;
+}
+
+/**
+ * Options for {@link mordocVitePlugin}.
+ *
+ * The `mode` field is a discriminant that controls two behaviours:
+ *  - `configureServer` (file watching / HMR) is registered only in dev.
+ *    In build mode Vite runs once and exits, so watching is never needed.
+ *  - `virtual:mordoc/assets` rewrites disk paths to `/_assets/<basename>`
+ *    web URLs only in dev, where the dev-server middleware serves them.
+ *    In build mode `copyAndRewriteAssets` handles the rewrite before the
+ *    plugin receives the data.
+ */
+export type MordocVitePluginOptions = MordocVitePluginDevOptions | MordocVitePluginBuildOptions;
 
 /**
  * Vite plugin that exposes a Mordoc project's data to the React client
@@ -411,55 +443,64 @@ export interface MordocVitePluginOptions {
  *
  * Lifecycle:
  *   - `buildStart`: runs the pipeline once and caches the result.
- *     Fires in both dev (when the server starts) and prod (before bundling).
+ *     Fires in both dev (when the server starts) and build (before bundling).
+ *     In build mode the caller pre-loads `data` so the pipeline is skipped.
  *   - `resolveId` / `load`: serves the cached data as virtual ES modules.
  *     Eager modules (configs, route index, loader map) resolve by exact id.
  *     Lazy per-route page modules resolve by `PAGE_MODULE_PREFIX` match.
- *   - `configureServer` (dev only, when `data` is not injected): watches
- *     `content/` and `config/`, refreshes the in-memory pipeline cache,
- *     triggers `reloadModule` for config-only eager updates, runs `runPipeline`
- *     when the route set may change, and sends a **full document reload** after
- *     granular `.md` edits so React Router picks up fresh loader data (invalidate
- *     lazy virtuals for SSR, then **full document reload**).
+ *   - `configureServer` (dev mode only): watches `content/` and `config/`,
+ *     refreshes the in-memory pipeline cache — either a targeted recompute
+ *     (single-page reparse, a single config loader) or a full `runPipeline`
+ *     re-run when the change is broad enough that a targeted update isn't
+ *     safe — invalidates the affected virtual module(s) so Vite's transform
+ *     cache doesn't serve stale output, and always ends in an explicit
+ *     `full-reload`. See {@link applyMordocWatchBatch}.
  *
- * Asset paths: in dev, `virtual:mordoc/assets` emits `/_assets/<basename>`
- * web URLs and `configureServer` registers a middleware that serves those
- * files from `<projectRoot>/config/assets/`. In build, `copyAndRewriteAssets`
+ * Asset paths: in dev mode `virtual:mordoc/assets` emits `/_assets/<basename>`
+ * web URLs and `configureServer` registers a middleware that serves those files
+ * from `<projectRoot>/config/assets/`. In build mode `copyAndRewriteAssets`
  * handles the rewrite before the plugin receives the data.
  */
 export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
-  // Seed the cache from the caller if data was injected; otherwise it
-  // gets filled by buildStart's own runPipeline call. Either way, every
-  // hook below sees a populated `data` by the time it runs.
-  let data: MordocData | null = options.data ?? null;
+  // Build mode always provides data upfront; dev mode starts null and
+  // buildStart populates it. The discriminated union on `mode` enforces this.
+  let data: MordocData | null = options.mode === 'dev' ? null : options.data;
 
   return {
     name: 'mordoc',
 
     async buildStart() {
-      // Skip the pipeline if the caller already supplied data — the build
-      // command does this so the client and SSR Vite passes share one
-      // pipeline result. Dev (no `data`) still runs it here.
-      if (!data) {
+      // Dev mode: run the pipeline now. The result is kept in memory and
+      // updated incrementally by the file watcher throughout the session.
+      // Build mode: data was pre-loaded by the caller — nothing to do here.
+      if (options.mode === 'dev') {
         data = await runPipeline(options.projectRoot);
       }
     },
 
     configureServer(server) {
-      if (options.data) {
+      if (options.mode === 'build') {
         return;
       }
       const projectRoot = options.projectRoot;
       let debounceTimer: ReturnType<typeof setTimeout> | null = null;
       const pending = new Map<string, WatchEvent>();
 
+      // Processes whatever file events have accumulated in `pending` since
+      // the last flush. Runs on a timer (see `schedule` below), not per-event.
       const flush = async () => {
         debounceTimer = null;
         if (pending.size === 0) return;
         if (!data) {
+          // buildStart's runPipeline() hasn't resolved yet — reschedule
+          // instead of dropping these events, since applyMordocWatchBatch
+          // needs the current MordocData snapshot to diff against.
           debounceTimer = setTimeout(flush, 50);
           return;
         }
+        // Snapshot + clear immediately so any events that arrive while
+        // applyMordocWatchBatch is awaiting go into a fresh `pending` map
+        // for the *next* flush, rather than being lost or mutated mid-batch.
         const batch = new Map(pending);
         pending.clear();
         try {
@@ -473,32 +514,53 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
             },
           );
         } catch (err) {
+          // A targeted incremental update failed — fall back to rebuilding
+          // everything from scratch and forcing the browser to reload, so a
+          // bug in the incremental path can't leave the dev server serving
+          // stale or inconsistent data.
           console.error('[mordoc] watch update failed:', err);
           try {
-            const recovered = await runPipeline(projectRoot);
-            data = recovered;
-            await reloadAllMordocVirtualModules(server, recovered.pages);
-            server.ws.send({ type: 'full-reload', path: '*' });
+            await rerunPipelineForDev(
+              server,
+              projectRoot,
+              () => data,
+              (next) => {
+                data = next;
+              },
+            );
           } catch (recoverErr) {
             console.error('[mordoc] watch recovery failed:', recoverErr);
           }
         }
       };
 
+      // Records an event and (re)starts the debounce timer. Called once per
+      // matching file-system event; `flush` only fires 75ms after the last
+      // one, so a burst of saves (editors often write several times per
+      // save) collapses into a single flush.
       const schedule = (absPath: string, event: WatchEvent) => {
         pending.set(absPath, event);
         if (debounceTimer) clearTimeout(debounceTimer);
         debounceTimer = setTimeout(flush, 75);
       };
 
+      // Vite's watcher only covers files already part of the module graph
+      // by default; content/config files are read directly off disk rather
+      // than imported, so they must be added explicitly to be watched.
       server.watcher.add(path.join(projectRoot, 'content'));
       server.watcher.add(path.join(projectRoot, 'config'));
 
       server.watcher.on('all', (event, rawPath) => {
+        // Ignore watcher events we don't handle (e.g. directory add/unlink).
         if (event !== 'add' && event !== 'change' && event !== 'unlink') return;
         const absPath = path.normalize(String(rawPath));
         const rel = forwardProjectRel(projectRoot, absPath);
+        // Path is outside the project root, or otherwise not expressible
+        // as a forward-slash relative path.
         if (!rel) return;
+        // Only content/config changes affect MordocData; ignore anything
+        // else the watcher happens to report (e.g. from a broader chokidar
+        // config elsewhere).
         if (!rel.startsWith('content/') && !rel.startsWith('config/')) return;
         schedule(absPath, event as WatchEvent);
       });
@@ -509,7 +571,7 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
         const themePath = path.join(options.projectRoot, 'config', 'styles', 'theme.css');
         return fs.existsSync(themePath) ? themePath : RESOLVED_THEME_CSS_EMPTY;
       }
-      if (EAGER_SET.has(id) || isPageModuleId(id)) {
+      if (EAGER_VIRTUAL_IDS.includes(id) || isPageModuleId(id)) {
         return RESOLVED_PREFIX + id;
       }
       return null;
@@ -519,7 +581,7 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
       if (id === RESOLVED_THEME_CSS_EMPTY) return '';
       if (!id.startsWith(RESOLVED_PREFIX)) return null;
       const virtualId = id.slice(RESOLVED_PREFIX.length);
-      const isEager = EAGER_SET.has(virtualId);
+      const isEager = EAGER_VIRTUAL_IDS.includes(virtualId);
       const isPage = isPageModuleId(virtualId);
       if (!isEager && !isPage) return null;
       if (!data) {
@@ -531,9 +593,10 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
         );
       }
       if (isEager) {
-        // In dev (no injected data), rewrite asset disk paths to /_assets/ URLs
-        // so the browser can fetch them via the dev asset middleware.
-        if (virtualId === 'virtual:mordoc/assets' && !options.data) {
+        // In dev mode, rewrite asset disk paths to /_assets/ web URLs so the
+        // browser can fetch them via the dev-server asset middleware.
+        // In build mode copyAndRewriteAssets already handled this rewrite.
+        if (virtualId === 'virtual:mordoc/assets' && options.mode === 'dev') {
           return generateVirtualModule(virtualId, {
             ...data,
             assets: rewriteAssetsForDev(data.assets),

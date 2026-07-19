@@ -131,7 +131,9 @@ export function pagesRouteSignature(pages: TransformedPage[]): string {
     .join('|');
 }
 
-/** Projects `MordocData` to the `ShellData` consumed by the React shell and SSR renderer. */
+/** Projects `MordocData` to `ShellData`. Used by `ssg-runner.ts` to build 
+ * the data passed into `entry-server.tsx`'s `render()`. 
+ */
 export function toShellData(data: MordocData): ShellData {
   return {
     site: data.site,

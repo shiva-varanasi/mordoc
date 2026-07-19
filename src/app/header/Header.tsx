@@ -277,7 +277,7 @@ export function Header({ sidenavOpen, onMenuToggle, onSearchOpen, showMenu = tru
               {sidenavOpen ? <CloseIcon /> : <HamburgerIcon />}
             </button>
           )}
-          <Link to="/" className={styles.logo}>
+          <Link to={buildLangPrefix(currentLang, site.defaultLanguage) || '/'} className={styles.logo}>
             {logo ? (
               <img src={logo} alt={site.name} className={styles.logoImage} />
             ) : (

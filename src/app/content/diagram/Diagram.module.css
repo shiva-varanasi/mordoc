@@ -1,0 +1,98 @@
+/* ============================================================
+   DIAGRAM TOKENS
+   ============================================================ */
+:root {
+  --diagram-overlay-bg: rgba(0, 0, 0, 0.82);
+}
+
+/* ── Inline figure ───────────────────────────────────────────── */
+
+.figure {
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  cursor: zoom-in;
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: filter 150ms ease;
+}
+
+.figure:hover {
+  filter: brightness(0.97);
+}
+
+.figure svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ── Lightbox overlay ────────────────────────────────────────── */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--diagram-overlay-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: overlayFadeIn 150ms ease forwards;
+  cursor: zoom-out;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Close button ────────────────────────────────────────────── */
+
+.closeButton {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* ── Lightbox diagram ────────────────────────────────────────── */
+
+.lightboxDiagramWrap {
+  display: flex;
+  cursor: default;
+  max-width: min(94vw, 1400px);
+  max-height: 90vh;
+  overflow: auto;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  animation: diagramFadeIn 180ms ease forwards;
+}
+
+@keyframes diagramFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.lightboxDiagramWrap svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}

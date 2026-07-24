@@ -1,12 +1,12 @@
 /**
  * Default colors and spacing for the sequence-diagram type.
  *
- * KNOWN LIMITATION: these are literal hex values, baked into each message's
- * `Scene` primitives once, in Node, at build time — before the browser's
- * light/dark theme is known. They will not follow Mordoc's dark-mode toggle
- * today. Fixing this (e.g. emitting `var(--...)` references instead of hex,
- * resolved later by the browser) is a deliberately deferred, not-yet-designed
- * follow-up — see the diagrams design notes.
+ * Colors are `var(--diagram-...)` references, not literal hex — they're baked
+ * into each message's `Scene` primitives once, in Node, at build time, but
+ * resolve in the browser at paint time, so they follow Mordoc's light/dark
+ * toggle live. The actual light/dark hex pairs live in Diagram.module.css
+ * (`:root` / `:global(.dark)`), alongside this codebase's other themeable
+ * chrome tokens.
  */
 
 // Per-actor activation-bar colors, in fixed assignment order (actor 1 always
@@ -15,14 +15,14 @@
 // Mordoc's validated categorical palette, chosen so adjacent activation bars
 // stay visually distinct for colorblind and full-color readers alike.
 const ACTIVATION_COLORS = [
-  '#2a78d6', // blue
-  '#008300', // green
-  '#e87ba4', // magenta
-  '#eda100', // yellow
-  '#1baf7a', // aqua
-  '#eb6834', // orange
-  '#4a3aa7', // violet
-  '#e34948', // red
+  'var(--diagram-activation-1)', // blue
+  'var(--diagram-activation-2)', // green
+  'var(--diagram-activation-3)', // magenta
+  'var(--diagram-activation-4)', // yellow
+  'var(--diagram-activation-5)', // aqua
+  'var(--diagram-activation-6)', // orange
+  'var(--diagram-activation-7)', // violet
+  'var(--diagram-activation-8)', // red
 ];
 
 export const theme = {
@@ -50,15 +50,16 @@ export const theme = {
   arrowheadWidth: 5,
 
   // ── Ink ──────────────────────────────────────────────────────────────────
-  lifelineStroke: '#c3c2b7', // muted, uniform across every actor
-  arrowStroke: '#52514e',
-  labelColor: '#0b0b0b',
+  lifelineStroke: 'var(--diagram-lifeline)', // muted, uniform across every actor
+  arrowStroke: 'var(--diagram-arrow)',
+  labelColor: 'var(--diagram-label)',
   labelFontSize: 13,
+  // Baseline-to-baseline distance between an author's `\n`-broken label
+  // lines. Also drives how much extra vertical room a row needs beyond the
+  // single-line default.
+  labelLineHeight: 15,
+  // Gap between a cross-actor message label's bottom line and the arrow it
+  // sits above.
+  labelArrowGap: 10,
   actorLabelFontSize: 14,
-
-  // ── Dotted grid backdrop ────────────────────────────────────────────────
-  background: {
-    dotColor: '#e1e0d9',
-    spacing: 20,
-  },
 };

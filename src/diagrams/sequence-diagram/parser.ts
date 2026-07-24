@@ -8,6 +8,11 @@
  *   <from> -> <to>: <message text>      (solid arrow — a call)
  *   <from> --> <to>: <message text>     (dashed arrow — a return/response)
  *
+ * A message's text may contain literal `\n` sequences to force a line break
+ * in the rendered label (e.g. `Alice -> Bob: line one\nline two`) — the
+ * engine never wraps text automatically; the author decides where labels
+ * break, typically after spotting an overflow in the preview.
+ *
  * Declaring actors up front is optional — an actor mentioned in a message
  * that was never declared is auto-registered with no icon, label = its id.
  * Column order in the rendered diagram is the order actors are first seen,
@@ -29,7 +34,8 @@ export type ArrowStyle = 'solid' | 'dashed';
 export interface Message {
   from: string;
   to: string;
-  text: string;
+  /** Rendered label, pre-split on the author's literal `\n` line breaks. Always at least one entry. */
+  lines: string[];
   style: ArrowStyle;
 }
 
@@ -88,7 +94,8 @@ export function parse(content: string): SequenceDiagramAst {
       const [, from, arrow, to, text] = messageMatch;
       ensureActor(from);
       ensureActor(to);
-      messages.push({ from, to, text: text.trim(), style: arrow === '-->' ? 'dashed' : 'solid' });
+      const lines = text.trim().split('\\n').map((textLine) => textLine.trim());
+      messages.push({ from, to, lines, style: arrow === '-->' ? 'dashed' : 'solid' });
       continue;
     }
 

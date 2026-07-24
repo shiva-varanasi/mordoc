@@ -9,41 +9,30 @@
  * never actually pulls in anything from outside this client-side folder.
  */
 
-import { useId, Fragment } from 'react';
+import { Fragment, useLayoutEffect, useRef, useState } from 'react';
 import type { Scene, Primitive } from '../../../diagrams/generic/scene.js';
 
 interface SceneSvgProps {
   scene: Scene;
+  // When set, renders at exactly `scene.width/height * scale` CSS pixels via
+  // inline style (which wins over the `.figure svg { width: 100% }` fit-to-
+  // container rule). Omit it for the inline thumbnail, where that rule
+  // should keep governing size as before.
+  scale?: number;
 }
 
-export function SceneSvg({ scene }: SceneSvgProps) {
-  // useId keeps the dotted-grid pattern's id unique even when several
-  // diagrams render on the same page — SSR markup and the client hydration
-  // pass must agree on this id, which is exactly what useId guarantees.
-  const patternId = `diagram-grid-${useId()}`;
+export function SceneSvg({ scene, scale }: SceneSvgProps) {
+  const sizeStyle =
+    scale !== undefined ? { width: scene.width * scale, height: scene.height * scale } : undefined;
 
   return (
     <svg
       viewBox={`0 0 ${scene.width} ${scene.height}`}
       width={scene.width}
       height={scene.height}
+      style={sizeStyle}
       xmlns="http://www.w3.org/2000/svg"
     >
-      {scene.background && (
-        <defs>
-          <pattern
-            id={patternId}
-            width={scene.background.spacing}
-            height={scene.background.spacing}
-            patternUnits="userSpaceOnUse"
-          >
-            <circle cx={1} cy={1} r={1} fill={scene.background.dotColor} />
-          </pattern>
-        </defs>
-      )}
-      {scene.background && (
-        <rect x={0} y={0} width={scene.width} height={scene.height} fill={`url(#${patternId})`} />
-      )}
       {scene.primitives.map((primitive, index) => (
         <PrimitiveElement key={index} primitive={primitive} />
       ))}
@@ -60,7 +49,7 @@ function PrimitiveElement({ primitive }: { primitive: Primitive }) {
           y={primitive.y}
           width={primitive.width}
           height={primitive.height}
-          fill={primitive.fill}
+          style={{ fill: primitive.fill }}
           rx={primitive.rx}
           opacity={primitive.opacity}
         />
@@ -68,20 +57,7 @@ function PrimitiveElement({ primitive }: { primitive: Primitive }) {
     case 'line':
       return <LineElement primitive={primitive} />;
     case 'text':
-      // React auto-escapes `primitive.content` here — an author's message
-      // label can never inject markup, no manual XSS-escaping needed.
-      return (
-        <text
-          x={primitive.x}
-          y={primitive.y}
-          fill={primitive.fill}
-          fontSize={primitive.fontSize}
-          fontWeight={primitive.fontWeight}
-          textAnchor={primitive.anchor ?? 'start'}
-        >
-          {primitive.content}
-        </text>
-      );
+      return <TextPrimitiveElement primitive={primitive} />;
     case 'image':
       return (
         <image
@@ -103,6 +79,71 @@ function PrimitiveElement({ primitive }: { primitive: Primitive }) {
   }
 }
 
+type TextPrimitiveType = Extract<Primitive, { type: 'text' }>;
+
+/**
+ * With `anchor: 'middle'`, each of `lines` is centered independently on `x`
+ * — so a `leadMarker` (a sequence-diagram step's "3.") can't be placed a
+ * fixed distance from `x` itself: `x` is the *center* of every line, not
+ * its left edge, and that left edge varies per line (whichever line is
+ * widest sticks out furthest). A fixed offset from center lands the marker
+ * on top of whichever word ends up nearest the middle instead of outside
+ * the block.
+ *
+ * So the marker is a sibling `<text>`, positioned from the *measured*
+ * bounding box of the rendered lines (`getBBox()`) rather than computed at
+ * layout time — `layout.ts` never sees real glyph widths, only the browser
+ * does. `useLayoutEffect` re-measures after every paint that could change
+ * that box, and runs before the browser presents the frame, so there's no
+ * visible jump from the fallback position it starts at.
+ */
+function TextPrimitiveElement({ primitive }: { primitive: TextPrimitiveType }) {
+  const lineHeight = primitive.lineHeight ?? primitive.fontSize * DEFAULT_LINE_HEIGHT_RATIO;
+  const anchor = primitive.anchor ?? 'start';
+  const linesRef = useRef<SVGTextElement>(null);
+  const [markerX, setMarkerX] = useState(primitive.x - LEAD_MARKER_GAP);
+
+  useLayoutEffect(() => {
+    if (!primitive.leadMarker || anchor !== 'middle') return;
+    const node = linesRef.current;
+    if (!node) return;
+    setMarkerX(node.getBBox().x - LEAD_MARKER_GAP);
+  }, [primitive.leadMarker, anchor, primitive.x, primitive.fontSize, primitive.lines.join('\n')]);
+
+  return (
+    <Fragment>
+      {/* React auto-escapes each line here — an author's message label can
+          never inject markup, no manual XSS-escaping needed. */}
+      <text
+        ref={linesRef}
+        x={primitive.x}
+        y={primitive.y}
+        style={{ fill: primitive.fill }}
+        fontSize={primitive.fontSize}
+        fontWeight={primitive.fontWeight}
+        textAnchor={anchor}
+      >
+        {primitive.lines.map((line, index) => (
+          <tspan key={index} x={primitive.x} dy={index === 0 ? 0 : lineHeight}>
+            {line}
+          </tspan>
+        ))}
+      </text>
+      {primitive.leadMarker && (
+        <text
+          x={markerX}
+          y={primitive.y}
+          style={{ fill: primitive.fill }}
+          fontSize={primitive.fontSize}
+          textAnchor="end"
+        >
+          {primitive.leadMarker}
+        </text>
+      )}
+    </Fragment>
+  );
+}
+
 type LinePrimitiveType = Extract<Primitive, { type: 'line' }>;
 
 function LineElement({ primitive }: { primitive: LinePrimitiveType }) {
@@ -115,7 +156,7 @@ function LineElement({ primitive }: { primitive: LinePrimitiveType }) {
         y1={y1}
         x2={x2}
         y2={y2}
-        stroke={stroke}
+        style={{ stroke }}
         strokeWidth={strokeWidth}
         strokeDasharray={dashed ? '4 4' : undefined}
       />
@@ -139,6 +180,16 @@ function LineElement({ primitive }: { primitive: LinePrimitiveType }) {
 // diagram type's theme), but the primitive format itself doesn't require it.
 const DEFAULT_ARROWHEAD_LENGTH = 8;
 const DEFAULT_ARROWHEAD_WIDTH = 5;
+
+// Fallback for a `TextPrimitive` that omits `lineHeight` — every multi-line
+// label this codebase currently emits sets it explicitly (from the owning
+// diagram type's theme), but the primitive format itself doesn't require it.
+const DEFAULT_LINE_HEIGHT_RATIO = 1.2;
+
+// Horizontal space between a `leadMarker` (e.g. "3.") and the text block it
+// precedes. Also its unmeasured fallback position (see TextPrimitiveElement)
+// — fine as-is for anchor !== 'middle', which never overwrites it.
+const LEAD_MARKER_GAP = 4;
 
 /**
  * Draws a filled triangle at (x2, y2) pointing away from (x1, y1). Computed
@@ -181,5 +232,5 @@ function ArrowheadElement({
     `${backX - perpX * width},${backY - perpY * width}`,
   ].join(' ');
 
-  return <polygon points={points} fill={color} />;
+  return <polygon points={points} style={{ fill: color }} />;
 }

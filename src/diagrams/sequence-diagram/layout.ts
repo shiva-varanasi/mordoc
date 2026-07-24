@@ -21,12 +21,33 @@ export function computeLayout(ast: SequenceDiagramAst): Scene {
 
   const width = theme.marginX * 2 + Math.max(0, actors.length - 1) * theme.columnWidth;
   const lifelineTop = theme.headerHeight;
-  const height = lifelineTop + theme.topPadding + messages.length * theme.stepHeight + theme.bottomPadding;
+
+  // Each row's height grows with how many lines its label breaks into
+  // (author-controlled via literal `\n` in the message text — see
+  // parser.ts): a 3-line label needs more room than a 1-line one. `rowExtra`
+  // is the extra height a row needs beyond the single-line default, and it's
+  // added *above* the arrow (where the label sits), so the gap below each
+  // arrow stays a constant `stepHeight / 2` no matter how long its label is.
+  const rowExtra = messages.map((m) => Math.max(0, m.lines.length - 1) * theme.labelLineHeight);
+  const rowHeights = rowExtra.map((extra) => theme.stepHeight + extra);
+  const rowTops: number[] = [];
+  {
+    let acc = 0;
+    for (const rowHeight of rowHeights) {
+      rowTops.push(acc);
+      acc += rowHeight;
+    }
+  }
+  const totalMessagesHeight = rowHeights.reduce((sum, rowHeight) => sum + rowHeight, 0);
+
+  const height = lifelineTop + theme.topPadding + totalMessagesHeight + theme.bottomPadding;
   const lifelineBottom = height;
 
-  // The vertical center of the arrow for a given message row.
+  // The vertical center of the arrow for a given message row — pushed down
+  // within its own row band by that row's `rowExtra` so wrapped label lines
+  // have room to stack above it.
   const messageY = (row: number) =>
-    lifelineTop + theme.topPadding + row * theme.stepHeight + theme.stepHeight / 2;
+    lifelineTop + theme.topPadding + rowTops[row] + theme.stepHeight / 2 + rowExtra[row];
 
   const activationIntervals = computeActivationIntervals(messages, actorIndex);
   const isActiveAt = (actorId: string, row: number) =>
@@ -55,7 +76,7 @@ export function computeLayout(ast: SequenceDiagramAst): Scene {
       type: 'text',
       x,
       y: labelY,
-      content: actor.label,
+      lines: [actor.label],
       fill: theme.labelColor,
       fontSize: theme.actorLabelFontSize,
       fontWeight: 'bold',
@@ -70,7 +91,7 @@ export function computeLayout(ast: SequenceDiagramAst): Scene {
       x2: x,
       y2: lifelineBottom,
       stroke: theme.lifelineStroke,
-      strokeWidth: 1,
+      strokeWidth: 2,
       dashed: true,
     });
   });
@@ -107,18 +128,22 @@ export function computeLayout(ast: SequenceDiagramAst): Scene {
 
   // ── Messages: numbered arrows + labels ─────────────────────────────────────
   messages.forEach((message, row) => {
-    const stepNumber = row + 1;
     const y = messageY(row);
-    const labelContent = `${stepNumber}. ${message.text}`;
+    const marker = `${row + 1}.`;
 
     if (message.from === message.to) {
       // Self-loops always run rightward out of the lifeline, so — like the
       // "from" side of a rightward cross-actor arrow — they start at the
       // activation bar's right edge (not the bare lifeline center) when the
       // actor is active at this row.
+      //
+      // These labels are left-anchored (not centered — see the cross-actor
+      // branch below for why that distinction matters), so folding the step
+      // number into the first line reads fine as-is; no `leadMarker` needed.
       const selfActive = isActiveAt(message.from, row);
       const selfX = columnX(actorIndex.get(message.from)!) + (selfActive ? theme.activationWidth / 2 : 0);
-      primitives.push(...selfMessagePrimitives(message, selfX, y, labelContent));
+      const selfLabelLines = message.lines.map((line, i) => (i === 0 ? `${marker} ${line}` : line));
+      primitives.push(...selfMessagePrimitives(selfX, y, selfLabelLines));
       return;
     }
 
@@ -150,33 +175,45 @@ export function computeLayout(ast: SequenceDiagramAst): Scene {
       arrowheadWidth: theme.arrowheadWidth,
     });
 
+    // The label block sits just above the arrow, growing upward for
+    // additional wrapped lines so its bottom line always sits a fixed
+    // `labelArrowGap` above the arrow — same placement as the single-line
+    // case when there's only one line.
+    const labelTopY = y - theme.labelArrowGap - Math.max(0, message.lines.length - 1) * theme.labelLineHeight;
     primitives.push({
       type: 'text',
       x: (fromX + toX) / 2,
-      y: y - 10,
-      content: labelContent,
+      y: labelTopY,
+      lines: message.lines,
+      // Passed as `leadMarker` (see scene.ts) rather than folded into
+      // `lines[0]`: this block is anchor: 'middle', where each line centers
+      // independently on `x` — baking "N. " into line 0 would widen just
+      // that line and skew its centering, instead of the number hanging to
+      // the left like a list bullet in front of an evenly centered block.
+      leadMarker: marker,
       fill: theme.labelColor,
       fontSize: theme.labelFontSize,
       anchor: 'middle',
+      lineHeight: theme.labelLineHeight,
     });
   });
 
-  return { width, height, background: theme.background, primitives };
+  return { width, height, primitives };
 }
 
 /**
  * A self-message (an actor calling itself) is drawn as a small bracket-shaped
  * loop out from and back to its own lifeline, with the label to its right.
  */
-function selfMessagePrimitives(
-  _message: SequenceDiagramAst['messages'][number],
-  x: number,
-  y: number,
-  labelContent: string,
-): Primitive[] {
+function selfMessagePrimitives(x: number, y: number, labelLines: string[]): Primitive[] {
   const top = y - theme.selfLoopHalfHeight;
   const bottom = y + theme.selfLoopHalfHeight;
   const out = x + theme.selfLoopWidth;
+
+  // The label block is vertically centered against the loop — same
+  // single-line baseline as before when there's only one line, growing
+  // evenly up/down for additional wrapped lines.
+  const labelTopY = y + 4 - ((labelLines.length - 1) * theme.labelLineHeight) / 2;
 
   return [
     { type: 'line', x1: x, y1: top, x2: out, y2: top, stroke: theme.arrowStroke, strokeWidth: 1.5 },
@@ -196,11 +233,12 @@ function selfMessagePrimitives(
     {
       type: 'text',
       x: out + 8,
-      y: y + 4,
-      content: labelContent,
+      y: labelTopY,
+      lines: labelLines,
       fill: theme.labelColor,
       fontSize: theme.labelFontSize,
       anchor: 'start',
+      lineHeight: theme.labelLineHeight,
     },
   ];
 }

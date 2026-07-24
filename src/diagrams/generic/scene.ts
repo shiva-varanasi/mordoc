@@ -45,17 +45,34 @@ export interface LinePrimitive {
   arrowheadWidth?: number;
 }
 
-/** A single line of text. No wrapping — callers must keep content short. */
+/**
+ * One or more lines of text, stacked downward from (x, y) — (x, y) is the
+ * baseline of the first line. Line breaks are always caller-supplied (e.g. a
+ * sequence-diagram author's literal `\n` in a message's text); this
+ * primitive does no wrapping or text measurement of its own.
+ */
 export interface TextPrimitive {
   type: 'text';
   x: number;
   y: number;
-  content: string;
+  lines: string[];
   fill: string;
   fontSize: number;
   fontWeight?: 'normal' | 'bold';
   /** SVG text-anchor; defaults to 'start' if omitted. */
   anchor?: 'start' | 'middle' | 'end';
+  /** Baseline-to-baseline distance between stacked lines. Only meaningful when `lines.length > 1`. */
+  lineHeight?: number;
+  /**
+   * A short marker (e.g. a sequence-diagram step's "3.") rendered
+   * immediately to the left of the first line, on its own baseline anchor —
+   * excluded from `lines` so it never takes part in `anchor`'s centering.
+   * Without this, folding a step number into `lines[0]` skews an anchor:
+   * 'middle' block's per-line centering toward whichever line carries the
+   * prefix; keeping it separate lets the marker hang like a list bullet
+   * while the text block centers on its own content.
+   */
+  leadMarker?: string;
 }
 
 /**
@@ -94,13 +111,5 @@ export type Primitive =
 export interface Scene {
   width: number;
   height: number;
-  /**
-   * Optional dotted-grid backdrop, rendered by the generic SVG renderer
-   * before any primitives. Any diagram type can opt into this by setting it.
-   */
-  background?: {
-    dotColor: string;
-    spacing: number;
-  };
   primitives: Primitive[];
 }

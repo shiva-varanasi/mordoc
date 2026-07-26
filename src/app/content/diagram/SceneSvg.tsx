@@ -107,7 +107,25 @@ function TextPrimitiveElement({ primitive }: { primitive: TextPrimitiveType }) {
     if (!primitive.leadMarker || anchor !== 'middle') return;
     const node = linesRef.current;
     if (!node) return;
-    setMarkerX(node.getBBox().x - LEAD_MARKER_GAP);
+
+    let cancelled = false;
+    const measure = () => {
+      if (!cancelled) setMarkerX(node.getBBox().x - LEAD_MARKER_GAP);
+    };
+    measure();
+
+    // Inter loads async (see index.css's render-blocking-ish `@import`), so
+    // the inline thumbnail's first mount can still be painting with the
+    // browser's fallback font — narrower than Inter, so measuring against
+    // it here places the marker too close once the swap happens. The
+    // lightbox doesn't hit this: it only mounts on click, by which point
+    // the font's long since ready. `document.fonts.ready` resolves
+    // instantly if nothing's pending, so this is a no-op there.
+    document.fonts?.ready.then(measure);
+
+    return () => {
+      cancelled = true;
+    };
   }, [primitive.leadMarker, anchor, primitive.x, primitive.fontSize, primitive.lines.join('\n')]);
 
   return (

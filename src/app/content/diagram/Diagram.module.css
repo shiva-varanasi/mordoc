@@ -1,0 +1,220 @@
+/* ============================================================
+   DIAGRAM TOKENS
+   ============================================================ */
+:root {
+  --diagram-overlay-bg: rgba(0, 0, 0, 0.82);
+  --diagram-grid-spacing: 20px;
+  --diagram-grid-dot: radial-gradient(circle, var(--color-border) 1px, transparent 1px);
+
+  /* Diagram ink — generic diagram primitives (consumed by a diagram type's
+     theme.ts, e.g. src/diagrams/sequence-diagram/theme.ts, via var()
+     references baked into the Scene at build time — see that file's doc
+     comment). Only sequence-diagram draws on these today, but nothing here
+     is sequence-diagram-specific, so they're named for what they are, not
+     who currently uses them. Light values below match that type's original,
+     hand-tuned defaults; dark values are re-tuned for contrast against
+     --color-surface's dark value rather than reused as-is.
+     --diagram-label isn't listed here — it just tracks --color-fg, so one
+     definition in :root already covers both modes. */
+  --diagram-label: var(--color-fg);
+  /* Deliberately the same tone as the canvas surface behind it (not a new
+     color): a message label's background rect exists to erase the dotted
+     grid locally, not to draw a visible box. No `.dark` override needed —
+     it just tracks --color-surface, same as --diagram-label above. */
+  --diagram-label-bg: var(--color-surface);
+  --diagram-lifeline: #757575;
+  --diagram-arrow: #52514e;
+  --diagram-activation-1: #2a78d6; /* blue */
+  --diagram-activation-2: #008300; /* green */
+  --diagram-activation-3: #e87ba4; /* magenta */
+  --diagram-activation-4: #eda100; /* yellow */
+  --diagram-activation-5: #1baf7a; /* aqua */
+  --diagram-activation-6: #eb6834; /* orange */
+  --diagram-activation-7: #4a3aa7; /* violet */
+  --diagram-activation-8: #e34948; /* red */
+}
+
+:global(.dark) {
+  --diagram-lifeline: #4f4e46;
+  --diagram-arrow: #b0afaa;
+  --diagram-activation-1: #5b9ce6; /* blue */
+  --diagram-activation-2: #2fa32f; /* green */
+  --diagram-activation-3: #f096b8; /* magenta */
+  --diagram-activation-4: #f5b433; /* yellow */
+  --diagram-activation-5: #2ecf92; /* aqua */
+  --diagram-activation-6: #f2825a; /* orange */
+  --diagram-activation-7: #7d6ad6; /* violet */
+  --diagram-activation-8: #ef6665; /* red */
+}
+
+/* ── Inline figure ───────────────────────────────────────────── */
+
+/* The dotted grid backdrop is shared canvas chrome for every diagram type
+   (not a per-type theme choice), so it lives here rather than in any
+   individual diagram type's theme.ts. `background-attachment: local` keeps
+   the dots scrolling together with the diagram in the `overflow-x: auto`
+   case, rather than staying fixed to the viewport while content scrolls
+   under them. */
+.figure {
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  cursor: zoom-in;
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  background-color: var(--color-surface);
+  background-image: var(--diagram-grid-dot);
+  background-size: var(--diagram-grid-spacing) var(--diagram-grid-spacing);
+  background-attachment: local;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: filter 150ms ease;
+}
+
+.figure:hover {
+  filter: brightness(0.97);
+}
+
+.figure svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ── Lightbox overlay ────────────────────────────────────────── */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--diagram-overlay-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: overlayFadeIn 150ms ease forwards;
+  cursor: zoom-out;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Close button ────────────────────────────────────────────── */
+
+.closeButton {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  background: rgba(20, 20, 20, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.closeButton:hover {
+  background: rgba(20, 20, 20, 0.8);
+}
+
+/* ── Lightbox diagram ────────────────────────────────────────── */
+
+/* Fixed-size shell — its box size (not the SVG's) is what "fit to viewport"
+   is measured against, so it holds the padding and stays a stable size
+   regardless of the diagram's own dimensions. */
+.lightboxViewport {
+  display: flex;
+  cursor: default;
+  width: min(94vw, 1400px);
+  height: 90vh;
+  padding: 1.5rem;
+  background-color: var(--color-surface);
+  background-image: var(--diagram-grid-dot);
+  background-size: var(--diagram-grid-spacing) var(--diagram-grid-spacing);
+  border-radius: var(--radius-md);
+  animation: diagramFadeIn 180ms ease forwards;
+}
+
+@keyframes diagramFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* The measured, scrollable content area — no padding of its own, so its
+   clientWidth/clientHeight is exactly the space available to fit the
+   diagram into. `margin: auto` on the SVG child centers it while it's
+   smaller than this box, and still lets scrolling reach every edge once
+   zooming makes it bigger. */
+.lightboxDiagramWrap {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  overflow: auto;
+}
+
+.lightboxDiagramWrap svg {
+  display: block;
+  flex-shrink: 0;
+  margin: auto;
+}
+
+/* ── Zoom controls ───────────────────────────────────────────── */
+
+.zoomControls {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(20, 20, 20, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  padding: 0.375rem;
+}
+
+.zoomButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  font-size: 1.125rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.zoomButton:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.zoomButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.zoomLevel {
+  min-width: 3rem;
+  text-align: center;
+  color: #ffffff;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}

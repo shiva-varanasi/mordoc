@@ -14,5 +14,5 @@
     "isolatedModules": true,
     "types": []
   },
-  "include": ["**/*", "../types/**/*"]
+  "include": ["**/*", "../types/**/*", "../diagrams/generic/**/*"]
 }

@@ -1,6 +1,7 @@
 import Markdoc from '@markdoc/markdoc';
 import type { Config, Schema, RenderableTreeNode } from '@markdoc/markdoc';
 import type { Slugger } from './slug.js';
+import { buildScene } from '../diagrams/build-scene.js';
 
 /**
  * Walks a renderable subtree and concatenates its text content.
@@ -105,14 +106,37 @@ const linkTag: Schema = {
 };
 
 /**
- * Routes fenced code blocks to the CodeBlock React component.
- * Markdoc's built-in fence node provides `language` and `content` attributes.
+ * Routes fenced code blocks to the CodeBlock React component — except for
+ * diagram fences (```sequence-diagram, and any future ```<type>-diagram),
+ * which are parsed and laid out right here, once, at build time.
+ *
+ * A diagram fence's raw text is turned into a flat, JSON-serializable
+ * `Scene` (see `src/diagrams/build-scene.ts`) and wrapped as a `Diagram`
+ * tag; the diagram engine's parser/layout code itself never reaches the
+ * client bundle, only its `Scene` output does. An invalid diagram throws
+ * here, which fails the build with a clear error rather than shipping a
+ * broken page.
+ *
+ * Every other fenced language falls through to the same CodeBlock rendering
+ * Markdoc would have produced automatically, unchanged.
  */
 const fence: Schema = {
   render: 'CodeBlock',
   attributes: {
     language: { type: String },
     content:  { type: String, render: true },
+  },
+  transform(node, config) {
+    const attributes = node.transformAttributes(config);
+    const language = typeof attributes['language'] === 'string' ? attributes['language'] : '';
+    const content = typeof attributes['content'] === 'string' ? attributes['content'] : '';
+
+    if (language.endsWith('-diagram')) {
+      const scene = buildScene(language, content);
+      return new Markdoc.Tag('Diagram', { scene }, []);
+    }
+
+    return new Markdoc.Tag('CodeBlock', { language, content }, []);
   },
 };
 

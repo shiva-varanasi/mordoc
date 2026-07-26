@@ -16,14 +16,10 @@ import type { DiagramDefinition } from './generic/diagram-definition.js';
 import * as sequenceDiagram from './sequence-diagram/index.js';
 
 /**
- * Plain object literal dispatch table: a fence's `language` string (e.g.
- * `"sequence-diagram"`) is used directly, as-is, as the lookup key here.
- * No mutable Map, no self-registering "call register() at module load"
- * pattern — mirrors how `markdoc-config.ts`'s own `tags: {}` config object
- * already works in this codebase.
- *
- * Adding a new diagram type means adding one entry here plus a new
- * `src/diagrams/<type>/` folder — nothing under `src/app/` changes.
+ * Dispatch table keyed by a fence's `language` string (e.g.
+ * `"sequence-diagram"`). Adding a new diagram type means adding one entry
+ * here plus a new `src/diagrams/<type>/` folder — nothing under `src/app/`
+ * changes.
  */
 const diagramTypes: Record<string, DiagramDefinition> = {
   'sequence-diagram': sequenceDiagram,

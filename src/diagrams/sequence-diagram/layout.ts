@@ -195,6 +195,12 @@ export function computeLayout(ast: SequenceDiagramAst): Scene {
       fontSize: theme.labelFontSize,
       anchor: 'middle',
       lineHeight: theme.labelLineHeight,
+      background: {
+        fill: theme.labelBg,
+        paddingX: theme.labelBgPaddingX,
+        paddingY: theme.labelBgPaddingY,
+        rx: theme.labelBgRadius,
+      },
     });
   });
 
@@ -239,6 +245,12 @@ function selfMessagePrimitives(x: number, y: number, labelLines: string[]): Prim
       fontSize: theme.labelFontSize,
       anchor: 'start',
       lineHeight: theme.labelLineHeight,
+      background: {
+        fill: theme.labelBg,
+        paddingX: theme.labelBgPaddingX,
+        paddingY: theme.labelBgPaddingY,
+        rx: theme.labelBgRadius,
+      },
     },
   ];
 }

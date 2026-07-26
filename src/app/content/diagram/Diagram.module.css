@@ -17,6 +17,11 @@
      --diagram-label isn't listed here — it just tracks --color-fg, so one
      definition in :root already covers both modes. */
   --diagram-label: var(--color-fg);
+  /* Deliberately the same tone as the canvas surface behind it (not a new
+     color): a message label's background rect exists to erase the dotted
+     grid locally, not to draw a visible box. No `.dark` override needed —
+     it just tracks --color-surface, same as --diagram-label above. */
+  --diagram-label-bg: var(--color-surface);
   --diagram-lifeline: #757575;
   --diagram-arrow: #52514e;
   --diagram-activation-1: #2a78d6; /* blue */

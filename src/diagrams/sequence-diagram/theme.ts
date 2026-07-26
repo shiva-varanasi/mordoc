@@ -62,4 +62,12 @@ export const theme = {
   // sits above.
   labelArrowGap: 10,
   actorLabelFontSize: 14,
+
+  // ── Message label background ────────────────────────────────────────────
+  // Same color as the canvas itself (not a new hue) — the goal is to erase
+  // the dotted grid immediately behind a label, not to draw an obvious box.
+  labelBg: 'var(--diagram-label-bg)',
+  labelBgPaddingX: 4,
+  labelBgPaddingY: 3,
+  labelBgRadius: 4,
 };

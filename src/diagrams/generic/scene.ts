@@ -73,6 +73,21 @@ export interface TextPrimitive {
    * while the text block centers on its own content.
    */
   leadMarker?: string;
+  /**
+   * An opaque rect painted behind this text's (and `leadMarker`'s, if
+   * present) measured bounding box — keeps a label legible over a busy
+   * backdrop (e.g. the diagram canvas's dotted grid). Sized at paint time,
+   * not here, since only the browser knows the text's real rendered width —
+   * see `SceneSvg.tsx`.
+   */
+  background?: {
+    fill: string;
+    /** Extra space beyond the measured text box, in px. */
+    paddingX: number;
+    paddingY: number;
+    /** Corner radius, in px. Omit for square corners. */
+    rx?: number;
+  };
 }
 
 /**

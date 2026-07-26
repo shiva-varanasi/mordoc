@@ -97,11 +97,20 @@ type TextPrimitiveType = Extract<Primitive, { type: 'text' }>;
  * that box, and runs before the browser presents the frame, so there's no
  * visible jump from the fallback position it starts at.
  */
+interface BackgroundBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 function TextPrimitiveElement({ primitive }: { primitive: TextPrimitiveType }) {
   const lineHeight = primitive.lineHeight ?? primitive.fontSize * DEFAULT_LINE_HEIGHT_RATIO;
   const anchor = primitive.anchor ?? 'start';
   const linesRef = useRef<SVGTextElement>(null);
+  const contentRef = useRef<SVGGElement>(null);
   const [markerX, setMarkerX] = useState(primitive.x - LEAD_MARKER_GAP);
+  const [bgBox, setBgBox] = useState<BackgroundBox | null>(null);
 
   useLayoutEffect(() => {
     if (!primitive.leadMarker || anchor !== 'middle') return;
@@ -128,36 +137,80 @@ function TextPrimitiveElement({ primitive }: { primitive: TextPrimitiveType }) {
     };
   }, [primitive.leadMarker, anchor, primitive.x, primitive.fontSize, primitive.lines.join('\n')]);
 
+  // Sized from the measured bounding box of `contentRef` — the label and,
+  // when present, its leadMarker together — for the same reason `markerX`
+  // above is measured rather than computed in layout.ts: only the browser
+  // knows real glyph widths. Depends on `markerX` so a leadMarker'd label
+  // re-measures once the effect above has moved the marker to its real
+  // position; measuring one render too early would size the box around the
+  // marker's unpositioned fallback spot instead of where it ends up.
+  useLayoutEffect(() => {
+    const background = primitive.background;
+    if (!background) return;
+    const node = contentRef.current;
+    if (!node) return;
+
+    let cancelled = false;
+    const measure = () => {
+      if (cancelled) return;
+      const box = node.getBBox();
+      setBgBox({
+        x: box.x - background.paddingX,
+        y: box.y - background.paddingY,
+        width: box.width + background.paddingX * 2,
+        height: box.height + background.paddingY * 2,
+      });
+    };
+    measure();
+    document.fonts?.ready.then(measure);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [primitive.background, markerX, primitive.x, primitive.fontSize, primitive.lines.join('\n')]);
+
   return (
     <Fragment>
-      {/* React auto-escapes each line here — an author's message label can
-          never inject markup, no manual XSS-escaping needed. */}
-      <text
-        ref={linesRef}
-        x={primitive.x}
-        y={primitive.y}
-        style={{ fill: primitive.fill }}
-        fontSize={primitive.fontSize}
-        fontWeight={primitive.fontWeight}
-        textAnchor={anchor}
-      >
-        {primitive.lines.map((line, index) => (
-          <tspan key={index} x={primitive.x} dy={index === 0 ? 0 : lineHeight}>
-            {line}
-          </tspan>
-        ))}
-      </text>
-      {primitive.leadMarker && (
+      {primitive.background && bgBox && (
+        <rect
+          x={bgBox.x}
+          y={bgBox.y}
+          width={bgBox.width}
+          height={bgBox.height}
+          rx={primitive.background.rx}
+          style={{ fill: primitive.background.fill }}
+        />
+      )}
+      <g ref={contentRef}>
+        {/* React auto-escapes each line here — an author's message label can
+            never inject markup, no manual XSS-escaping needed. */}
         <text
-          x={markerX}
+          ref={linesRef}
+          x={primitive.x}
           y={primitive.y}
           style={{ fill: primitive.fill }}
           fontSize={primitive.fontSize}
-          textAnchor="end"
+          fontWeight={primitive.fontWeight}
+          textAnchor={anchor}
         >
-          {primitive.leadMarker}
+          {primitive.lines.map((line, index) => (
+            <tspan key={index} x={primitive.x} dy={index === 0 ? 0 : lineHeight}>
+              {line}
+            </tspan>
+          ))}
         </text>
-      )}
+        {primitive.leadMarker && (
+          <text
+            x={markerX}
+            y={primitive.y}
+            style={{ fill: primitive.fill }}
+            fontSize={primitive.fontSize}
+            textAnchor="end"
+          >
+            {primitive.leadMarker}
+          </text>
+        )}
+      </g>
     </Fragment>
   );
 }

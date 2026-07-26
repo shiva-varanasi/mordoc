@@ -129,17 +129,23 @@
 
 /* The shell's box size (not the SVG's) is what "fit to viewport" is measured
    against. Its width/height track --diagram-ratio (set inline per-diagram in
-   Diagram.tsx) up to the 94vw/1400px/90vh caps below — the same "shrink to
+   Diagram.tsx) up to the 94vw/1400px/90svh caps below — the same "shrink to
    fit, preserve aspect ratio" math as `object-fit: contain`, but sizing the
    container itself rather than fitting a replaced element inside a fixed
    one. Without this, a fixed-shape box leaves large empty grid-background
-   margins around wide/short diagrams on narrow (portrait) screens. */
+   margins around wide/short diagrams on narrow (portrait) screens.
+   `svh` (not `vh`): on mobile Chrome, plain `vh` resolves against the large
+   (toolbar-hidden) viewport while this overlay's `inset: 0` is sized to the
+   real, currently-visible one — the mismatch makes content sized off `vh`
+   overflow the actually-visible box and forces a spurious scrollbar the
+   instant the lightbox opens. `svh` always matches the worst-case (toolbar
+   visible) height, so it fits what's really on screen. */
 .lightboxViewport {
   display: flex;
   cursor: default;
-  width: min(94vw, 1400px, calc(90vh * var(--diagram-ratio, 1)));
+  width: min(94vw, 1400px, calc(90svh * var(--diagram-ratio, 1)));
   aspect-ratio: var(--diagram-ratio, 1);
-  max-height: 90vh;
+  max-height: 90svh;
   padding: 1.5rem;
   background-color: var(--color-surface);
   background-image: var(--diagram-grid-dot);

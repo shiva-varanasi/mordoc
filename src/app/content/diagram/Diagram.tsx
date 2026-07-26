@@ -14,7 +14,7 @@
  * Content.tsx's components map.
  */
 
-import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback, useRef, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { SceneSvg } from './SceneSvg.js';
 import type { Scene } from '../../../diagrams/generic/scene.js';
@@ -132,7 +132,14 @@ export function Diagram({ scene }: DiagramProps) {
         </button>
       </div>
 
-      <div className={styles.lightboxViewport} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={styles.lightboxViewport}
+        // Drives the CSS aspect-ratio the viewport box sizes itself to (see
+        // Diagram.module.css) so the box matches this diagram's own shape
+        // instead of a fixed rectangle unrelated to it.
+        style={{ '--diagram-ratio': scene.width / scene.height } as CSSProperties}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div ref={wrapRef} className={styles.lightboxDiagramWrap}>
           {fitScale !== null && <SceneSvg scene={scene} scale={effectiveScale} />}
         </div>

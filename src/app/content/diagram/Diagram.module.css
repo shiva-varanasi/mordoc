@@ -127,14 +127,19 @@
 
 /* ── Lightbox diagram ────────────────────────────────────────── */
 
-/* Fixed-size shell — its box size (not the SVG's) is what "fit to viewport"
-   is measured against, so it holds the padding and stays a stable size
-   regardless of the diagram's own dimensions. */
+/* The shell's box size (not the SVG's) is what "fit to viewport" is measured
+   against. Its width/height track --diagram-ratio (set inline per-diagram in
+   Diagram.tsx) up to the 94vw/1400px/90vh caps below — the same "shrink to
+   fit, preserve aspect ratio" math as `object-fit: contain`, but sizing the
+   container itself rather than fitting a replaced element inside a fixed
+   one. Without this, a fixed-shape box leaves large empty grid-background
+   margins around wide/short diagrams on narrow (portrait) screens. */
 .lightboxViewport {
   display: flex;
   cursor: default;
-  width: min(94vw, 1400px);
-  height: 90vh;
+  width: min(94vw, 1400px, calc(90vh * var(--diagram-ratio, 1)));
+  aspect-ratio: var(--diagram-ratio, 1);
+  max-height: 90vh;
   padding: 1.5rem;
   background-color: var(--color-surface);
   background-image: var(--diagram-grid-dot);
@@ -184,6 +189,17 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-md);
   padding: 0.375rem;
+}
+
+/* Touch-primary devices (phones, most tablets) can already pinch-to-zoom the
+   lightbox natively — nothing here disables that — so the on-screen +/-
+   buttons are redundant chrome that also risks covering content on short
+   viewports. Keyed on input type, not screen width, so a narrow desktop
+   window (mouse, no touch) still gets the buttons. */
+@media (pointer: coarse) {
+  .zoomControls {
+    display: none;
+  }
 }
 
 .zoomButton {

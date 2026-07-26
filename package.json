@@ -4,7 +4,7 @@
     "type": "git",
     "url": "https://github.com/shiva-varanasi/mordoc.git"
   },
-  "version": "1.6.3",
+  "version": "1.6.4",
   "description": "A modern documentation site generator powered by Vite, React, and Markdoc.",
   "type": "module",
   "files": [

@@ -135,17 +135,32 @@
    one. Without this, a fixed-shape box leaves large empty grid-background
    margins around wide/short diagrams on narrow (portrait) screens.
    `svh` (not `vh`): on mobile Chrome, plain `vh` resolves against the large
-   (toolbar-hidden) viewport while this overlay's `inset: 0` is sized to the
-   real, currently-visible one — the mismatch makes content sized off `vh`
-   overflow the actually-visible box and forces a spurious scrollbar the
-   instant the lightbox opens. `svh` always matches the worst-case (toolbar
-   visible) height, so it fits what's really on screen. */
+   (toolbar-hidden) viewport rather than the real, currently-visible one —
+   `svh` always matches the worst-case (toolbar visible) height, so it fits
+   what's really on screen.
+   `box-sizing: content-box` (overriding the project-wide border-box reset):
+   --diagram-ratio/aspect-ratio must apply to the same box .lightboxDiagram-
+   Wrap actually fills — the content area, padding excluded — not the padded
+   border-box. Otherwise the fixed 1.5rem padding is subtracted equally from
+   both a large dimension (width, for a wide diagram) and a small one
+   (height), skewing the interior ratio away from the diagram's own and
+   pinning one axis to a zero-slack exact fit — which then tips into a
+   spurious scrollbar from ordinary subpixel rounding, since the SVG's
+   `flex-shrink: 0` (below) won't let flexbox silently absorb it.
+   Each cap below has `3rem` (the combined left+right or top+bottom 1.5rem
+   padding) subtracted before the padding is added back by the box model —
+   so the *visible* box (content + padding) still tops out at exactly
+   94vw/1400px/90svh, same as when this was measured on the border-box.
+   Without the subtraction, padding sits outside the caps instead of inside
+   them: the visible box renders up to 3rem bigger than intended, and on a
+   narrow phone screen can overflow past the viewport edges entirely. */
 .lightboxViewport {
   display: flex;
   cursor: default;
-  width: min(94vw, 1400px, calc(90svh * var(--diagram-ratio, 1)));
+  box-sizing: content-box;
+  width: min(calc(94vw - 3rem), calc(1400px - 3rem), calc((90svh - 3rem) * var(--diagram-ratio, 1)));
   aspect-ratio: var(--diagram-ratio, 1);
-  max-height: 90svh;
+  max-height: calc(90svh - 3rem);
   padding: 1.5rem;
   background-color: var(--color-surface);
   background-image: var(--diagram-grid-dot);

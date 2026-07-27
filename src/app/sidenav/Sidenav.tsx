@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router';
 import { useMordocData } from '../data-context.js';
 import { detectCurrentLang, buildLangPrefix, stripLangPrefix, resolveLabel, applyLangToSidenav } from '../lang-utils.js';
+import { samePath } from '../path-utils.js';
 import type { SidenavConfig, SidenavItem } from '../../types/navigation.js';
 import styles from './Sidenav.module.css';
 
@@ -27,7 +28,7 @@ function ChevronIcon({ open }: { open: boolean }) {
 function groupContainsActive(items: SidenavConfig, activePath: string): boolean {
   return items.some(
     (item) =>
-      (item.path !== undefined && item.path === activePath) ||
+      (item.path !== undefined && samePath(item.path, activePath)) ||
       (item.children !== undefined && groupContainsActive(item.children, activePath)),
   );
 }
@@ -48,7 +49,7 @@ function SidenavNode({ item, depth }: { item: SidenavItem; depth: number }) {
   const isGroupActive = item.children
     ? groupContainsActive(item.children, location.pathname)
     : false;
-  const isLabelActive = item.path ? location.pathname === item.path : false;
+  const isLabelActive = item.path ? samePath(location.pathname, item.path) : false;
   const [open, setOpen] = useState(isGroupActive || isLabelActive || item.expanded === true);
 
   useEffect(() => {
@@ -134,7 +135,7 @@ function resolveActiveSidenav(
   if (navigation.kind === 'sidenav') return navigation.sidenav;
 
   const match = navigation.topnav
-    .filter((item) => contentPath === item.path || contentPath.startsWith(item.path + '/'))
+    .filter((item) => samePath(contentPath, item.path) || contentPath.startsWith(item.path + '/'))
     .sort((a, b) => b.path.length - a.path.length)[0];
 
   return match?.sidenav ?? [];

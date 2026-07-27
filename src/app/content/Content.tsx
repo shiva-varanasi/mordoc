@@ -6,6 +6,7 @@ import { useMordocData } from '../data-context.js';
 import { Toc } from '../toc/Toc.js';
 import { Footer } from '../footer/Footer.js';
 import { detectCurrentLang, buildLangPrefix, stripLangPrefix, resolveLabel, applyLangToSidenav } from '../lang-utils.js';
+import { samePath } from '../path-utils.js';
 import type { PageData } from '../../types/content.js';
 import type { SidenavConfig } from '../../types/navigation.js';
 import { CodeBlock } from './code-block/CodeBlock.js';
@@ -44,7 +45,7 @@ function findBreadcrumb(
 ): BreadcrumbEntry[] | null {
   for (const item of items) {
     const current: BreadcrumbEntry = { label: item.label, path: item.path };
-    if (item.path === targetPath) {
+    if (item.path !== undefined && samePath(item.path, targetPath)) {
       return [...ancestors, current];
     }
     if (item.children) {
@@ -63,7 +64,7 @@ function resolveActiveSidenavRaw(
     return { sectionLabel: null, sectionPath: null, sidenav: navigation.sidenav };
   }
   const match = navigation.topnav
-    .filter((item) => contentPath === item.path || contentPath.startsWith(item.path + '/'))
+    .filter((item) => samePath(contentPath, item.path) || contentPath.startsWith(item.path + '/'))
     .sort((a, b) => b.path.length - a.path.length)[0];
   return {
     sectionLabel: match?.label ?? null,

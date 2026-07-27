@@ -2,6 +2,16 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import styles from './SearchModal.module.css';
 
+/**
+ * Pagefind indexes built pages as directories, so result URLs have a
+ * trailing slash (`/foo/`) while Mordoc's own routes never do (`/foo`).
+ * Strip it before navigating so location.pathname matches sidenav/breadcrumb
+ * config paths exactly.
+ */
+function normalizePath(url: string): string {
+  return url.length > 1 && url.endsWith('/') ? url.slice(0, -1) : url;
+}
+
 // Module-level singleton so the loaded Pagefind instance is reused across
 // open/close cycles. Replaced atomically when the language changes.
 let pf: PagefindAPI | null = null;
@@ -153,7 +163,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
       setSelectedIndex((i) => Math.max(i - 1, 0));
     } else if (e.key === 'Enter' && results[selectedIndex]) {
       onClose();
-      navigate(results[selectedIndex].url);
+      navigate(normalizePath(results[selectedIndex].url));
     }
   }
 
@@ -226,7 +236,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
                 role="option"
                 aria-selected={i === selectedIndex}
                 className={`${styles.result}${i === selectedIndex ? ` ${styles.resultSelected}` : ''}`}
-                onClick={() => { onClose(); navigate(result.url); }}
+                onClick={() => { onClose(); navigate(normalizePath(result.url)); }}
                 onMouseEnter={() => setSelectedIndex(i)}
               >
                 <span className={styles.resultTitle}>{result.title}</span>

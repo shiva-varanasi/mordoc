@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import Markdoc from '@markdoc/markdoc';
-import yaml from 'js-yaml';
+import * as yaml from 'js-yaml';
 import type { ContentMap, Frontmatter, ParsedPage } from '../types/content.js';
 
 /**

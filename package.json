@@ -4,7 +4,7 @@
     "type": "git",
     "url": "https://github.com/shiva-varanasi/mordoc.git"
   },
-  "version": "1.6.5",
+  "version": "1.6.6",
   "description": "A modern documentation site generator powered by Vite, React, and Markdoc.",
   "type": "module",
   "files": [
@@ -16,7 +16,7 @@
     "mordoc": "bin/cli.js"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=24.18.1"
   },
   "author": "Shiva Varanasi",
   "scripts": {
@@ -32,21 +32,21 @@
   "license": "MIT",
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^25.6.0",
+    "@types/node": "^26.1.2",
     "@types/prismjs": "^1.26.6",
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@markdoc/markdoc": "^0.5.7",
-    "@vitejs/plugin-react": "^4.7.0",
-    "js-yaml": "^4.1.1",
+    "@markdoc/markdoc": "^0.5.8",
+    "@vitejs/plugin-react": "^6.0.4",
+    "js-yaml": "^5.2.2",
     "pagefind": "^1.5.2",
     "prismjs": "^1.30.0",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
-    "react-router": "^7.14.2",
-    "vite": "^6.4.2"
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router": "^8.3.0",
+    "vite": "^8.1.5"
   }
 }

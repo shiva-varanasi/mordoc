@@ -3,7 +3,8 @@ import path from 'node:path';
 import type { Plugin, ViteDevServer } from 'vite';
 import { loadAssets } from '../config/assets-loader.js';
 import type { ResolvedAssets } from '../types/assets.js';
-import { loadSiteConfig } from '../config/site-loader.js';
+import type { ResolvedFont, ResolvedFonts } from '../types/fonts.js';
+import { loadSiteConfig, loadFonts, fontFormat } from '../config/site-loader.js';
 import {
   loadNavigation,
   loadNavTranslations,
@@ -56,6 +57,17 @@ const THEME_CSS_ID = 'virtual:mordoc/theme';
 const RESOLVED_THEME_CSS_EMPTY = '\0virtual:mordoc/theme';
 
 /**
+ * Virtual module ID for the generated @font-face + --font-sans/--font-mono
+ * CSS for a project's custom fonts (site.json's "fonts" field). Unlike
+ * THEME_CSS_ID, this has no real file to resolve to — its content is always
+ * generated from `MordocData.fonts` — so it always resolves through the
+ * same null-byte-prefixed scheme as the eager JS virtual modules. The
+ * ".css" suffix is what makes Vite's CSS pipeline (extraction, minification)
+ * treat it as a stylesheet rather than plain JS.
+ */
+const FONT_FACE_CSS_ID = 'virtual:mordoc/font-face.css';
+
+/**
  * Rewrites absolute disk paths in `ResolvedAssets` to `/_assets/<basename>`
  * web URLs so the browser can fetch them from the dev middleware.
  */
@@ -67,6 +79,19 @@ function rewriteAssetsForDev(assets: ResolvedAssets): ResolvedAssets {
     logo: toUrl(assets.logo),
     logoDark: toUrl(assets.logoDark),
   };
+}
+
+/** Same rewrite as {@link rewriteAssetsForDev}, for one custom font face. */
+function rewriteFontForDev(font: ResolvedFont | null): ResolvedFont | null {
+  if (!font) return null;
+  const toUrl = (p: string | null) =>
+    p ? `/_assets/${path.basename(p)}` : null;
+  return { family: font.family, regular: toUrl(font.regular), italic: toUrl(font.italic) };
+}
+
+/** Applies {@link rewriteFontForDev} to both font slots. */
+function rewriteFontsForDev(fonts: ResolvedFonts): ResolvedFonts {
+  return { body: rewriteFontForDev(fonts.body), code: rewriteFontForDev(fonts.code) };
 }
 
 /** True if `id` is a lazy per-route page module id (after prefix). */
@@ -185,6 +210,78 @@ export function generateVirtualModule(id: string, data: MordocData): string | nu
 }
 
 /**
+ * Escapes a value for embedding inside a single-quoted CSS string literal.
+ * `family` is already validated quote/backslash-free at site.json load time,
+ * but `regular`/`italic` are just filenames on disk — not restricted to a
+ * safe character set — so this is the defense for those.
+ */
+function escapeCssString(value: string): string {
+  return value.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+/** Per-slot CSS variable and fallback stack, applied after a declared custom font. */
+const FONT_SLOT_CSS: Record<keyof ResolvedFonts, { cssVar: string; fallback: string }> = {
+  body: {
+    cssVar: '--font-sans',
+    fallback: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  },
+  code: {
+    cssVar: '--font-mono',
+    fallback: "ui-monospace, 'Cascadia Code', 'Fira Code', 'Consolas', monospace",
+  },
+};
+
+/**
+ * Builds the @font-face + :root block for one font slot. Empty when the
+ * slot is null, or declares neither "regular" nor "italic".
+ */
+function generateFontFaceBlock(font: ResolvedFont | null, slot: keyof ResolvedFonts): string {
+  if (!font) return '';
+
+  const family = escapeCssString(font.family);
+  const faces: string[] = [];
+  if (font.regular) {
+    const src = escapeCssString(font.regular);
+    faces.push(
+      `@font-face {\n  font-family: '${family}';\n  src: url('${src}') format('${fontFormat(font.regular)}');\n  font-weight: 100 900;\n  font-style: normal;\n  font-display: swap;\n}`,
+    );
+  }
+  if (font.italic) {
+    const src = escapeCssString(font.italic);
+    faces.push(
+      `@font-face {\n  font-family: '${family}';\n  src: url('${src}') format('${fontFormat(font.italic)}');\n  font-weight: 100 900;\n  font-style: italic;\n  font-display: swap;\n}`,
+    );
+  }
+  if (faces.length === 0) return '';
+
+  const { cssVar, fallback } = FONT_SLOT_CSS[slot];
+  faces.push(`:root {\n  ${cssVar}: '${family}', ${fallback};\n}`);
+  return faces.join('\n\n');
+}
+
+/**
+ * Builds the CSS source for `virtual:mordoc/font-face.css` — the optional
+ * @font-face + --font-sans/--font-mono overrides generated from a project's
+ * custom fonts (site.json's "fonts" field). Empty when neither slot is
+ * declared, so the default Inter/system stacks in index.css stand untouched.
+ *
+ * Imported in main.tsx after index.css but before `virtual:mordoc/theme`,
+ * so a user's own theme.css can still override --font-sans/--font-mono if
+ * they want to.
+ *
+ * Pure function — mirrors {@link generateVirtualModule}'s shape so the
+ * plugin's `load` hook and any future preview/validate tooling can call it
+ * without a live Vite instance.
+ */
+export function generateFontFaceCss(fonts: ResolvedFonts): string {
+  const blocks = (Object.keys(FONT_SLOT_CSS) as (keyof ResolvedFonts)[])
+    .map((slot) => generateFontFaceBlock(fonts[slot], slot))
+    .filter((block) => block !== '');
+  if (blocks.length === 0) return '';
+  return blocks.join('\n\n') + '\n';
+}
+
+/**
  * Builds the JS source for the lazy `virtual:mordoc/page/<routePath>`
  * module that carries a single page's full `PageData`. Returns null if
  * no page matches the given routePath.
@@ -247,6 +344,7 @@ function invalidateAllMordocVirtualModules(
   for (const id of EAGER_VIRTUAL_IDS) {
     invalidateVirtualModule(server, id);
   }
+  invalidateVirtualModule(server, FONT_FACE_CSS_ID);
   for (const page of pages) {
     invalidateVirtualModule(server, `${PAGE_MODULE_PREFIX}${page.entry.routePath}`);
   }
@@ -309,7 +407,9 @@ async function applyMordocWatchBatch(
       return;
     }
     data.site = site;
+    data.fonts = await loadFonts(projectRoot, site);
     invalidateVirtualModule(server, 'virtual:mordoc/site');
+    invalidateVirtualModule(server, FONT_FACE_CSS_ID);
     changed = true;
   }
 
@@ -571,6 +671,9 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
         const themePath = path.join(options.projectRoot, 'config', 'styles', 'theme.css');
         return fs.existsSync(themePath) ? themePath : RESOLVED_THEME_CSS_EMPTY;
       }
+      if (id === FONT_FACE_CSS_ID) {
+        return RESOLVED_PREFIX + FONT_FACE_CSS_ID;
+      }
       if (EAGER_VIRTUAL_IDS.includes(id) || isPageModuleId(id)) {
         return RESOLVED_PREFIX + id;
       }
@@ -579,6 +682,18 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
 
     load(id) {
       if (id === RESOLVED_THEME_CSS_EMPTY) return '';
+      if (id === RESOLVED_PREFIX + FONT_FACE_CSS_ID) {
+        if (!data) {
+          throw new Error(
+            `mordoc plugin: load("${id}") called before buildStart populated data.`,
+          );
+        }
+        // In dev mode, rewrite the fonts' disk paths to /_assets/ web URLs so
+        // the browser can fetch them via the dev-server asset middleware. In
+        // build mode copyAndRewriteAssets already handled this rewrite.
+        const fonts = options.mode === 'dev' ? rewriteFontsForDev(data.fonts) : data.fonts;
+        return generateFontFaceCss(fonts);
+      }
       if (!id.startsWith(RESOLVED_PREFIX)) return null;
       const virtualId = id.slice(RESOLVED_PREFIX.length);
       const isEager = EAGER_VIRTUAL_IDS.includes(virtualId);

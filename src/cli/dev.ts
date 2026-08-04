@@ -86,7 +86,18 @@ export async function runDevCommand(options: DevCommandOptions): Promise<void> {
     //     treats backslash as a separator on Windows too, so the '/' check
     //     above would not by itself catch this case.
     if (!filename || filename.includes('/') || filename.includes('..')) return next();
-    const filePath = path.join(projectRoot, 'config', 'assets', filename);
+    // Custom fonts (site.json's "fonts" field) live one level deeper, in
+    // config/assets/fonts/, but are served at the same flat /_assets/<basename>
+    // URL as everything else — so a miss at the flat path falls back to that
+    // one known subdirectory before giving up.
+    const flatPath = path.join(projectRoot, 'config', 'assets', filename);
+    const fontPath = path.join(projectRoot, 'config', 'assets', 'fonts', filename);
+    let filePath = flatPath;
+    try {
+      await fs.access(flatPath);
+    } catch {
+      filePath = fontPath;
+    }
     try {
       const content = await fs.readFile(filePath);
       const ext = path.extname(filename).slice(1).toLowerCase();
@@ -98,6 +109,9 @@ export async function runDevCommand(options: DevCommandOptions): Promise<void> {
         ico: 'image/x-icon',
         gif: 'image/gif',
         webp: 'image/webp',
+        woff2: 'font/woff2',
+        woff: 'font/woff',
+        ttf: 'font/ttf',
       };
       res.setHeader('Content-Type', mime[ext] ?? 'application/octet-stream');
       res.statusCode = 200;

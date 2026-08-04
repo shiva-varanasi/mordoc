@@ -2,6 +2,7 @@ import type { SiteConfig } from './site.js';
 import type { LanguageConfig } from './language.js';
 import type { ResolvedTopnavConfig, SidenavConfig, HeaderLink } from './navigation.js';
 import type { ResolvedAssets } from './assets.js';
+import type { ResolvedFonts } from './fonts.js';
 import type { PageMeta, TransformedPage } from './content.js';
 
 /**
@@ -36,6 +37,8 @@ export interface MordocData {
   language: LanguageConfig | null;
   navigation: NavigationConfig;
   assets: ResolvedAssets;
+  /** Custom fonts declared via site.json's "fonts" field, one slot per CSS role. Each slot null when absent — falls back to the default stack for that role. */
+  fonts: ResolvedFonts;
   pages: TransformedPage[];
   /** Nav label translations keyed by language code. Empty for single-language projects. */
   translations: Record<string, Record<string, string>>;

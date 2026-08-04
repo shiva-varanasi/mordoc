@@ -12,6 +12,9 @@ import type { ShellData } from '../types/pipeline.js';
 import './index.css';
 import { MordocDataContext } from './data-context.js';
 import { createAppRouter } from './routes.js';
+// Generated @font-face + --font-sans/--font-mono for a project's custom fonts
+// (site.json's "fonts" field) — after index.css's default stacks, before theme.css.
+import 'virtual:mordoc/font-face.css';
 // theme.css must be last so user overrides win over component-level :root tokens
 import 'virtual:mordoc/theme';
 

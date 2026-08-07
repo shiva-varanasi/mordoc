@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Outlet, ScrollRestoration, useLocation, useMatches, useNavigation } from 'react-router';
 import { Header } from './header/Header.js';
 import { Sidenav, MobileTopnavSection } from './sidenav/Sidenav.js';
@@ -24,6 +24,41 @@ export function App() {
   useEffect(() => {
     setSidenavOpen(false);
   }, [location.pathname]);
+
+  // Latest pathname, readable from the scroll-lock effect's cleanup without
+  // making that effect re-run on every route change.
+  const pathnameRef = useRef(location.pathname);
+  useEffect(() => {
+    pathnameRef.current = location.pathname;
+  }, [location.pathname]);
+
+  // Lock background scroll while the mobile drawer is open. Plain
+  // `overflow: hidden` doesn't reliably stop touch-scrolling on iOS, so pin
+  // body in place at its current scroll offset and restore it on close.
+  useEffect(() => {
+    if (!sidenavOpen) return;
+    const openedPathname = pathnameRef.current;
+    const scrollY = window.scrollY;
+    const { style } = document.body;
+    const prev = { position: style.position, top: style.top, left: style.left, right: style.right };
+    style.position = 'fixed';
+    style.top = `-${scrollY}px`;
+    style.left = '0';
+    style.right = '0';
+    return () => {
+      style.position = prev.position;
+      style.top = prev.top;
+      style.left = prev.left;
+      style.right = prev.right;
+      // Only re-apply the old offset if the drawer closed WITHOUT navigating
+      // (toggle button / backdrop tap / same-page link). A real route change
+      // is <ScrollRestoration>'s job — forcing the old offset here would
+      // fight it and can leave the new page stuck mid-scroll instead of at top.
+      if (pathnameRef.current === openedPathname) {
+        window.scrollTo(0, scrollY);
+      }
+    };
+  }, [sidenavOpen]);
 
   // Sync <html lang> and Pagefind index whenever the active language changes.
   // Runs on initial mount (initial preload) and on every language switch.
@@ -74,8 +109,8 @@ export function App() {
             className={`${styles.sidenavArea} ${sidenavOpen ? styles.sidenavAreaOpen : ''}`}
             aria-label="Side navigation"
           >
-            <MobileTopnavSection />
-            <Sidenav />
+            <MobileTopnavSection onNavigate={() => setSidenavOpen(false)} />
+            <Sidenav onNavigate={() => setSidenavOpen(false)} />
           </aside>
         )}
         {!isLanding && sidenavOpen && (

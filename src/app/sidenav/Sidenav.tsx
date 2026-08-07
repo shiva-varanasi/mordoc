@@ -33,17 +33,33 @@ function groupContainsActive(items: SidenavConfig, activePath: string): boolean 
   );
 }
 
-function SidenavList({ items, depth = 0 }: { items: SidenavConfig; depth?: number }) {
+function SidenavList({
+  items,
+  depth = 0,
+  onNavigate,
+}: {
+  items: SidenavConfig;
+  depth?: number;
+  onNavigate?: () => void;
+}) {
   return (
     <ul className={styles.menu}>
       {items.map((item, i) => (
-        <SidenavNode key={i} item={item} depth={depth} />
+        <SidenavNode key={i} item={item} depth={depth} onNavigate={onNavigate} />
       ))}
     </ul>
   );
 }
 
-function SidenavNode({ item, depth }: { item: SidenavItem; depth: number }) {
+function SidenavNode({
+  item,
+  depth,
+  onNavigate,
+}: {
+  item: SidenavItem;
+  depth: number;
+  onNavigate?: () => void;
+}) {
   const location = useLocation();
   const navigate = useNavigate();
   const isGroupActive = item.children
@@ -64,6 +80,7 @@ function SidenavNode({ item, depth }: { item: SidenavItem; depth: number }) {
         <NavLink
           to={item.path}
           end
+          onClick={onNavigate}
           className={({ isActive }) =>
             isTop
               ? `${styles.topLink}${isActive ? ` ${styles.topLinkActive}` : ''}`
@@ -101,7 +118,7 @@ function SidenavNode({ item, depth }: { item: SidenavItem; depth: number }) {
         </a>
         {open && (
           <div className={styles.groupContent}>
-            <SidenavList items={item.children} depth={depth + 1} />
+            <SidenavList items={item.children} depth={depth + 1} onNavigate={onNavigate} />
           </div>
         )}
       </li>
@@ -121,7 +138,7 @@ function SidenavNode({ item, depth }: { item: SidenavItem; depth: number }) {
       </button>
       {open && item.children && (
         <div className={styles.groupContent}>
-          <SidenavList items={item.children} depth={depth + 1} />
+          <SidenavList items={item.children} depth={depth + 1} onNavigate={onNavigate} />
         </div>
       )}
     </li>
@@ -146,7 +163,7 @@ function resolveActiveSidenav(
  * Hidden on desktop (display:none) — the `<Topnav>` row handles desktop.
  * Only rendered when navigation.kind === 'topnav'; returns null otherwise.
  */
-export function MobileTopnavSection() {
+export function MobileTopnavSection({ onNavigate }: { onNavigate?: () => void } = {}) {
   const { navigation, language, site, translations } = useMordocData();
   const { pathname } = useLocation();
 
@@ -162,6 +179,7 @@ export function MobileTopnavSection() {
           <li key={item.path} className={styles.menuItem}>
             <NavLink
               to={`${prefix}${item.path}`}
+              onClick={onNavigate}
               className={({ isActive }) =>
                 isActive ? `${styles.topLink} ${styles.topLinkActive}` : styles.topLink
               }
@@ -176,7 +194,7 @@ export function MobileTopnavSection() {
   );
 }
 
-export function Sidenav() {
+export function Sidenav({ onNavigate }: { onNavigate?: () => void } = {}) {
   const { navigation, language, site, translations } = useMordocData();
   const { pathname } = useLocation();
 
@@ -199,7 +217,7 @@ export function Sidenav() {
 
   return (
     <nav className={styles.sidenav} aria-label="Side navigation">
-      <SidenavList items={processedSidenav} depth={0} />
+      <SidenavList items={processedSidenav} depth={0} onNavigate={onNavigate} />
     </nav>
   );
 }

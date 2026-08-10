@@ -1,3 +1,24 @@
+/* ============================================================
+   APP TOKENS — space App allocates to a region without deriving
+   it from that region's own content (sidenav width), and each
+   Area box's own aesthetic (Step A: App owns Area boxes — box
+   placement AND background/border; components own only their
+   own inner content).
+   Header's own row heights (--primary-area-height, --topnav-area-height,
+   --header-height) live in Header.module.css — Header decides those,
+   App only reads them.
+   ============================================================ */
+:root {
+  --header-area-bg:     #ffffff;
+  --sidenav-area-bg:    #ffffff;
+  --sidenav-area-width: 16rem;
+}
+
+:global(.dark) {
+  --header-area-bg:  rgba(18, 18, 18);
+  --sidenav-area-bg: rgba(18, 18, 18);
+}
+
 /* ── Full page shell ──────────────────────────────────────── */
 .app {
   display: flex;
@@ -7,14 +28,17 @@
   background: var(--color-bg);
 }
 
-/* ── Header area — structural box only ───────────────────── */
-/* Aesthetics (background, border, backdrop) live in Header.module.css */
+/* ── Header area ──────────────────────────────────────────── */
+/* Owns the full box: placement AND aesthetics. Header.module.css only */
+/* styles the inner content (Header's own root is a plain <div>). */
 /* Height is intentionally auto — the header's flex column drives it */
 .headerArea {
   position: sticky;
   top: 0;
   z-index: 50;
   width: 100%;
+  background: var(--header-area-bg);
+  border-bottom: 1px solid var(--color-border);
 }
 
 /* ── Body row — sidenav | content ────────────────────────── */
@@ -26,17 +50,18 @@
 }
 
 /* ── Sidenav area ─────────────────────────────────────────── */
-/* Aesthetics (background, border-right) live in Sidenav.module.css */
+/* Owns the full box: placement AND aesthetics — same split as .headerArea. */
+/* Sidenav.module.css only styles the inner content (Sidenav's own root */
+/* is a plain <nav>). */
 .sidenavArea {
   position: sticky;
-  top: var(--header-total);
-  align-self: flex-start;
-  width: var(--sidenav-width);
-  height: calc(100svh - var(--header-total));
+  top: var(--header-height);
+  width: var(--sidenav-area-width);
+  height: calc(100svh - var(--header-height));
   overflow-y: auto;
   overscroll-behavior: contain;
   flex-shrink: 0;
-  background: var(--color-bg);
+  background: var(--sidenav-area-bg);
   border-right: 1px solid var(--color-border);
 }
 
@@ -50,7 +75,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  top: var(--header-total);
+  top: var(--header-height);
   background: rgba(0, 0, 0, 0.4);
   z-index: 35;
 }
@@ -69,13 +94,13 @@
 
   .sidenavArea {
     position: fixed;
-    top: var(--header-total);
+    top: var(--header-height);
     left: 0;
     width: 100%;
     transform: translateX(-100%);
     transition: transform 200ms ease;
     z-index: 40;
-    height: calc(100svh - var(--header-total));
+    height: calc(100svh - var(--header-height));
   }
 
   .sidenavAreaOpen {

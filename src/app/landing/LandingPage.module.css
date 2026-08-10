@@ -3,7 +3,7 @@
 .landing {
   display: flex;
   flex-direction: column;
-  min-height: calc(100svh - var(--header-total));
+  min-height: calc(100svh - var(--header-height));
 }
 
 /* No padding — hero and section components each own their inner spacing

@@ -24,7 +24,6 @@
   --color-bg:            #ffffff;
   --color-surface:       #fafafa;
   --color-border:        #e5e5e5;
-  --color-header-bg:     #ffffff;
 
   /* Text */
   --color-fg:            #1c1c1c;
@@ -42,12 +41,8 @@
   --accent-emphasis: var(--accent);
   --accent-strong:   color-mix(in oklch, var(--accent) 80%, black);
 
-  /* Layout — shared across multiple components */
-  --header-height:      4rem;
-  --topnav-height:      0px;   /* overridden by .has-topnav below */
-  --header-total:       calc(var(--header-height) + var(--topnav-height));
-  --sidenav-width:      16rem;
-  --sidenav-width-icon: 3.5rem;
+  /* Layout — shared across multiple independent components, no single owner.
+     Header/sidenav/topnav sizing lives in App.module.css — App decides those. */
   --toc-width:          16rem;
   --content-max-width:  64rem;
   --page-gutter:        2.5rem;
@@ -71,7 +66,6 @@
   --color-bg:        #121212;
   --color-surface:   #0f0f0f;
   --color-border:    #2e2e2e;
-  --color-header-bg: rgba(18, 18, 18);
 
   --color-fg:         #e2e8f0;
   --color-content-fg: rgb(214, 214, 214);
@@ -84,18 +78,6 @@
   --accent-muted:    color-mix(in oklch, var(--accent) 25%, #121212);
   --accent-emphasis: color-mix(in oklch, var(--accent) 70%, white);
   --accent-strong:   color-mix(in oklch, var(--accent) 50%, white);
-}
-
-/* Topnav height — class-based so @media can override it on mobile.
-   Inline style.setProperty() cannot be overridden by media queries. */
-.has-topnav {
-  --topnav-height: 2.75rem;
-}
-
-@media (max-width: 767.98px) {
-  .has-topnav {
-    --topnav-height: 0px;
-  }
 }
 
 /* ============================================================

@@ -74,7 +74,6 @@ function SidenavNode({
 
   // Leaf item — path only, no children
   if (item.path && !item.children) {
-    const isTop = depth === 0;
     return (
       <li className={styles.menuItem}>
         <NavLink
@@ -82,9 +81,7 @@ function SidenavNode({
           end
           onClick={onNavigate}
           className={({ isActive }) =>
-            isTop
-              ? `${styles.topLink}${isActive ? ` ${styles.topLinkActive}` : ''}`
-              : `${styles.navLink}${isActive ? ` ${styles.navLinkActive}` : ''}`
+            `${styles.navLink}${isActive ? ` ${styles.navLinkActive}` : ''}`
           }
         >
           {item.label}
@@ -181,7 +178,7 @@ export function MobileTopnavSection({ onNavigate }: { onNavigate?: () => void } 
               to={`${prefix}${item.path}`}
               onClick={onNavigate}
               className={({ isActive }) =>
-                isActive ? `${styles.topLink} ${styles.topLinkActive}` : styles.topLink
+                isActive ? `${styles.navLink} ${styles.navLinkActive}` : styles.navLink
               }
             >
               {resolveLabel(item.label, currentLang, site.defaultLanguage, translations)}

@@ -14,7 +14,7 @@
   display: grid;
   grid-template-columns: 1fr var(--toc-width);
   grid-template-areas: "content toc";
-  min-height: calc(100svh - var(--header-total));
+  min-height: calc(100svh - var(--header-height));
 }
 
 .articleArea {

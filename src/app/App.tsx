@@ -86,8 +86,10 @@ export function App() {
   }, []);
 
   // Toggle a class instead of an inline style so that CSS media queries can
-  // override --topnav-height to 0px on mobile (inline styles win the cascade
-  // unconditionally, making the @media override impossible).
+  // override --topnav-area-height to 0px on mobile (inline styles win the
+  // cascade unconditionally, making the @media override impossible). The
+  // rule reacting to this class lives in Header.module.css, not here —
+  // Header owns its own row heights.
   useEffect(() => {
     document.documentElement.classList.toggle('has-topnav', navigation.kind === 'topnav');
   }, [navigation.kind]);
@@ -95,19 +97,19 @@ export function App() {
   return (
     <div className={styles.app}>
       <ScrollRestoration />
-      <Header
-        sidenavOpen={sidenavOpen}
-        onMenuToggle={() => setSidenavOpen((o) => !o)}
-        onSearchOpen={() => setSearchOpen(true)}
-        showMenu={!isLanding}
-        className={styles.headerArea}
-      />
+      <header className={styles.headerArea}>
+        <Header
+          sidenavOpen={sidenavOpen}
+          onMenuToggle={() => setSidenavOpen((o) => !o)}
+          onSearchOpen={() => setSearchOpen(true)}
+          showMenu={!isLanding}
+        />
+      </header>
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
       <div className={styles.layout}>
         {!isLanding && (
           <aside
             className={`${styles.sidenavArea} ${sidenavOpen ? styles.sidenavAreaOpen : ''}`}
-            aria-label="Side navigation"
           >
             <MobileTopnavSection onNavigate={() => setSidenavOpen(false)} />
             <Sidenav onNavigate={() => setSidenavOpen(false)} />

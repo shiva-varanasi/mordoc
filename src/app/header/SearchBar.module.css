@@ -2,52 +2,54 @@
    SEARCH BAR TOKENS
    ============================================================ */
 :root {
-  --search-width:        256px;
-  --search-height:       36px;
-  --search-radius:       8px;
-  --search-px:           12px;
-  --search-gap:          8px;
-  --search-font-size:    14px;
-  --search-icon-size:    16px;
-  --search-bg:           rgba(245, 245, 245, 0.5);
-  --search-bg-hover:     #f5f5f5;
-  --search-border:       #e5e5e5;
-  --search-border-hover: color-mix(in oklch, var(--accent) 30%, transparent);
-  --search-fg:           #666666;
-  --kbd-height:          20px;
-  --kbd-px:              6px;
-  --kbd-font-size:       10px;
-  --kbd-radius:          4px;
+  --search-bar-width:        256px;
+  --search-bar-height:       36px;
+  --search-bar-radius:       8px;
+  --search-bar-padding:           12px;
+  --search-bar-gap:          8px;
+  --search-bar-font-size:    14px;
+  --search-bar-icon-size:    16px;
+  --search-bar-bg:           rgba(245, 245, 245, 0.5);
+  --search-bar-bg-hover:     #f5f5f5;
+  --search-bar-border:       #e5e5e5;
+  --search-bar-border-hover: color-mix(in oklch, var(--accent) 30%, transparent);
+  --search-bar-fg:           #666666;
+  --search-bar-kbd-height:          20px;
+  --search-bar-kbd-padding:              6px;
+  --search-bar-kbd-font-size:       10px;
+  --search-bar-kbd-radius:          4px;
+  --search-bar-kbd-bg:              #ffffff;
 }
 
 :global(.dark) {
-  --search-bg:       rgba(36, 36, 36, 0.5);
-  --search-bg-hover: #242424;
-  --search-border:   #2e2e2e;
-  --search-fg:       #9e9e9e;
+  --search-bar-bg:       rgba(36, 36, 36, 0.5);
+  --search-bar-bg-hover: #242424;
+  --search-bar-border:   #2e2e2e;
+  --search-bar-fg:       #9e9e9e;
+  --search-bar-kbd-bg:          #1a1a1a;
 }
 
 @media (min-width: 768px) {
-  :root { --search-width: 220px; }
+  :root { --search-bar-width: 220px; }
 }
 
 @media (min-width: 1024px) {
-  :root { --search-width: 256px; }
+  :root { --search-bar-width: 256px; }
 }
 
 .searchBar {
   display: flex;
   align-items: center;
-  gap: var(--search-gap);
-  width: var(--search-width);
+  gap: var(--search-bar-gap);
+  width: var(--search-bar-width);
   max-width: 100%;
-  height: var(--search-height);
-  padding: 0 var(--search-px);
-  background: var(--search-bg);
-  color: var(--search-fg);
-  border: 1px solid var(--search-border);
-  border-radius: var(--search-radius);
-  font-size: var(--search-font-size);
+  height: var(--search-bar-height);
+  padding: 0 var(--search-bar-padding);
+  background: var(--search-bar-bg);
+  color: var(--search-bar-fg);
+  border: 1px solid var(--search-bar-border);
+  border-radius: var(--search-bar-radius);
+  font-size: var(--search-bar-font-size);
   font-family: inherit;
   cursor: pointer;
   text-align: left;
@@ -55,8 +57,8 @@
 }
 
 .searchBar:hover {
-  background-color: var(--search-bg-hover);
-  border-color: var(--search-border-hover);
+  background-color: var(--search-bar-bg-hover);
+  border-color: var(--search-bar-border-hover);
 }
 
 .searchBar:focus-visible {
@@ -65,28 +67,28 @@
 }
 
 .icon {
-  width: var(--search-icon-size);
-  height: var(--search-icon-size);
+  width: var(--search-bar-icon-size);
+  height: var(--search-bar-icon-size);
   flex-shrink: 0;
-  color: var(--search-fg);
+  color: var(--search-bar-fg);
 }
 
 .placeholder {
   flex: 1;
-  color: var(--search-fg);
+  color: var(--search-bar-fg);
 }
 
 .kbd {
   display: inline-flex;
   align-items: center;
-  height: var(--kbd-height);
-  padding: 0 var(--kbd-px);
-  border: 1px solid var(--search-border);
-  border-radius: var(--kbd-radius);
-  background: var(--toggle-bg);
+  height: var(--search-bar-kbd-height);
+  padding: 0 var(--search-bar-kbd-padding);
+  border: 1px solid var(--search-bar-border);
+  border-radius: var(--search-bar-kbd-radius);
+  background: var(--search-bar-kbd-bg);
   font-family: ui-monospace, 'JetBrains Mono', 'Cascadia Code', 'Fira Code', monospace;
-  font-size: var(--kbd-font-size);
+  font-size: var(--search-bar-kbd-font-size);
   font-weight: 500;
-  color: var(--search-fg);
+  color: var(--search-bar-fg);
   flex-shrink: 0;
 }

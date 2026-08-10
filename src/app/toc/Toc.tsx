@@ -48,7 +48,7 @@ export function Toc({ items }: TocProps) {
     const el = document.getElementById(id);
     if (!el) return;
     // scroll-margin-top on headings (Content.module.css) accounts for the sticky
-    // header height via --header-total, so scrollIntoView gives the correct offset.
+    // header height via --header-height, so scrollIntoView gives the correct offset.
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     history.pushState(null, '', `#${id}`);
   }

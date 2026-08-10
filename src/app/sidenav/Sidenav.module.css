@@ -1,40 +1,37 @@
 /* ============================================================
-   SIDENAV TOKENS
+   SIDENAV TOKENS — colors + font-weight only. Shape/size (padding,
+   row height, font-size, the mobile-divider border color) are fixed,
+   not exposed for customization.
+   --sidenav-active-fg/-bg default to the global accent tokens, which
+   are already dark-mode-aware — no separate dark override needed here.
    ============================================================ */
 :root {
-  --sidenav-bg:             #FAFAFA;
-  --sidenav-fg:             #383838;
-  --sidenav-fg-muted:       #666666;
-  --sidenav-border:         #E5E5E5;
-  --sidenav-accent:         #EFEFEF;
-  --sidenav-accent-fg:      #1C1C1C;
-  --sidenav-group-label-fg: rgba(56, 56, 56, 0.7);
-  --sidenav-gap-y:          4px;
-  --sidenav-item-h:         36px;
-  --sidenav-group-h:        36px;
-  --sidenav-pad-x:          8px;
-  --sidenav-pad-y:          16px;
-  --sidenav-item-pad-x:     8px;
-  --sidenav-item-pad-y:     6px;
+  --sidenav-fg:                 #383838;
+  --sidenav-fg-muted:           #666666;
+  --sidenav-group-label-fg:     rgba(56, 56, 56, 0.7);
+  --sidenav-hover-bg:           #EFEFEF;
+  --sidenav-active-fg:          var(--accent-emphasis);
+  --sidenav-active-bg:          var(--accent-subtle);
+  --sidenav-font-weight:        500;
+  --sidenav-active-font-weight: 600;
 }
 
 :global(.dark) {
-  --sidenav-bg:             #0F0F0F;
   --sidenav-fg:             #D6D6D6;
   --sidenav-fg-muted:       #9E9E9E;
-  --sidenav-border:         #292929;
-  --sidenav-accent:         #1F1F1F;
-  --sidenav-accent-fg:      #EBEBEB;
   --sidenav-group-label-fg: rgba(214, 214, 214, 0.7);
+  --sidenav-hover-bg:       #1F1F1F;
 }
 
 /* ============================================================
    SIDENAV — inner content only
-   Geometry (position / width / height / overflow) lives in App.module.css
+   Geometry (position / width / height / overflow) and the box's own
+   background/border-right live in App.module.css (.sidenavArea) —
+   same split as Header/.headerArea.
    ============================================================ */
 
 .sidenav {
-  padding: var(--sidenav-pad-y) var(--sidenav-pad-x);
+  padding: 16px 8px;
 }
 
 /* ── Menu list ───────────────────────────────────────────────── */
@@ -64,14 +61,14 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  min-height: var(--sidenav-group-h);
-  padding: var(--sidenav-item-pad-y) var(--sidenav-item-pad-x);
+  min-height: 36px;
+  padding: 6px 8px;
   margin-top: 10px;
   border-radius: var(--radius-md);
   background: none;
   border: none;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: var(--sidenav-font-weight);
   line-height: 1.25;
   letter-spacing: 0;
   color: var(--sidenav-group-label-fg);
@@ -86,7 +83,7 @@
 }
 
 .groupLabelTrigger:hover {
-  background: var(--sidenav-accent);
+  background: var(--sidenav-hover-bg);
 }
 
 .groupLabelText {
@@ -103,11 +100,11 @@
   justify-content: space-between;
   gap: 8px;
   width: 100%;
-  min-height: var(--sidenav-group-h);
-  padding: var(--sidenav-item-pad-y) var(--sidenav-item-pad-x);
+  min-height: 36px;
+  padding: 6px 8px;
   border-radius: var(--radius-md);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: var(--sidenav-font-weight);
   line-height: 1.25;
   color: var(--sidenav-fg);
   text-decoration: none;
@@ -121,72 +118,43 @@
 }
 
 .linkedGroupLabel:hover {
-  background: var(--sidenav-accent);
+  background: var(--sidenav-hover-bg);
 }
 
 .linkedGroupLabel.linkActive {
-  color: var(--accent-emphasis);
-  background: var(--accent-subtle);
+  color: var(--sidenav-active-fg);
+  background: var(--sidenav-active-bg);
 }
 
 /* ============================================================
-   TOP-LEVEL LEAF LINK (depth=0, no children)
-   Matches group-label height/weight for visual consistency
-   ============================================================ */
-
-.topLink {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  min-height: var(--sidenav-group-h);
-  padding: var(--sidenav-item-pad-y) var(--sidenav-item-pad-x);
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.25;
-  color: var(--sidenav-fg);
-  text-decoration: none;
-  transition: color 150ms ease, background-color 150ms ease;
-}
-
-.topLink:hover {
-  background: var(--sidenav-accent);
-}
-
-.topLink.topLinkActive {
-  background: var(--accent-subtle);
-  color: var(--accent-emphasis);
-  font-weight: 600;
-}
-
-/* ============================================================
-   NESTED LEAF LINK (depth>0)
-   Indented under a group, lighter weight
+   LEAF LINK — a menu entry with no children (also used by
+   MobileTopnavSection's top navigation list). Matches group-label
+   height/weight for visual consistency at any depth.
    ============================================================ */
 
 .navLink {
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: var(--sidenav-item-h);
-  padding: var(--sidenav-item-pad-y) 8px var(--sidenav-item-pad-y) 8px;
+  min-height: 36px;
+  padding: 6px 8px;
   border-radius: var(--radius-md);
   font-size: 14px;
-  font-weight: 500;
-  line-height: 1.4;
+  font-weight: var(--sidenav-font-weight);
+  line-height: 1.25;
   color: var(--sidenav-fg);
   text-decoration: none;
   transition: color 150ms ease, background-color 150ms ease;
 }
 
 .navLink:hover {
-  background: var(--sidenav-accent);
+  background: var(--sidenav-hover-bg);
 }
 
 .navLink.navLinkActive {
-  background: var(--accent-subtle);
-  color: var(--accent-emphasis);
-  font-weight: 600;
+  background: var(--sidenav-active-bg);
+  color: var(--sidenav-active-fg);
+  font-weight: var(--sidenav-active-font-weight);
 }
 
 /* ============================================================
@@ -218,8 +186,7 @@
 
 .groupLabelTrigger:focus-visible,
 .linkedGroupLabel:focus-visible,
-.navLink:focus-visible,
-.topLink:focus-visible {
+.navLink:focus-visible {
   outline: 2px solid var(--accent-emphasis);
   outline-offset: -2px;
   border-radius: var(--radius-md);
@@ -233,7 +200,7 @@
 
 .mobileTopnav {
   display: none;
-  padding: var(--sidenav-pad-y) var(--sidenav-pad-x) 0;
+  padding: 16px 8px 0;
 }
 
 @media (max-width: 767.98px) {
@@ -244,8 +211,12 @@
 
 .mobileTopnavDivider {
   border: none;
-  border-top: 1px solid var(--sidenav-border);
-  margin: var(--sidenav-pad-y) 0 0;
+  border-top: 1px solid #E5E5E5;
+  margin: 16px 0 0;
+}
+
+:global(.dark) .mobileTopnavDivider {
+  border-top-color: #292929;
 }
 
 /* ============================================================
@@ -256,7 +227,6 @@
   .groupLabelTrigger,
   .linkedGroupLabel,
   .navLink,
-  .topLink,
   .chevron {
     transition: none !important;
   }

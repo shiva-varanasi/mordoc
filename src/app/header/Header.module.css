@@ -2,100 +2,106 @@
    HEADER TOKENS
    ============================================================ */
 :root {
-  --header-px:        16px;
-  --header-gap:       12px;
-  --actions-gap:      4px;
-  --brand-gap:        8px;
+  --header-padding:        16px;
+  --primary-area-gap:       12px;
   --brand-logo-size:  28px;
-  --brand-logo-radius: 6px;
   --menu-btn-size:    36px;
   --menu-btn-radius:  6px;
   --menu-btn-icon:    20px;
-  --toggle-size:      40px;
-  --toggle-radius:    8px;
-  --toggle-icon-size: 20px;
-  --toggle-bg:        #ffffff;
-  --toggle-bg-hover:  #f5f5f5;
-  --toggle-border:    #e5e5e5;
-  --toggle-fg:        #1c1c1c;
-}
 
-:global(.dark) {
-  --toggle-bg:       #1a1a1a;
-  --toggle-bg-hover: #242424;
-  --toggle-border:   #2e2e2e;
-  --toggle-fg:       #ebebeb;
+  /* Header's own two-row skeleton — Header decides these (they're derived
+     from its own .primaryArea row and .topnavArea row), not App. Other
+     independent files (App's sidenav/overlay offset, Content, Skeleton,
+     LandingPage, NotFound) read --header-height via var() to stay aligned. */
+  --primary-area-height: 4rem;
+  --topnav-area-height:  0px;   /* overridden by :global(.has-topnav) below */
+  --header-height:       calc(var(--primary-area-height) + var(--topnav-area-height));
 }
 
 @media (max-width: 479px) {
   :root {
-    --header-gap:       8px;
-    --actions-gap:      2px;
-    --toggle-size:      36px;
-    --toggle-icon-size: 18px;
+    --primary-area-gap:       8px;
+  }
+
+  .rightArea {
+    gap: 2px;
   }
 }
 
 @media (min-width: 768px) {
   :root {
-    --header-gap: 16px;
+    --primary-area-gap: 16px;
   }
 }
 
 @media (min-width: 1024px) {
   :root {
-    --header-gap: 20px;
+    --primary-area-gap: 20px;
   }
 }
 
 @media (min-width: 1280px) {
   :root {
-    --header-gap: 24px;
+    --primary-area-gap: 24px;
   }
 }
 
-/* Aesthetic + internal layout only.
-   Structural placement (position: sticky, z-index, height) lives in App.module.css .headerArea */
+/* Topnav row height — class-based so @media can override it on mobile.
+   Inline style.setProperty() cannot be overridden by media queries.
+   Toggled by App.tsx on document.documentElement, same as .dark. */
+:global(.has-topnav) {
+  --topnav-area-height: 2.75rem;
+}
+
+@media (max-width: 767.98px) {
+  :global(.has-topnav) {
+    --topnav-area-height: 0px;
+  }
+}
+
+/* Inner content layout only — arranges the primary row + topnav row.
+   The box itself (placement, background, border, blur) is owned entirely
+   by App.module.css .headerArea, which this renders inside of. */
 .header {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  background: var(--color-header-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--color-border);
 }
 
-/* ── Top bar ────────────────────────────────────────────── */
-.inner {
+/* ── Primary row — brand + search + actions ────────────────
+   Header's own directly-owned content (brand/search/actions aren't split
+   into separate components), so this is Header's row, not an Area box
+   wrapping a child — unlike .topnavArea, which wraps Topnav. */
+.primaryArea {
   width: 100%;
-  height: var(--header-height);
-  padding: 0 var(--header-px);
+  height: var(--primary-area-height);
+  padding: 0 var(--header-padding);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--header-gap);
+  gap: var(--primary-area-gap);
 }
 
 /* Three regions */
-.brand {
+.brandArea {
   display: flex;
   align-items: center;
-  gap: var(--brand-gap);
+  gap: 8px;
   flex-shrink: 0;
 }
 
-.search {
+/* Area box for SearchBar — Header decides placement (claims the center
+   column); SearchBar.module.css only styles its own inner content. */
+.searchArea {
   flex: 1;
   display: flex;
   justify-content: center;
   min-width: 0;
 }
 
-.actions {
+.rightArea {
   display: flex;
   align-items: center;
-  gap: var(--actions-gap);
+  gap: 4px;
   flex-shrink: 0;
 }
 
@@ -106,7 +112,7 @@
   text-decoration: none;
   color: inherit;
   flex-shrink: 0;
-  border-radius: var(--brand-logo-radius);
+  border-radius: 6px;
 }
 
 .logoImage {
@@ -138,7 +144,7 @@
 }
 
 .menuBtn:hover {
-  background: var(--lang-bg-hover);
+  background: var(--color-bg-hover);
 }
 
 .menuBtn:focus-visible {
@@ -146,143 +152,13 @@
   outline-offset: 2px;
 }
 
-/* ── Theme toggle ───────────────────────────────────────── */
-.themeToggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--toggle-size);
-  height: var(--toggle-size);
-  background: var(--toggle-bg);
-  color: var(--toggle-fg);
-  border: 1px solid var(--toggle-border);
-  border-radius: var(--toggle-radius);
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
-}
-
-.themeToggle:hover {
-  background: var(--toggle-bg-hover);
-}
-
-.themeToggle:focus-visible {
-  outline: 2px solid var(--accent-emphasis);
-  outline-offset: 2px;
-}
-
-/* ── Header links (from headernav.yaml) ─────────────────── */
-
-/* Overrides --button-* tokens so Button renders at compact header size. */
-.headerLinks {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding-right: 8px;
-  margin-right: 4px;
-  border-right: 1px solid var(--color-border);
-  --button-height: 2rem;
-  --button-px: 0.875rem;
-  --button-font-size: 0.875rem;
-}
-
-/* Plain 'link' variant — matches article prose link style */
-.headerLink {
-  display: inline-flex;
-  align-items: center;
-  padding: 0 0.25rem;
-  height: 2rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--accent-emphasis);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  text-decoration-color: transparent;
-  border-radius: var(--radius-sm);
-  white-space: nowrap;
-  transition: color 0.15s, text-decoration-color 0.15s;
-}
-
-.headerLink:hover {
-  color: var(--accent-strong);
-  text-decoration-color: var(--accent-strong);
-}
-
-/* ── Mobile overflow menu (≤ 767px) ────────────────────── */
-
-/* Wrapper for the ellipsis trigger + dropdown — hidden on desktop */
-.headerLinksMenu {
-  display: none;
-  position: relative;
-}
-
-.headerLinksMenuBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--toggle-size);
-  height: var(--toggle-size);
-  background: transparent;
-  border: 0;
-  border-radius: var(--toggle-radius);
-  color: var(--color-fg);
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.headerLinksMenuBtn:hover {
-  background: var(--color-bg-hover);
-}
-
-.headerLinksMenuBtn:focus-visible {
-  outline: 2px solid var(--accent-emphasis);
-  outline-offset: 2px;
-}
-
-.headerLinksDropdown {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  min-width: 160px;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  padding: 4px;
-  z-index: 200;
-}
-
-:global(.dark) .headerLinksDropdown {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-}
-
-/* Each row in the dropdown */
-.dropdownItem {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-fg);
-  text-decoration: none;
-  border-radius: var(--radius-sm);
-  white-space: nowrap;
-  transition: background 0.12s, color 0.12s;
-  cursor: pointer;
-  border: 0;
-  background: transparent;
-  text-align: left;
-}
-
-.dropdownItem:hover {
-  background: var(--color-bg-hover);
-}
-
 /* ── Topnav second row ──────────────────────────────────── */
-.topnavRow {
+/* Area box for Topnav — Header decides placement/height (the second row);
+   Topnav.module.css only styles its own inner content (height: 100%). */
+.topnavArea {
   width: 100%;
-  height: 2.75rem;
-  padding: 0 var(--header-px);
+  height: var(--topnav-area-height);
+  padding: 0 var(--header-padding);
   display: flex;
   align-items: stretch;
 }
@@ -297,26 +173,18 @@
    Responsive
    ════════════════════════════════════════════════════════════ */
 
-/* < 768px: hamburger visible, search + topnav row hidden;
-   header links strip hidden, overflow menu button visible */
+/* < 768px: hamburger visible, search + topnav row hidden.
+   HeaderLinks.module.css handles its own strip/overflow-menu swap. */
 @media (max-width: 767.98px) {
   .menuBtn {
     display: inline-flex;
   }
 
-  .search {
+  .searchArea {
     display: none;
   }
 
-  .topnavRow {
+  .topnavArea {
     display: none;
-  }
-
-  .headerLinks {
-    display: none;
-  }
-
-  .headerLinksMenu {
-    display: block;
   }
 }

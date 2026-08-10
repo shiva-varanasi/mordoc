@@ -3,7 +3,7 @@
    ============================================================ */
 :root {
   --lang-height:    36px;
-  --lang-px:        10px;
+  --lang-padding:        10px;
   --lang-gap:       6px;
   --lang-radius:    6px;
   --lang-font-size: 14px;
@@ -11,6 +11,9 @@
   --lang-fg:        #383838;
   --lang-fg-hover:  #1c1c1c;
   --lang-bg-hover:  #f5f5f5;
+
+  --lang-active-color: var(--accent-emphasis);
+  --lang-active-bg:    var(--accent-subtle);
 }
 
 :global(.dark) {
@@ -28,7 +31,7 @@
   align-items: center;
   gap: var(--lang-gap);
   height: var(--lang-height);
-  padding: 0 var(--lang-px);
+  padding: 0 var(--lang-padding);
   border: 0;
   background: transparent;
   border-radius: var(--lang-radius);
@@ -52,12 +55,12 @@
 
 /* Hide language code on small phones — globe icon only */
 @media (max-width: 479px) {
-  .code {
-    display: none;
+  :root {
+    --lang-padding: 8px;
   }
 
-  .trigger {
-    padding: 0 8px;
+  .code {
+    display: none;
   }
 }
 
@@ -92,6 +95,6 @@
 }
 
 .optionActive {
-  color: var(--accent-emphasis);
-  background: var(--accent-subtle);
+  color: var(--lang-active-color);
+  background: var(--lang-active-bg);
 }

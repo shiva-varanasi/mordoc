@@ -4,8 +4,7 @@ import pagesIndex from 'virtual:mordoc/pages-index';
 import loaders from 'virtual:mordoc/page-loaders';
 import { App } from './App.js';
 import { Content } from './content/Content.js';
-import { LandingPage } from './landing/LandingPage.js';
-import { NotFound } from './not-found/NotFound.js';
+import { NotFound } from './content/not-found/NotFound.js';
 
 /**
  * Builds the React Router route config from Mordoc's eager virtual
@@ -50,7 +49,7 @@ export function buildRoutes(): RouteObject[] {
     }
     const common = {
       loader: async () => (await pageLoader()).default,
-      Component: pageIndex.layout === 'landing' ? LandingPage : Content,
+      Component: Content,
       handle: { layout: pageIndex.layout ?? 'content' },
     };
     return pageIndex.routePath === '/'

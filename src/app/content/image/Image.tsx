@@ -9,7 +9,7 @@
  * as false — so document.body is never accessed during server-side rendering.
  *
  * Wired via the `image` node override in markdoc-config.ts, registered in
- * Content.tsx's components map.
+ * ArticlePage.tsx's and LandingPage.tsx's components maps.
  */
 
 import { useState, useEffect, useCallback } from 'react';

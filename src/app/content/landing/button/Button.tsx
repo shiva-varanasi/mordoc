@@ -9,7 +9,7 @@
  * button renders as a clean inline-flex element regardless.
  *
  * Registered as a Markdoc tag (`button`) in markdoc-config.ts and in
- * LandingPage.tsx's components map. Also registered in Content.tsx so it
+ * LandingPage.tsx's components map. Also registered in ArticlePage.tsx so it
  * can be used in regular content pages.
  *
  * The prop is named `path` (not `href`) to match Mordoc's authoring

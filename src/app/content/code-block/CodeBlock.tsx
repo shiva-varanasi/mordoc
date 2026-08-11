@@ -8,7 +8,7 @@
  * markup around already-escaped source text; no user-controlled HTML is injected.
  *
  * Wired up via the `fence` node in markdoc-config, which forwards `language`
- * and `content` as props. Registered in Content.tsx's `components` map.
+ * and `content` as props. Registered in ArticlePage.tsx's and LandingPage.tsx's `components` maps.
  */
 
 import { useState } from 'react';

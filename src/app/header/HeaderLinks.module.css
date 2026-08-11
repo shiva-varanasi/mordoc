@@ -36,7 +36,7 @@
   margin-right: 4px;
   border-right: 1px solid var(--color-border);
   --button-height: var(--header-links-button-height);
-  --button-px: var(--header-links-button-padding);
+  --button-padding: var(--header-links-button-padding);
   --button-font-size: var(--header-links-button-font-size);
 }
 

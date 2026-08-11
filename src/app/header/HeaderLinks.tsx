@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
-import { Button } from '../landing/button/Button.js';
+import { Button } from '../content/landing/button/Button.js';
 import type { HeaderLink } from '../../types/navigation.js';
 import styles from './HeaderLinks.module.css';
 

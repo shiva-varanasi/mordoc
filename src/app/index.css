@@ -41,12 +41,6 @@
   --accent-emphasis: var(--accent);
   --accent-strong:   color-mix(in oklch, var(--accent) 80%, black);
 
-  /* Layout — shared across multiple independent components, no single owner.
-     Header/sidenav/topnav sizing lives in App.module.css — App decides those. */
-  --toc-width:          16rem;
-  --content-max-width:  64rem;
-  --page-gutter:        2.5rem;
-
   /* Typography */
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
@@ -109,7 +103,20 @@ body {
   line-height: 1.6;
 }
 
-/* Scrollbar */
+/* Scrollbar — standard properties cover Firefox; the ::-webkit-scrollbar
+   rules below cover Chromium/Safari (which ignore these standard properties
+   whenever the older pseudo-element API is also present, so in practice
+   this block only affects Firefox's rendering).
+   --color-fg-muted rather than --color-border: Firefox's thin-scrollbar
+   thumb has much less visual weight than a webkit-styled one (no explicit
+   px width/border-radius/opaque fill to work with, just a color hint), so
+   it needs a stronger color to read at the same contrast Chromium gets
+   from --color-border. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-fg-muted) transparent;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

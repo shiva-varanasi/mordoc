@@ -11,7 +11,7 @@
  *
  * Wired via the `fence` node's transform in markdoc-config.ts (which produces
  * a `Diagram` tag for any ```<type>-diagram fence), registered in
- * Content.tsx's components map.
+ * ArticlePage.tsx's components map.
  */
 
 import { useState, useEffect, useLayoutEffect, useCallback, useRef, type CSSProperties } from 'react';

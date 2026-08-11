@@ -1,5 +1,17 @@
+/* ============================================================
+   TOC TOKENS — default to --accent-emphasis (derived), independently
+   overridable per state. outline is deliberately NOT a token here — focus
+   rings stay wired to the global --accent-emphasis everywhere, for
+   consistent keyboard-navigation accessibility across the app.
+   ============================================================ */
+:root {
+  --toc-link-hover-fg:      var(--accent-emphasis);
+  --toc-link-active-fg:     var(--accent-emphasis);
+  --toc-link-active-border: var(--accent-emphasis);
+}
+
 .toc {
-  /* positioning handled by .tocAside in Content.module.css */
+  /* positioning handled by .tocArea in Content.module.css */
 }
 
 .heading {
@@ -43,7 +55,7 @@
 .link[data-level="6"] { padding-left: 52px; }
 
 .link:hover {
-  color: var(--accent-emphasis);
+  color: var(--toc-link-hover-fg);
 }
 
 .link:focus-visible {
@@ -53,7 +65,7 @@
 }
 
 .link.active {
-  color: var(--accent-emphasis);
+  color: var(--toc-link-active-fg);
   font-weight: 500;
-  border-left-color: var(--accent-emphasis);
+  border-left-color: var(--toc-link-active-border);
 }

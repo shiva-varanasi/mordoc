@@ -8,7 +8,7 @@
  * external URLs open in a new tab.
  *
  * Registered as a Markdoc tag (`card`) in markdoc-config.ts and added to
- * Content.tsx's components map. Intended to be used inside {% cardGrid %}.
+ * ArticlePage.tsx's and LandingPage.tsx's components maps. Intended to be used inside {% cardGrid %}.
  */
 
 import { Link } from 'react-router';

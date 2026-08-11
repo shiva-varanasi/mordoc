@@ -1,5 +1,5 @@
 .footer {
-  max-width: var(--content-max-width);
+  max-width: var(--article-max-width);
   width: 100%;
   margin: 0 auto;
   padding: 0 1.5rem 2rem;

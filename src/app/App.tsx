@@ -3,7 +3,7 @@ import { Outlet, ScrollRestoration, useLocation, useMatches, useNavigation } fro
 import { Header } from './header/Header.js';
 import { Sidenav, MobileTopnavSection } from './sidenav/Sidenav.js';
 import { SearchModal, switchPagefind } from './header/SearchModal.js';
-import { Skeleton } from './skeleton/Skeleton.js';
+import { Skeleton } from './content/skeleton/Skeleton.js';
 import { useMordocData } from './data-context.js';
 import { detectCurrentLang } from './lang-utils.js';
 import styles from './App.module.css';

@@ -26,8 +26,9 @@ export interface DevCommandOptions {
  * that arises from SSR HTML arriving before Vite's client runtime has injected
  * styles, and sidesteps SSR/hydration mismatch noise during development.
  *
- * `document.title` is set by `Content.tsx` via `useEffect` once the route
- * loader resolves — no server-side title injection needed in dev.
+ * `document.title` is set by the route's page component (`ArticlePage.tsx`
+ * or `LandingPage.tsx`) via `useEffect` once the route loader resolves —
+ * no server-side title injection needed in dev.
  *
  * The production `mordoc build` path still runs full SSR + SSG: `entry-server.tsx`
  * and the static-HTML output are exercised at build time.
@@ -142,7 +143,7 @@ export async function runDevCommand(options: DevCommandOptions): Promise<void> {
   //
   // Notably absent: <title> and all <style> tags you'd see in DevTools.
   // Those are never part of this response — <title> is set client-side by
-  // Content.tsx's useEffect once route data resolves, and styles are
+  // ArticlePage.tsx's (or LandingPage.tsx's) useEffect once route data resolves, and styles are
   // injected into the live DOM by Vite's CSS-HMR runtime after main.tsx
   // executes. This handler only ever produces the initial empty-bodied shell.
   server.middlewares.use(async (req, res, next) => {

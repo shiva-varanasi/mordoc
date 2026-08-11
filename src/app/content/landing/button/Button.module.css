@@ -1,10 +1,19 @@
 /* ── Button tokens ────────────────────────────────────────────── */
 
 :root {
-  --button-primary-fg: white;
-  --button-height:     2.625rem;
-  --button-px:         1.375rem;
-  --button-font-size:  0.9375rem;
+  --button-primary-fg:           white;
+  --button-height:                2.625rem;
+  --button-padding:               1.375rem;
+  --button-font-size:             0.9375rem;
+
+  /* Default to the global accent scale (derived), independently
+     overridable per state/variant. */
+  --button-primary-bg:           var(--accent);
+  --button-primary-border:       var(--accent);
+  --button-primary-hover-bg:     var(--accent-strong);
+  --button-primary-hover-border: var(--accent-strong);
+  --button-secondary-fg:         var(--accent);
+  --button-secondary-hover-bg:   var(--accent-subtle);
 }
 
 /* ── Button ───────────────────────────────────────────────────── */
@@ -14,7 +23,7 @@
   align-items: center;
   justify-content: center;
   height: var(--button-height);
-  padding: 0 var(--button-px);
+  padding: 0 var(--button-padding);
   border-radius: var(--radius-md);
   font-size: var(--button-font-size);
   font-weight: 600;
@@ -29,26 +38,26 @@
 /* ── Primary ──────────────────────────────────────────────────── */
 
 .primary {
-  background: var(--accent);
+  background: var(--button-primary-bg);
   color: var(--button-primary-fg);
-  border-color: var(--accent);
+  border-color: var(--button-primary-border);
 }
 
 .primary:hover {
-  background: var(--accent-strong);
-  border-color: var(--accent-strong);
+  background: var(--button-primary-hover-bg);
+  border-color: var(--button-primary-hover-border);
 }
 
 /* ── Secondary ────────────────────────────────────────────── */
 
 .secondary {
   background: transparent;
-  color: var(--accent);
+  color: var(--button-secondary-fg);
   border-color: transparent;
 }
 
 .secondary:hover {
-  background: var(--accent-subtle);
+  background: var(--button-secondary-hover-bg);
 }
 
 /* Markdoc wraps button body text in <p> — collapse it so the button

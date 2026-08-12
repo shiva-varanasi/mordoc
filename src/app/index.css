@@ -18,6 +18,10 @@
    ROOT TOKENS — global design primitives only.
    Component-specific tokens live at the top of each component's
    CSS module file (e.g. Sidenav.module.css, Header.module.css).
+   These global tokens are overridden via config/styles/theme.css;
+   component-specific tokens are overridden per-component via
+   config/styles/<name>.css (e.g. config/styles/sidenav.css) — see
+   COMPONENT_THEME_FILES in src/vite/plugin.ts for the full list.
    ============================================================ */
 :root {
   /* Surfaces */
@@ -34,7 +38,7 @@
   --color-bg-hover: #f3f4f6;
 
   /* Accent — single configurable token; all other accent vars are derived.
-     Users override --accent (and optionally dark) in config/theme.css. */
+     Users override --accent (and optionally dark) in config/styles/theme.css. */
   --accent:          #D64518;
   --accent-subtle:   color-mix(in oklch, var(--accent) 8%, white);
   --accent-muted:    color-mix(in oklch, var(--accent) 20%, white);

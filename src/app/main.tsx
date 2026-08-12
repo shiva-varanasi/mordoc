@@ -17,6 +17,29 @@ import { createAppRouter } from './routes.js';
 import 'virtual:mordoc/font-face.css';
 // theme.css must be last so user overrides win over component-level :root tokens
 import 'virtual:mordoc/theme';
+// Per-component "advanced tier" token overrides — after theme.css, so a
+// component-specific override can win over a same-named global theme.css
+// token in the (expected-rare) case the two ever collide. Each resolves to
+// config/styles/<name>.css when present, empty otherwise — see
+// COMPONENT_THEME_FILES in src/vite/plugin.ts for the full list.
+import 'virtual:mordoc/theme/app';
+import 'virtual:mordoc/theme/sidenav';
+import 'virtual:mordoc/theme/header';
+import 'virtual:mordoc/theme/header-links';
+import 'virtual:mordoc/theme/topnav';
+import 'virtual:mordoc/theme/language-picker';
+import 'virtual:mordoc/theme/theme-toggle';
+import 'virtual:mordoc/theme/search-bar';
+import 'virtual:mordoc/theme/search-modal';
+import 'virtual:mordoc/theme/content';
+import 'virtual:mordoc/theme/article-page';
+import 'virtual:mordoc/theme/toc';
+import 'virtual:mordoc/theme/diagram';
+import 'virtual:mordoc/theme/image';
+import 'virtual:mordoc/theme/code-block';
+import 'virtual:mordoc/theme/callout';
+import 'virtual:mordoc/theme/card';
+import 'virtual:mordoc/theme/button';
 
 /**
  * Browser entry. Assembles `ShellData` from the eager virtual modules

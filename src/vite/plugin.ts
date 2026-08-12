@@ -57,6 +57,47 @@ const THEME_CSS_ID = 'virtual:mordoc/theme';
 const RESOLVED_THEME_CSS_EMPTY = '\0virtual:mordoc/theme';
 
 /**
+ * Prefix for per-component "advanced tier" token override virtual modules.
+ * The full id is `${COMPONENT_THEME_PREFIX}${name}` for each entry in
+ * {@link COMPONENT_THEME_FILES}, e.g. `virtual:mordoc/theme/sidenav`.
+ */
+const COMPONENT_THEME_PREFIX = 'virtual:mordoc/theme/';
+
+/**
+ * Per-component token override files. Each entry lets a site owner drop a
+ * `config/styles/<filename>` into their project to override that one
+ * component's `:root` token block, without touching the rest — the
+ * "advanced tier" alongside THEME_CSS_ID's single global "basic tier" file.
+ * Same resolve-real-file-or-empty pattern as THEME_CSS_ID, generalized over
+ * a table instead of one-off per file since the set is large and fixed.
+ *
+ * `name` is the id suffix after {@link COMPONENT_THEME_PREFIX}; `filename`
+ * is the file Vite looks for under config/styles/. Only components whose
+ * .module.css declares its own :root token block are listed here — some
+ * components deliberately have no override file (e.g. Hero, Footer).
+ */
+const COMPONENT_THEME_FILES: readonly { name: string; filename: string }[] = [
+  { name: 'app', filename: 'app.css' },
+  { name: 'sidenav', filename: 'sidenav.css' },
+  { name: 'header', filename: 'header.css' },
+  { name: 'header-links', filename: 'header-links.css' },
+  { name: 'topnav', filename: 'topnav.css' },
+  { name: 'language-picker', filename: 'language-picker.css' },
+  { name: 'theme-toggle', filename: 'theme-toggle.css' },
+  { name: 'search-bar', filename: 'search-bar.css' },
+  { name: 'search-modal', filename: 'search-modal.css' },
+  { name: 'content', filename: 'content.css' },
+  { name: 'article-page', filename: 'article-page.css' },
+  { name: 'toc', filename: 'toc.css' },
+  { name: 'diagram', filename: 'diagram.css' },
+  { name: 'image', filename: 'image.css' },
+  { name: 'code-block', filename: 'code-block.css' },
+  { name: 'callout', filename: 'callout.css' },
+  { name: 'card', filename: 'card.css' },
+  { name: 'button', filename: 'button.css' },
+];
+
+/**
  * Virtual module ID for the generated @font-face + --font-sans/--font-mono
  * CSS for a project's custom fonts (site.json's "fonts" field). Unlike
  * THEME_CSS_ID, this has no real file to resolve to — its content is always
@@ -671,6 +712,16 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
         const themePath = path.join(options.projectRoot, 'config', 'styles', 'theme.css');
         return fs.existsSync(themePath) ? themePath : RESOLVED_THEME_CSS_EMPTY;
       }
+      if (id.startsWith(COMPONENT_THEME_PREFIX)) {
+        const name = id.slice(COMPONENT_THEME_PREFIX.length);
+        const entry = COMPONENT_THEME_FILES.find((f) => f.name === name);
+        if (!entry) return null;
+        const filePath = path.join(options.projectRoot, 'config', 'styles', entry.filename);
+        // Same empty-sentinel scheme as THEME_CSS_ID, generalized: no static
+        // per-file constant exists, so the sentinel is derived from the id
+        // itself (still unique per component, still null-byte-prefixed).
+        return fs.existsSync(filePath) ? filePath : RESOLVED_PREFIX + id;
+      }
       if (id === FONT_FACE_CSS_ID) {
         return RESOLVED_PREFIX + FONT_FACE_CSS_ID;
       }
@@ -682,6 +733,7 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
 
     load(id) {
       if (id === RESOLVED_THEME_CSS_EMPTY) return '';
+      if (id.startsWith(RESOLVED_PREFIX + COMPONENT_THEME_PREFIX)) return '';
       if (id === RESOLVED_PREFIX + FONT_FACE_CSS_ID) {
         if (!data) {
           throw new Error(

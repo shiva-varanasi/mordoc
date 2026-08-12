@@ -65,6 +65,13 @@ declare module 'virtual:mordoc/header-links' {
 // CSS-only side-effect import; resolves to config/styles/theme.css when present.
 declare module 'virtual:mordoc/theme' {}
 
+// CSS-only side-effect imports for the per-component "advanced tier" token
+// overrides; each resolves to config/styles/<name>.css when present. Wildcard
+// declaration (same pattern as the page-module one below) rather than one
+// block per entry in COMPONENT_THEME_FILES, since all of them share the same
+// shape: no exports, CSS-only.
+declare module 'virtual:mordoc/theme/*' {}
+
 // Wildcard declaration for per-route lazy page modules.
 //
 // Every specifier of the form `virtual:mordoc/page/<routePath>` resolves

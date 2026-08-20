@@ -50,7 +50,7 @@
    background-size is fixed-pixel so the sweep width is constant
    regardless of the block's rendered width. */
 .block {
-  border-radius: var(--radius-sm);
+  border-radius: 4px;
   background-image: linear-gradient(
     90deg,
     var(--color-surface)  0px,

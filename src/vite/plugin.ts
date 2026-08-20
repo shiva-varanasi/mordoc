@@ -74,7 +74,7 @@ const COMPONENT_THEME_PREFIX = 'virtual:mordoc/theme/';
  * `name` is the id suffix after {@link COMPONENT_THEME_PREFIX}; `filename`
  * is the file Vite looks for under config/styles/. Only components whose
  * .module.css declares its own :root token block are listed here — some
- * components deliberately have no override file (e.g. Hero, Footer).
+ * components deliberately have no override file (e.g. Footer, LandingPage).
  */
 const COMPONENT_THEME_FILES: readonly { name: string; filename: string }[] = [
   { name: 'app', filename: 'app.css' },
@@ -88,7 +88,11 @@ const COMPONENT_THEME_FILES: readonly { name: string; filename: string }[] = [
   { name: 'search-modal', filename: 'search-modal.css' },
   { name: 'content', filename: 'content.css' },
   { name: 'article-page', filename: 'article-page.css' },
+  { name: 'not-found', filename: 'not-found.css' },
+  { name: 'skeleton', filename: 'skeleton.css' },
   { name: 'toc', filename: 'toc.css' },
+  { name: 'hero', filename: 'hero.css' },
+  { name: 'section', filename: 'section.css' },
   { name: 'diagram', filename: 'diagram.css' },
   { name: 'image', filename: 'image.css' },
   { name: 'code-block', filename: 'code-block.css' },

@@ -8,9 +8,13 @@
  * rendered on a new line in the accent color so authors can highlight a key
  * phrase without any custom CSS.
  *
- * `background` sets a background image or color but applies no overlay —
- * the author is responsible for preparing an image that works with the
- * existing text colors.
+ * `background` sets a background image (a path or URL) and applies no
+ * overlay — the author is responsible for preparing an image that works
+ * with the existing text colors. Solid background color, title color,
+ * title-accent color, and description color are all design decisions, not
+ * content — they live in Hero.module.css's tokens (--hero-bg,
+ * --hero-title-color, --hero-title-accent-color, --hero-desc-color) so a
+ * site owner controls them once via CSS, not per-instance in markdown.
  *
  * Registered as a Markdoc tag (`hero`) in markdoc-config.ts and in
  * LandingPage.tsx's components map.
@@ -25,28 +29,14 @@ interface HeroProps {
   description?: string;
   image?: string;
   background?: string;
-  titleColor?: string;
-  titleAccentColor?: string;
-  descriptionColor?: string;
   children?: React.ReactNode;
 }
 
-export function Hero({ title, titleAccent, description, image, background, titleColor, titleAccentColor, descriptionColor, children }: HeroProps) {
+export function Hero({ title, titleAccent, description, image, background, children }: HeroProps) {
   const style: React.CSSProperties = {};
   if (background) {
-    const isImagePath =
-      background.startsWith('/') ||
-      background.startsWith('http://') ||
-      background.startsWith('https://');
-    if (isImagePath) {
-      style.backgroundImage = `url(${background})`;
-    } else {
-      style.backgroundColor = background;
-    }
+    style.backgroundImage = `url(${background})`;
   }
-  if (titleColor)       (style as Record<string, string>)['--hero-title-color']        = titleColor;
-  if (titleAccentColor) (style as Record<string, string>)['--hero-title-accent-color'] = titleAccentColor;
-  if (descriptionColor) (style as Record<string, string>)['--hero-desc-color']         = descriptionColor;
 
   return (
     <section className={styles.hero} style={style}>

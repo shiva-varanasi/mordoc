@@ -7,6 +7,10 @@
 
   --header-links-link-padding:   0.25rem;
   --header-links-link-font-size: 0.875rem;
+  --header-links-link-radius:    4px;
+
+  --header-links-dropdown-radius:      6px;
+  --header-links-dropdown-item-radius: 4px;
 
   --header-links-button-height:    2rem;
   --header-links-button-padding:   0.875rem;
@@ -50,7 +54,7 @@
   text-decoration: underline;
   text-underline-offset: 2px;
   text-decoration-color: transparent;
-  border-radius: var(--radius-sm);
+  border-radius: var(--header-links-link-radius);
   white-space: nowrap;
   transition: color 0.15s, text-decoration-color 0.15s;
 }
@@ -98,7 +102,7 @@
   min-width: 160px;
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--header-links-dropdown-radius);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   padding: 4px;
   z-index: 200;
@@ -118,7 +122,7 @@
   font-weight: 500;
   color: var(--color-fg);
   text-decoration: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--header-links-dropdown-item-radius);
   white-space: nowrap;
   transition: background 0.12s, color 0.12s;
   cursor: pointer;

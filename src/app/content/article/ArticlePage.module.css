@@ -6,6 +6,9 @@
   --breadcrumb-link-hover: #1c1c1c;
   --breadcrumb-current:    #1c1c1c;
   --breadcrumb-sep:        #6b6b6b;
+
+  --blockquote-radius:  6px;
+  --inline-code-radius: 4px;
 }
 
 :global(.dark) {
@@ -245,7 +248,7 @@
   padding: 0.75rem 1.25rem;
   border-left: 3px solid var(--color-border);
   background: var(--color-surface);
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  border-radius: 0 var(--blockquote-radius) var(--blockquote-radius) 0;
   color: var(--color-fg-muted);
   font-style: italic;
 }
@@ -290,7 +293,7 @@
   background: var(--color-surface);
   color: var(--color-content-fg);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--inline-code-radius);
   font-family: var(--font-mono);
   font-size: 0.875em;
   font-weight: 400;

@@ -1,14 +1,13 @@
 /**
  * Section — full-width landing page content block.
  *
- * Provides a visual grouping container with optional background and an
- * optional title rendered as an <h2>. The inner content is constrained
- * to a readable max-width and centered.
+ * Provides a visual grouping container with an optional background image and
+ * an optional title rendered as an <h2>. The inner content is constrained to
+ * a readable max-width and centered.
  *
- * Background via `background` attribute:
- *   - image path (/... or http...)   → background-image
- *   - CSS color (#hex, rgb, named…)  → background-color
- *   - omitted                        → transparent
+ * `background` accepts an image path/URL only — a solid background color is
+ * a design decision, not content, and lives in Section.module.css's
+ * --section-bg token so a site owner controls it once via CSS.
  *
  * Children can be any mix of Markdoc block content (headings, paragraphs,
  * lists, code fences) and custom tags (cardGrid, card, callout, button).
@@ -28,24 +27,13 @@ interface SectionProps {
 
 export function Section({ title, background, children }: SectionProps) {
   const style: React.CSSProperties = {};
-  let isImageBg = false;
-
   if (background) {
-    const isImagePath =
-      background.startsWith('/') ||
-      background.startsWith('http://') ||
-      background.startsWith('https://');
-    if (isImagePath) {
-      style.backgroundImage = `url(${background})`;
-      isImageBg = true;
-    } else {
-      style.backgroundColor = background;
-    }
+    style.backgroundImage = `url(${background})`;
   }
 
   const className = [
     styles.section,
-    isImageBg ? styles.hasBackgroundImage : '',
+    background ? styles.hasBackgroundImage : '',
   ].filter(Boolean).join(' ');
 
   return (

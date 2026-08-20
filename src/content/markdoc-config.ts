@@ -231,7 +231,9 @@ const cardGrid: Schema = {
  * Hero tag — full-width landing page hero section.
  *
  * Layout is inferred: `image` present → split (text + image), absent → centered.
- * `background` accepts an image path or any CSS color value.
+ * `background` accepts an image path or URL only — solid background color
+ * and all text colors are design decisions owned by Hero.module.css's
+ * tokens, not markdown attributes.
  * CTA buttons are passed as children ({% button %} tags).
  * Authors use: {% hero title="..." description="..." image="..." background="..." %}
  *   {% button path="..." %}Label{% /button %}
@@ -241,23 +243,21 @@ const hero: Schema = {
   render: 'Hero',
   children: ['tag', 'paragraph'],
   attributes: {
-    title:            { type: String, required: true },
-    titleAccent:      { type: String },
-    description:      { type: String },
-    image:            { type: String },
-    background:       { type: String },
-    titleColor:       { type: String },
-    titleAccentColor: { type: String },
-    descriptionColor: { type: String },
+    title:       { type: String, required: true },
+    titleAccent: { type: String },
+    description: { type: String },
+    image:       { type: String },
+    background:  { type: String },
   },
 };
 
 /**
  * Section tag — full-width landing page content block.
  *
- * Optional `title` renders an <h2>. `background` accepts "subtle",
- * an image path, or any CSS color value.
- * Authors use: {% section title="..." background="subtle" %}...{% /section %}
+ * Optional `title` renders an <h2>. `background` accepts an image path or
+ * URL only — solid background color is a design decision owned by
+ * Section.module.css's --section-bg token, not a markdown attribute.
+ * Authors use: {% section title="..." background="/images/foo.jpg" %}...{% /section %}
  */
 const section: Schema = {
   render: 'Section',

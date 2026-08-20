@@ -10,6 +10,11 @@
   --modal-input-size:  16px;
   --modal-result-hover: var(--color-bg-hover);
   --modal-result-selected: var(--accent-subtle);
+
+  --modal-radius: 10px;
+  --modal-result-radius: 6px;
+  /* Shared by .closeBtn kbd and .notice code — both the same inline chip. */
+  --modal-kbd-radius: 4px;
 }
 
 :global(.dark) {
@@ -39,7 +44,7 @@
   max-width: var(--modal-max-width);
   background: var(--modal-bg);
   border: 1px solid var(--modal-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--modal-radius);
   box-shadow: var(--modal-shadow);
   overflow: hidden;
   display: flex;
@@ -98,7 +103,7 @@
   align-items: center;
   padding: 2px 7px;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--modal-kbd-radius);
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 500;
@@ -123,7 +128,7 @@
   font-size: 12px;
   background: var(--color-surface);
   padding: 1px 5px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--modal-kbd-radius);
   border: 1px solid var(--color-border);
 }
 
@@ -143,7 +148,7 @@
   flex-direction: column;
   gap: 3px;
   padding: 10px 12px;
-  border-radius: var(--radius-md);
+  border-radius: var(--modal-result-radius);
   cursor: pointer;
   transition: background-color 0.1s;
 }

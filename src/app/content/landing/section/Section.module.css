@@ -1,8 +1,19 @@
+/* ============================================================
+   SECTION TOKENS
+   Solid background color is a design decision, not content. A
+   `background` image (set per-instance in markdown) layers on top of
+   --section-bg via its own inline style.
+   ============================================================ */
+:root {
+  --section-bg: transparent;
+}
+
 /* ── Section ──────────────────────────────────────────────────── */
 
 .section {
   position: relative;
   width: 100%;
+  background-color: var(--section-bg);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

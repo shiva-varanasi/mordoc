@@ -6,6 +6,10 @@
    are already dark-mode-aware — no separate dark override needed here.
    ============================================================ */
 :root {
+  /* Shared by all three row types (group trigger, linked group label, leaf
+     link) and their focus ring — they're all the same row shape. */
+  --sidenav-row-radius: 6px;
+
   --sidenav-fg:                 #383838;
   --sidenav-fg-muted:           #666666;
   --sidenav-group-label-fg:     rgba(56, 56, 56, 0.7);
@@ -64,7 +68,7 @@
   min-height: 36px;
   padding: 6px 8px;
   margin-top: 10px;
-  border-radius: var(--radius-md);
+  border-radius: var(--sidenav-row-radius);
   background: none;
   border: none;
   font-size: 12px;
@@ -102,7 +106,7 @@
   width: 100%;
   min-height: 36px;
   padding: 6px 8px;
-  border-radius: var(--radius-md);
+  border-radius: var(--sidenav-row-radius);
   font-size: 14px;
   font-weight: var(--sidenav-font-weight);
   line-height: 1.25;
@@ -138,7 +142,7 @@
   width: 100%;
   min-height: 36px;
   padding: 6px 8px;
-  border-radius: var(--radius-md);
+  border-radius: var(--sidenav-row-radius);
   font-size: 14px;
   font-weight: var(--sidenav-font-weight);
   line-height: 1.25;
@@ -189,7 +193,7 @@
 .navLink:focus-visible {
   outline: 2px solid var(--accent-emphasis);
   outline-offset: -2px;
-  border-radius: var(--radius-md);
+  border-radius: var(--sidenav-row-radius);
 }
 
 /* ============================================================

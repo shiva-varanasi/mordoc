@@ -15,6 +15,14 @@
   --button-primary-hover-border: var(--accent-strong);
   --button-secondary-fg:         var(--accent);
   --button-secondary-hover-bg:   var(--accent-subtle);
+
+  /* Off by default (no visual change for themes that don't set these) —
+     a theme with same-color-as-background buttons (e.g. an accent-filled
+     hero on an accent-colored button) can opt in to a shadow so the
+     button still reads as a distinct shape. See card.css's --card-shadow
+     for the same pattern applied to cards. */
+  --button-shadow:       none;
+  --button-shadow-hover: none;
 }
 
 /* ── Button ───────────────────────────────────────────────────── */
@@ -33,7 +41,12 @@
   white-space: nowrap;
   cursor: pointer;
   border: 1.5px solid transparent;
+  box-shadow: var(--button-shadow);
   transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.button:hover {
+  box-shadow: var(--button-shadow-hover);
 }
 
 /* ── Primary ──────────────────────────────────────────────────── */

@@ -1,5 +1,0 @@
-/* Content layout sizing — THE MATRIX — a touch wider, terminal-width feel */
-:root {
-  --toc-width:         16rem;
-  --article-max-width: 68rem;
-}

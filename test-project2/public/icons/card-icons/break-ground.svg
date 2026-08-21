@@ -1,7 +1,0 @@
-<svg width="40" height="36" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect x="1" y="1" width="38" height="34" fill="#ffd23f" stroke="#0a0a0a" stroke-width="2"/>
-<!-- Hard hat -->
-<path d="M12 24H28" stroke="#0a0a0a" stroke-width="2.2" stroke-linecap="square"/>
-<path d="M14 24C14 18 16.5 13 20 13C23.5 13 26 18 26 24" stroke="#0a0a0a" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter"/>
-<path d="M20 13V10.5" stroke="#0a0a0a" stroke-width="2.2" stroke-linecap="square"/>
-</svg>

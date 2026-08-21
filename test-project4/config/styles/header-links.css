@@ -1,9 +1,0 @@
-/* Header links — DEEP SPACE NETWORK */
-:root {
-  --header-links-menu-btn-radius:      var(--radius-sm);
-  --header-links-link-radius:          var(--radius-sm);
-  --header-links-dropdown-radius:      var(--radius-md);
-  --header-links-dropdown-item-radius: var(--radius-sm);
-  --header-links-link-color:           var(--accent-emphasis);
-  --header-links-link-color-hover:     var(--accent-strong);
-}

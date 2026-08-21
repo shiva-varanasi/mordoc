@@ -1,9 +1,0 @@
-/* Hero — DEEP SPACE NETWORK — no separate panel tone; the hero is
-   just open space, the page's own void. The foreground image gets
-   the theme's cyan glow instead of a drop shadow, like it's emitting
-   its own light against the dark. */
-:root {
-  --hero-bg: transparent;
-  --hero-image-radius: var(--radius-md);
-  --hero-image-shadow: var(--shadow-md);
-}

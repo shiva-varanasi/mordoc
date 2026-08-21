@@ -1,8 +1,0 @@
-/* Theme toggle — NEO-BRUTALIST WEB */
-:root {
-  --theme-toggle-bg:       var(--color-surface);
-  --theme-toggle-bg-hover: var(--color-bg-hover);
-  --theme-toggle-border:   var(--color-border);
-  --theme-toggle-fg:       var(--color-fg);
-  --theme-toggle-radius:   0;
-}

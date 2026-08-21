@@ -1,8 +1,0 @@
-/* Search modal — NEO-BRUTALIST WEB — a hard offset block, not a soft shadow */
-:root {
-  --modal-overlay-bg: rgba(10, 10, 10, 0.6);
-  --modal-shadow:     8px 8px 0 var(--color-border);
-  --modal-radius: 0;
-  --modal-result-radius: 0;
-  --modal-kbd-radius: 0;
-}

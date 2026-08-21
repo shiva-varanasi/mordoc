@@ -1,7 +1,0 @@
-/* Content layout sizing — DEEP SPACE NETWORK — intentionally makes no
-   width claim. The previous Mad Max: Fury Road theme widened this
-   (--toc-width: 16rem, --article-max-width: 68rem); per request, this
-   theme leaves Mordoc's own component defaults in place instead (see
-   Content.module.css: --toc-width: 16rem, --article-max-width: 64rem)
-   rather than restating numbers here where they could drift out of
-   sync if the framework default ever changes. */

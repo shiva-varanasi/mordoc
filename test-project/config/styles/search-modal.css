@@ -1,5 +1,0 @@
-/* Search modal — THE MATRIX — a CRT glow instead of a diffuse shadow */
-:root {
-  --modal-overlay-bg: rgba(0, 0, 0, 0.85);
-  --modal-shadow:     0 0 48px rgba(0, 255, 65, 0.1), 0 0 0 1px var(--color-border);
-}

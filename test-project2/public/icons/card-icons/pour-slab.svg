@@ -1,7 +1,0 @@
-<svg width="40" height="36" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect x="1" y="1" width="38" height="34" fill="#ffd23f" stroke="#0a0a0a" stroke-width="2"/>
-<!-- Crane lifting a load -->
-<path d="M13 26V12H27" stroke="#0a0a0a" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter"/>
-<path d="M25 12V16" stroke="#0a0a0a" stroke-width="2"/>
-<rect x="22" y="16" width="6" height="5" stroke="#0a0a0a" stroke-width="1.8"/>
-</svg>

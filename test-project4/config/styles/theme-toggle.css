@@ -1,8 +1,0 @@
-/* Theme toggle — DEEP SPACE NETWORK */
-:root {
-  --theme-toggle-bg:       var(--color-surface);
-  --theme-toggle-bg-hover: var(--color-bg-hover);
-  --theme-toggle-border:   var(--color-border);
-  --theme-toggle-fg:       var(--color-fg);
-  --theme-toggle-radius:   var(--radius-sm);
-}

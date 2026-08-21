@@ -1,5 +1,0 @@
-/* Topnav — THE MATRIX — a thick cursor-like active bar, not a hairline */
-:root {
-  --topnav-active-border-width: 3px;
-  --topnav-active-border-color: var(--accent-emphasis);
-}

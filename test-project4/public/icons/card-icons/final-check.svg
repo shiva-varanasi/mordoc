@@ -1,7 +1,0 @@
-<svg width="40" height="36" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect x="0.75" y="0.75" width="38.5" height="34.5" rx="5" fill="#0c1224" stroke="rgba(0,229,255,0.35)" stroke-width="1.5"/>
-<!-- Clipboard with checkmark -->
-<rect x="12" y="11" width="16" height="19" rx="1.5" stroke="#00e5ff" stroke-width="1.8"/>
-<rect x="16" y="9" width="8" height="4" rx="1" stroke="#00e5ff" stroke-width="1.8"/>
-<path d="M15.5 20.5L18.5 23.5L24.5 17" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>

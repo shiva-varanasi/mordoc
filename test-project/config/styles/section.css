@@ -1,4 +1,0 @@
-/* Section — THE MATRIX — a shade darker than the page, so cards float above it */
-:root {
-  --section-bg: color-mix(in oklch, var(--accent) 8%, var(--color-bg));
-}

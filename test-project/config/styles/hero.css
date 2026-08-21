@@ -1,4 +1,0 @@
-/* Hero — THE MATRIX — a console block, subtly lit against the page */
-:root {
-  --hero-bg: color-mix(in oklch, var(--accent) 14%, var(--color-bg));
-}

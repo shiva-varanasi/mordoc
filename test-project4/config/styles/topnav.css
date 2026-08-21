@@ -1,6 +1,0 @@
-/* Topnav — DEEP SPACE NETWORK — a precise readout underline, not a
-   welded bar. */
-:root {
-  --topnav-active-border-width: 2px;
-  --topnav-active-border-color: var(--accent-emphasis);
-}

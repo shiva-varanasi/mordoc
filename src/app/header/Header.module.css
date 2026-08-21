@@ -23,7 +23,7 @@
     --primary-area-gap:       8px;
   }
 
-  .rightArea {
+  .rightSection {
     gap: 2px;
   }
 }
@@ -82,7 +82,7 @@
 }
 
 /* Three regions */
-.brandArea {
+.leftSection {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -91,14 +91,14 @@
 
 /* Area box for SearchBar — Header decides placement (claims the center
    column); SearchBar.module.css only styles its own inner content. */
-.searchArea {
+.middleSection {
   flex: 1;
   display: flex;
   justify-content: center;
   min-width: 0;
 }
 
-.rightArea {
+.rightSection {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -180,7 +180,7 @@
     display: inline-flex;
   }
 
-  .searchArea {
+  .middleSection {
     display: none;
   }
 

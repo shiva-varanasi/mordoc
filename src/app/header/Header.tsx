@@ -81,8 +81,8 @@ export function Header({ sidenavOpen, onMenuToggle, onSearchOpen, showMenu = tru
     <div className={styles.header}>
       {/* Primary row */}
       <div className={styles.primaryArea}>
-        {/* Brand — hamburger + logo */}
-        <div className={styles.brandArea}>
+        {/* Left section — hamburger + logo */}
+        <div className={styles.leftSection}>
           {showMenu && (
             <button
               className={styles.menuBtn}
@@ -102,13 +102,13 @@ export function Header({ sidenavOpen, onMenuToggle, onSearchOpen, showMenu = tru
           </Link>
         </div>
 
-        {/* Centered search */}
-        <div className={styles.searchArea}>
+        {/* Middle section — centered search */}
+        <div className={styles.middleSection}>
           <SearchBar onOpen={onSearchOpen} />
         </div>
 
-        {/* Right actions */}
-        <div className={styles.rightArea}>
+        {/* Right section — actions */}
+        <div className={styles.rightSection}>
           <HeaderLinks links={translatedHeaderLinks} />
           {language && language.languages.length > 1 && (
             <LanguagePicker

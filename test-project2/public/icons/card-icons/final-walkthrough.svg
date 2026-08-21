@@ -1,0 +1,6 @@
+<svg width="40" height="36" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="1" y="1" width="38" height="34" fill="#ffd23f" stroke="#0a0a0a" stroke-width="2"/>
+<!-- Eye, square pupil -->
+<path d="M11 18C14 12.5 17.5 11 20 11C22.5 11 26 12.5 29 18C26 23.5 22.5 25 20 25C17.5 25 14 23.5 11 18Z" stroke="#0a0a0a" stroke-width="2.2" stroke-linejoin="miter"/>
+<rect x="17.5" y="15.5" width="5" height="5" stroke="#0a0a0a" stroke-width="2"/>
+</svg>

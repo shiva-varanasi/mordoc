@@ -1,0 +1,5 @@
+<svg width="90" height="28" viewBox="0 0 90 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="0.75" y="0.75" width="26.5" height="26.5" rx="5.25" fill="#00170a" stroke="#00ff41" stroke-width="1.5"/>
+<text x="8.5" y="20" font-family="'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace" font-size="16" font-weight="700" fill="#00ff41">#</text>
+<text x="36" y="19" font-family="'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace" font-size="16" font-weight="700" letter-spacing="1.5" fill="#f0fff4">ROOT</text>
+</svg>

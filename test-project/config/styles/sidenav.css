@@ -1,0 +1,15 @@
+/* Sidenav — THE MATRIX — "you are here" is marked with the same
+   phosphor white used for headings, not a third color: the active
+   item reads as emphasis (bold, brighter wash) rather than a
+   different hue, consistently with toc.css's active section.
+   Everything else (rest state, hover) stays the ambient green. */
+:root {
+  --sidenav-fg:             #00e63c;
+  --sidenav-fg-muted:       #0f9c2c;
+  --sidenav-group-label-fg: rgba(0, 230, 60, 0.7);
+  --sidenav-hover-bg:       #061206;
+
+  --sidenav-active-fg:          #f0fff4;
+  --sidenav-active-bg:          color-mix(in oklch, var(--accent) 18%, #000000);
+  --sidenav-active-font-weight: 700;
+}

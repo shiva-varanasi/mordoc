@@ -1,0 +1,5 @@
+/* Cards — THE MATRIX */
+:root {
+  --card-tag-bg:    color-mix(in oklch, var(--accent) 20%, #030c03);
+  --card-tag-color: var(--accent-emphasis);
+}

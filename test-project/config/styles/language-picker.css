@@ -1,0 +1,7 @@
+/* Language picker — THE MATRIX */
+:root {
+  --lang-fg:       #0f9c2c;
+  --lang-fg-hover: #00ff41;
+  --lang-bg-hover: #061206;
+  --lang-radius:   0;
+}

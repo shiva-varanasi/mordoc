@@ -1,0 +1,5 @@
+<svg width="40" height="36" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="0.75" y="0.75" width="38.5" height="34.5" rx="5" fill="#0c1224" stroke="rgba(0,229,255,0.35)" stroke-width="1.5"/>
+<!-- Signal / telemetry trace -->
+<path d="M10 18H14L16.5 12L20 24L22.5 16L24.5 18H30" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

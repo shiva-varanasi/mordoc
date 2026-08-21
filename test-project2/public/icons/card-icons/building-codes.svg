@@ -1,0 +1,6 @@
+<svg width="40" height="36" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="1" y="1" width="38" height="34" fill="#ffd23f" stroke="#0a0a0a" stroke-width="2"/>
+<!-- Set-square / drafting triangle -->
+<path d="M11 25L20 10L29 25" stroke="#0a0a0a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="square"/>
+<path d="M14.5 19H25.5" stroke="#0a0a0a" stroke-width="1.6"/>
+</svg>

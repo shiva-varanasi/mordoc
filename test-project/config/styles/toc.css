@@ -1,0 +1,11 @@
+/* Toc — THE MATRIX — hover stays the ambient green; the active section
+   (your actual reading position on the page) gets the same phosphor
+   white used for the active sidenav item and for headings, so "current
+   location" reads as one consistent signal across both nav surfaces —
+   the green marker border keeps a location cue even for readers who
+   rely on color alone for the border/text distinction. */
+:root {
+  --toc-link-hover-fg:      var(--accent-emphasis);
+  --toc-link-active-fg:     #f0fff4;
+  --toc-link-active-border: var(--accent);
+}

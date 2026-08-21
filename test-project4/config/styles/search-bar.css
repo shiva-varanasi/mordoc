@@ -1,0 +1,11 @@
+/* Search bar — DEEP SPACE NETWORK */
+:root {
+  --search-bar-bg:           var(--color-surface);
+  --search-bar-bg-hover:     var(--color-bg-hover);
+  --search-bar-border:       var(--color-border);
+  --search-bar-border-hover: var(--accent);
+  --search-bar-fg:           var(--color-fg-muted);
+  --search-bar-radius:       var(--radius-sm);
+  --search-bar-kbd-bg:       var(--color-bg);
+  --search-bar-kbd-radius:   var(--radius-sm);
+}

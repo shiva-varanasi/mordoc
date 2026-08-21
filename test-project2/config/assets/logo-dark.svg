@@ -1,0 +1,10 @@
+<svg width="100" height="28" viewBox="0 0 100 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<pattern id="hazard-dark" width="10" height="10" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+<rect width="10" height="10" fill="#0a0a0a"/>
+<rect width="5" height="10" fill="#ffd23f"/>
+</pattern>
+</defs>
+<rect x="0.75" y="0.75" width="26.5" height="26.5" fill="url(#hazard-dark)" stroke="#ffffff" stroke-width="1.5"/>
+<text x="35" y="20" font-family="'Space Grotesk', ui-sans-serif, system-ui, sans-serif" font-size="17" font-weight="700" letter-spacing="1" fill="#ffffff">SLAB</text>
+</svg>

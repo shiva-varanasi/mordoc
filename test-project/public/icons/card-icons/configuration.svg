@@ -1,0 +1,15 @@
+<svg width="40" height="36" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="0.5" y="0.5" width="39" height="35" rx="7.5" fill="#03170a" stroke="#0b3016"/>
+<!-- Slider track 1 -->
+<line x1="11" y1="12" x2="29" y2="12" stroke="#00ff41" stroke-width="2" stroke-linecap="round"/>
+<!-- Slider handle 1 -->
+<circle cx="17" cy="12" r="3" fill="#03170a" stroke="#00ff41" stroke-width="2"/>
+<!-- Slider track 2 -->
+<line x1="11" y1="18" x2="29" y2="18" stroke="#00ff41" stroke-width="2" stroke-linecap="round"/>
+<!-- Slider handle 2 -->
+<circle cx="24" cy="18" r="3" fill="#03170a" stroke="#00ff41" stroke-width="2"/>
+<!-- Slider track 3 -->
+<line x1="11" y1="24" x2="29" y2="24" stroke="#00ff41" stroke-width="2" stroke-linecap="round"/>
+<!-- Slider handle 3 -->
+<circle cx="18" cy="24" r="3" fill="#03170a" stroke="#00ff41" stroke-width="2"/>
+</svg>

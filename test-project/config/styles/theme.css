@@ -1,0 +1,54 @@
+/* ============================================================
+   THEME — THE MATRIX (global tier)
+   Single palette, no light/dark split — this project only ever
+   renders as the black-phosphor console (used for screen capture,
+   not a published site), so there is one canonical look instead of
+   two maintained in parallel.
+
+   Color logic: green is still the ambient "system" tone (body copy,
+   default links/buttons — everything --accent-derived), but it no
+   longer carries every job alone. A near-white sits above it for
+   headings/emphasis — the Construct's white void and old
+   white-phosphor terminals are as much "Matrix" as the green rain
+   is. That same white also marks your actual current location
+   (active sidenav item, active toc section) — no third color in the
+   system, just the emphasis tone doing double duty. See sidenav.css /
+   toc.css for where it's wired in.
+
+   Component-specific tokens live in their own files under this
+   folder (sidenav.css, callout.css, diagram.css, etc.) — see
+   COMPONENT_THEME_FILES in src/vite/plugin.ts for the full list.
+   ============================================================ */
+
+:root {
+  --accent: #00ff41;
+  /* Derived accent tokens pinned to their dark-surface formula so they
+     don't shift if the (unused) light/dark toggle is ever clicked. */
+  --accent-subtle:   color-mix(in oklch, var(--accent) 12%, #000000);
+  --accent-muted:    color-mix(in oklch, var(--accent) 25%, #000000);
+  --accent-emphasis: color-mix(in oklch, var(--accent) 70%, white);
+  --accent-strong:   color-mix(in oklch, var(--accent) 50%, white);
+
+  --color-bg:        #000000;
+  --color-surface:   #030c03;
+  --color-border:    #0b3016;
+
+  --color-fg:         #f0fff4; /* phosphor white — headings, primary chrome */
+  --color-content-fg: #00e63c; /* ambient green — body copy */
+  --color-fg-muted:   #4a8f5c; /* dimmed green — secondary/meta text */
+
+  --color-bg-hover:   #061206;
+
+  /* Shape — flat, no rounding, no elevation */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --shadow-sm: none;
+  --shadow-md: none;
+}
+
+/* Console texture — slightly tracked-out, a little extra leading */
+body {
+  letter-spacing: 0.015em;
+  line-height: 1.7;
+}

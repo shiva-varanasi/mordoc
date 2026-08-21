@@ -1,0 +1,4 @@
+/* Header — THE MATRIX — flat menu button, no rounding */
+:root {
+  --menu-btn-radius: 0;
+}

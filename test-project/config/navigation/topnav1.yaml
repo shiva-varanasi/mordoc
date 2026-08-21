@@ -1,0 +1,7 @@
+- label: Main guide
+  path: /introduction
+  sidenav: main-guide.yaml
+
+- label: Writing content
+  path: /writing-content/markdown-basics
+  sidenav: writing-content.yaml

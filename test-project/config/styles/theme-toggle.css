@@ -1,0 +1,8 @@
+/* Theme toggle — THE MATRIX */
+:root {
+  --theme-toggle-bg:       #030c03;
+  --theme-toggle-bg-hover: #061206;
+  --theme-toggle-border:   #0b3016;
+  --theme-toggle-fg:       #00ff41;
+  --theme-toggle-radius:   0;
+}

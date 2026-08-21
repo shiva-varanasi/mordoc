@@ -1,0 +1,16 @@
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script>
+  /* Force the theme via URL, e.g. /introduction?theme=dark — used by the
+     marketing-video player, whose iframes get partitioned (empty) storage
+     and therefore can't see a theme toggled in a normal tab. Runs before
+     the app bundle, which reads mordoc-theme from localStorage at boot. */
+  try {
+    var mordocThemeParam = new URLSearchParams(location.search).get('theme');
+    if (mordocThemeParam === 'dark' || mordocThemeParam === 'light') {
+      localStorage.setItem('mordoc-theme', mordocThemeParam);
+    }
+  } catch (e) {}
+</script>

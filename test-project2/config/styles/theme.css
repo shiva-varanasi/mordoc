@@ -1,0 +1,72 @@
+/* ============================================================
+   THEME — NEO-BRUTALIST WEB (global tier)
+   Flat, unmixed poster colors on a stark white/black canvas — no
+   gradients, no soft elevation. One loud accent (acid yellow) does
+   every interactive job; borders are always solid — black in light
+   mode, flipping to white in dark mode — so they read as a drawn
+   line rather than a subtle divider. Zero corner radius everywhere,
+   and where a component exposes a shadow token it's a hard, unblurred
+   offset block instead of a blurred drop shadow — the signature
+   "paper cutout" brutalist card. See card.css/hero.css for where the
+   offset-shadow trick and solid color blocking show up most. Fonts
+   (Space Grotesk for body, Space Mono for code — both geometric,
+   grid-driven grotesks) are wired via config/site.json's "fonts" block.
+   Component-specific tokens live in their own files under this
+   folder (sidenav.css, callout.css, diagram.css, etc.) — see
+   COMPONENT_THEME_FILES in src/vite/plugin.ts for the full list.
+   ============================================================ */
+
+:root {
+  --accent: #ffd23f;
+  /* Raw yellow only works as a solid block/border — as small text on
+     white it's nearly unreadable, so --accent-emphasis (what prose
+     links, nav text etc. actually render in) is a darkened "text-safe"
+     gold instead of the raw brand hex. --accent itself stays the pure
+     hex for backgrounds/borders/shadows, where it sits behind explicit
+     black text rather than being text itself. */
+  --accent-subtle:   color-mix(in oklch, var(--accent) 14%, white);
+  --accent-muted:    color-mix(in oklch, var(--accent) 28%, white);
+  --accent-emphasis: color-mix(in oklch, var(--accent) 55%, black);
+  --accent-strong:   color-mix(in oklch, var(--accent) 35%, black);
+
+  --color-bg:        #ffffff;
+  --color-surface:   #f2f2f2;
+  --color-border:    #0a0a0a;
+  --color-fg:         #0a0a0a;
+  --color-content-fg: #1a1a1a;
+  --color-fg-muted:   #5c5c5c;
+  --color-bg-hover:   #eaeaea;
+
+  /* Shape — flat, no rounding; hard unblurred offset instead of elevation */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --shadow-sm: 4px 4px 0 #0a0a0a;
+  --shadow-md: 6px 6px 0 #0a0a0a;
+}
+
+.dark {
+  /* Same brand yellow — on black it's the raw hex that reads as text
+     (no darkening needed), the opposite problem from light mode. */
+  --accent-subtle:   color-mix(in oklch, var(--accent) 18%, #0a0a0a);
+  --accent-muted:    color-mix(in oklch, var(--accent) 32%, #0a0a0a);
+  --accent-emphasis: var(--accent);
+  --accent-strong:   color-mix(in oklch, var(--accent) 78%, white);
+
+  --color-bg:        #0a0a0a;
+  --color-surface:   #171717;
+  --color-border:    #ffffff;
+  --color-fg:         #ffffff;
+  --color-content-fg: #ededed;
+  --color-fg-muted:   #9a9a9a;
+  --color-bg-hover:   #1f1f1f;
+
+  --shadow-sm: 4px 4px 0 #ffffff;
+  --shadow-md: 6px 6px 0 #ffffff;
+}
+
+/* Space Grotesk is a tight geometric grotesk — a slightly negative
+   tracking leans into that grid-cut character instead of fighting it. */
+body {
+  letter-spacing: -0.01em;
+}

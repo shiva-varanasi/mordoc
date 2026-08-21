@@ -1,0 +1,70 @@
+/* ============================================================
+   CODE BLOCK — NEO-BRUTALIST WEB
+   Same poster palette as callout.css/diagram.css instead of Prism's
+   default rainbow. Literal/data tokens use --accent-emphasis (the
+   text-safe gold), not raw --accent — raw yellow is unreadable as
+   small text against the light-mode surface, so it's reserved for
+   backgrounds/borders/shadows elsewhere. String color also moved off
+   yellow (teal instead) so it doesn't collide with the brand accent.
+   ============================================================ */
+:root {
+  --cb-radius:             0;
+  --cb-copy-button-radius: 0;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: var(--color-fg-muted);
+  font-style: italic;
+}
+
+.token.punctuation {
+  color: var(--color-content-fg);
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: var(--accent-emphasis);
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #0090ad;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #1f9d4c;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: var(--color-fg);
+  font-weight: 700;
+}
+
+.token.function,
+.token.class-name {
+  color: #e8281b;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #c81c72;
+}

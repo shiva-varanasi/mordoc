@@ -1,0 +1,11 @@
+/* Search bar — THE MATRIX */
+:root {
+  --search-bar-bg:           #030c03;
+  --search-bar-bg-hover:     #061206;
+  --search-bar-border:       #0b3016;
+  --search-bar-border-hover: var(--accent);
+  --search-bar-fg:           #0f9c2c;
+  --search-bar-radius:       0;
+  --search-bar-kbd-bg:       #000000;
+  --search-bar-kbd-radius:   0;
+}

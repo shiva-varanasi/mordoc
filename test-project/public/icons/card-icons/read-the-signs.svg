@@ -1,0 +1,11 @@
+<svg width="40" height="36" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="0.5" y="0.5" width="39" height="35" rx="7.5" fill="#03170a" stroke="#0b3016"/>
+<!-- Magnifying glass -->
+<circle cx="17" cy="16" r="6" stroke="#00ff41" stroke-width="2"/>
+<path d="M21.5 20.5L27 26" stroke="#00ff41" stroke-width="2" stroke-linecap="round"/>
+<!-- Pattern being scanned -->
+<circle cx="14.5" cy="14" r="0.9" fill="#00ff41"/>
+<circle cx="18.5" cy="13.5" r="0.9" fill="#00ff41"/>
+<circle cx="15.5" cy="18" r="0.9" fill="#00ff41"/>
+<circle cx="19.5" cy="17.5" r="0.9" fill="#00ff41"/>
+</svg>

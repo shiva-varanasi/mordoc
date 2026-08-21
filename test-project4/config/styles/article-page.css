@@ -1,0 +1,11 @@
+/* Breadcrumbs — DEEP SPACE NETWORK — hover picks up the cyan accent
+   instead of a neutral shift. */
+:root {
+  --breadcrumb-link:       var(--color-fg-muted);
+  --breadcrumb-link-hover: var(--accent-emphasis);
+  --breadcrumb-current:    var(--color-fg);
+  --breadcrumb-sep:        var(--color-fg-muted);
+
+  --blockquote-radius:  var(--radius-sm);
+  --inline-code-radius: var(--radius-sm);
+}

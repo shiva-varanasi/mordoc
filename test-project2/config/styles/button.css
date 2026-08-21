@@ -1,0 +1,24 @@
+/* Buttons — NEO-BRUTALIST WEB — solid accent block, black/white outline.
+   Black text works on the yellow bg in both modes, so no dark override
+   is needed here. --button-secondary-fg is pinned to --accent-emphasis
+   (the text-safe gold) rather than the default raw --accent, since
+   raw yellow text on a transparent/page background is unreadable.
+
+   --button-shadow: the primary button is accent-filled, and so is this
+   theme's hero (--hero-bg: var(--accent) in hero.css) — same-color-on-
+   same-color would leave only the 1.5px border holding the button
+   together. The card's hard offset shadow fixes the same problem for
+   cards; reusing it here keeps the button legible as its own shape
+   regardless of what it's sitting on. Hover shadow stays black (not
+   accent) since an accent-colored shadow would vanish against the
+   accent-filled hero the same way the fill does. */
+:root {
+  --button-primary-fg:           #0a0a0a;
+  --button-height:                2.75rem;
+  --button-radius:                0;
+  --button-primary-border:       var(--color-border);
+  --button-primary-hover-border: var(--color-border);
+  --button-secondary-fg:         var(--accent-emphasis);
+  --button-shadow:                4px 4px 0 var(--color-border);
+  --button-shadow-hover:          6px 6px 0 var(--color-border);
+}

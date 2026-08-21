@@ -1,0 +1,25 @@
+/* Cards — DEEP SPACE NETWORK — the signature texture: a scattered
+   starfield (three tiled radial-gradient dot layers, different tile
+   sizes so they don't align into an obvious grid) under a faint
+   cyan-nebula wash, over the surface color — instead of a flat fill,
+   a gloss gradient, or parchment foxing. Translucent cyan edge
+   instead of an opaque border; hover brightens the border to full
+   accent and swaps in the bigger glow. Tag reads like a HUD readout
+   chip — dark navy text on bright cyan. */
+:root {
+  --card-bg:
+    radial-gradient(1px 1px at 20% 30%, rgba(234, 244, 255, 0.9), transparent) 0 0 / 170px 170px repeat,
+    radial-gradient(1px 1px at 65% 70%, rgba(234, 244, 255, 0.7), transparent) 0 0 / 210px 210px repeat,
+    radial-gradient(1.5px 1.5px at 40% 85%, rgba(234, 244, 255, 0.8), transparent) 0 0 / 250px 250px repeat,
+    radial-gradient(ellipse 90% 70% at 75% 15%, rgba(0, 229, 255, 0.08), transparent 70%),
+    var(--color-surface);
+
+  --card-border:       var(--color-border);
+  --card-border-hover: var(--accent);
+  --card-shadow:       var(--shadow-sm);
+  --card-shadow-hover: var(--shadow-md);
+  --card-tag-bg:       var(--accent);
+  --card-tag-color:    var(--color-bg);
+  --card-radius:       var(--radius-md);
+  --card-tag-radius:   var(--radius-sm);
+}

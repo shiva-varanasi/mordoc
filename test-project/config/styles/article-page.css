@@ -1,0 +1,7 @@
+/* Breadcrumbs — THE MATRIX */
+:root {
+  --breadcrumb-link:       #0f9c2c;
+  --breadcrumb-link-hover: #00ff41;
+  --breadcrumb-current:    #00ff41;
+  --breadcrumb-sep:        #0f9c2c;
+}

@@ -1,0 +1,8 @@
+<svg width="40" height="36" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="0.75" y="0.75" width="38.5" height="34.5" rx="5" fill="#0c1224" stroke="rgba(0,229,255,0.35)" stroke-width="1.5"/>
+<!-- Gauge dial -->
+<path d="M11 22C11 16 15 12 20 12C25 12 29 16 29 22" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M20 20L24 15" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round"/>
+<circle cx="20" cy="20" r="1.6" fill="#00e5ff"/>
+<path d="M11 22H29" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

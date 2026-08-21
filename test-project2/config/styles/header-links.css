@@ -1,0 +1,9 @@
+/* Header links — NEO-BRUTALIST WEB */
+:root {
+  --header-links-menu-btn-radius:      0;
+  --header-links-link-radius:          0;
+  --header-links-dropdown-radius:      0;
+  --header-links-dropdown-item-radius: 0;
+  --header-links-link-color:           var(--accent-emphasis);
+  --header-links-link-color-hover:     var(--accent-strong);
+}

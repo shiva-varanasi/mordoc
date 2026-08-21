@@ -1,0 +1,24 @@
+{
+  "name": "ROOT",
+  "description": "ROOT is the operator's field manual for the System - how to read the code beneath everyday reality, find root, and see what's actually running underneath.",
+  "baseUrl": "https://www.mordoc.dev",
+  "defaultLanguage": "en",
+  "metadata": {
+    "ogImage": "/images/metadata/og-image.png",
+    "ogType": "website",
+    "twitterCard": "summary_large_image",
+    "twitterSite": "@mordoc"
+  },
+  "fonts": {
+    "body": {
+      "family": "JetBrains Mono",
+      "regular": "JetBrainsMono.ttf",
+      "italic": "JetBrainsMono-Italic-VariableFont_wght.ttf"
+    },
+    "code": {
+      "family": "JetBrains Mono",
+      "regular": "JetBrainsMono.ttf",
+      "italic": "JetBrainsMono-Italic-VariableFont_wght.ttf"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+/* ============================================================
+   DIAGRAM INK — NEO-BRUTALIST WEB
+   Eight flat, fully-saturated poster hues instead of a rainbow of
+   pastel tints — reads like a printed infographic, not a soft chart.
+   Activation-1 is the brand accent itself; the rest are the same
+   spot-color set used in callout.css/code-block.css. Lifeline/arrow
+   track the page's own fg tokens so they stay legible in both modes.
+   ============================================================ */
+:root {
+  --diagram-grid-spacing: 20px;
+
+  --diagram-lifeline: var(--color-fg-muted);
+  --diagram-arrow:    var(--color-fg);
+
+  --diagram-activation-1: var(--accent);  /* brand yellow */
+  --diagram-activation-2: #0047ff; /* cobalt */
+  --diagram-activation-3: #e8281b; /* red */
+  --diagram-activation-4: #1f9d4c; /* green */
+  --diagram-activation-5: #c81c72; /* magenta */
+  --diagram-activation-6: #7b2fff; /* purple */
+  --diagram-activation-7: #ff7a00; /* orange */
+  --diagram-activation-8: #0090ad; /* teal */
+}

@@ -1,0 +1,13 @@
+/* Hero — NEO-BRUTALIST WEB — a solid poster-yellow masthead block, not
+   a tint. Black text throughout (not white) since the block itself is
+   always bright regardless of mode — one accent, one ink color, no
+   third hue standing outside the documented black/white/yellow system. */
+:root {
+  --hero-bg:                 var(--accent);
+  --hero-title-color:        #0a0a0a;
+  --hero-title-accent-color: #0a0a0a;
+  --hero-desc-color:         rgba(10, 10, 10, 0.75);
+
+  --hero-image-radius: 0;
+  --hero-image-shadow: 6px 6px 0 #0a0a0a;
+}

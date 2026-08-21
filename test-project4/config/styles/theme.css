@@ -1,0 +1,86 @@
+/* ============================================================
+   THEME — DEEP SPACE NETWORK (global tier)
+   One fixed dark palette, no light/dark pair — deep space doesn't
+   have a "light mode." Like Neon Dusk before it (and Matrix in
+   test-project), there's no .dark block anywhere in this theme's
+   files: toggling light/dark is a no-op here, on purpose.
+
+   Every other dark theme in this set uses shadow to mean elevation —
+   a hard offset, a soft ambient blur. Here box-shadow means light
+   emission instead: a colored, zero-offset glow, like a HUD panel lit
+   from inside rather than a thing casting a shadow onto a surface.
+   Borders lean the same way — a translucent cyan edge, not an opaque
+   hairline, so panels read as energized glass rather than painted
+   trim. See card.css for the signature texture: a scattered starfield
+   (several small tiled radial-gradient dots) under a faint nebula
+   wash, instead of a flat fill, a gloss gradient, or aged-parchment
+   foxing.
+
+   Radius stays small and crisp (3-8px) — a HUD readout, not Matrix's
+   literal zero and nothing like the two blobby-rounded themes.
+   Callouts (see callout.css) use real mission-control color coding —
+   cyan telemetry, green "go," amber caution, red abort — rather than
+   arbitrary hues.
+
+   Fonts (Orbitron for body, Space Mono for code) are wired via
+   config/site.json's "fonts" block. Component-specific tokens live in
+   their own files under this folder — see COMPONENT_THEME_FILES in
+   src/vite/plugin.ts for the full list. Only the landing-page
+   components (button/hero/section/card) have been re-themed so far;
+   the rest still inherit these global tokens. content.css deliberately
+   makes no width claim — Mordoc's own defaults apply, not the
+   previous Mad Max: Fury Road theme's widened column.
+   ============================================================ */
+
+:root {
+  --accent: #00e5ff;
+  /* Electric cyan is bright enough (high luminance against this near-
+     black bg) to serve directly as text/link color with no darkening
+     needed — the same "already text-safe" situation Matrix's green
+     and Neon Dusk's lime were in. */
+  /* oklab, not oklch, for these two — accent and --color-bg are both
+     real (if very low-chroma) colors, and oklch's hue angle is
+     numerically unstable for near-black/near-white inputs that aren't
+     *exactly* gray (R=G=B), which is exactly what --color-fg/
+     --color-content-fg/--color-bg-hover below hit: mixing #eaf4ff and
+     #05070f "in oklch" was interpolating through a essentially-noise
+     hue and landing on amber/orange instead of gray. oklab blends the
+     Cartesian a/b channels directly instead of a hue angle, so it
+     can't do that. */
+  --accent-subtle:   color-mix(in oklab, var(--accent) 14%, var(--color-bg));
+  --accent-muted:    color-mix(in oklab, var(--accent) 30%, var(--color-bg));
+  --accent-emphasis: var(--accent);
+  --accent-strong:   color-mix(in oklch, var(--accent) 70%, white);
+
+  --color-bg:        #05070f;
+  --color-surface:   #0c1224;
+  /* Translucent, not opaque — an energized glass edge, and it self-
+     avoids the "border == text ink" trap from earlier in this
+     session (test-project3): it's cyan-tinted, nowhere near --color-fg. */
+  --color-border:    rgba(0, 229, 255, 0.25);
+  --color-fg:         #eaf4ff;
+  /* Literal grays, not color-mix derivations — black space, white/
+     silver stars, cyan as the one color in the system. No hue-mixing
+     ambiguity possible this way. */
+  --color-content-fg: #cdd6e3;
+  --color-fg-muted:   #7a8699;
+  --color-bg-hover:   #0d1424;
+
+  /* Shape — small, crisp, HUD-panel corners */
+  --radius-sm: 3px;
+  --radius-md: 5px;
+  --radius-lg: 8px;
+
+  /* Glow, not elevation — zero offset, pure colored blur */
+  --shadow-sm: 0 0 8px rgba(0, 229, 255, 0.25), 0 0 2px rgba(0, 229, 255, 0.45);
+  --shadow-md: 0 0 28px rgba(0, 229, 255, 0.35), 0 0 8px rgba(0, 229, 255, 0.55);
+}
+
+/* Orbitron is a wide, geometric, display-leaning face already — a
+   touch of extra tracking on headings leans into its "retro sci-fi
+   title card" character instead of fighting it. Body copy stays
+   default-tracked; Orbitron gets dense at paragraph length if you
+   also open up its tracking. */
+h1, h2, h3 {
+  letter-spacing: 0.03em;
+}

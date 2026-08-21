@@ -1,0 +1,25 @@
+/* ============================================================
+   DIAGRAM INK — THE MATRIX
+   Sequence diagrams drop the default 8-hue rainbow for a monochrome
+   green ramp, like a wireframe rendered on the same phosphor tube as
+   the rest of the page. A tighter grid spacing reads a little more
+   like a character grid than the default dotted canvas. Left
+   monochrome deliberately (unlike code-block.css) — a diagram's
+   shapes carry the structure, so it doesn't need extra hues to
+   avoid reading flat the way a wall of text does.
+   ============================================================ */
+:root {
+  --diagram-grid-spacing: 16px;
+
+  --diagram-lifeline: #0f9c2c;
+  --diagram-arrow:    #00e63c;
+
+  --diagram-activation-1: #00ff41;
+  --diagram-activation-2: #00cc34;
+  --diagram-activation-3: #33ff66;
+  --diagram-activation-4: #009929;
+  --diagram-activation-5: #66ff8f;
+  --diagram-activation-6: #00e63c;
+  --diagram-activation-7: #1aff53;
+  --diagram-activation-8: #007a20;
+}

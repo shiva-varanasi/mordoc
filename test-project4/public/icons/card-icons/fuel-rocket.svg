@@ -1,0 +1,9 @@
+<svg width="40" height="36" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="0.75" y="0.75" width="38.5" height="34.5" rx="5" fill="#0c1224" stroke="rgba(0,229,255,0.35)" stroke-width="1.5"/>
+<!-- Fuel tank with nozzle -->
+<rect x="13" y="14" width="11" height="12" rx="1.2" stroke="#00e5ff" stroke-width="1.8"/>
+<path d="M16.5 14V11" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M20.5 14V11" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M13 20.5H24" stroke="#00e5ff" stroke-width="1.4"/>
+<path d="M28.5 15.5L24.5 19.5" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

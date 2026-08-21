@@ -1,5 +1,7 @@
 node_modules/
 dist/
-test-project*/
+test-project3/
+test-project5/
 template-project/
+mordoc-docs/
 CLAUDE.md

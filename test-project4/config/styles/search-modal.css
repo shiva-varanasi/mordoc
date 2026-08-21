@@ -1,0 +1,10 @@
+/* Search modal — DEEP SPACE NETWORK — the theme's own cyan glow
+   stands in for a bespoke shadow; overlay tints toward the void
+   instead of neutral black. */
+:root {
+  --modal-overlay-bg: rgba(5, 7, 15, 0.7);
+  --modal-shadow:     var(--shadow-md);
+  --modal-radius:         var(--radius-md);
+  --modal-result-radius:  var(--radius-sm);
+  --modal-kbd-radius:     var(--radius-sm);
+}

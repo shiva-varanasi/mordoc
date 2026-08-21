@@ -1,8 +1,19 @@
+/* ============================================================
+   SECTION TOKENS
+   Solid background color is a design decision, not content. A
+   `background` image (set per-instance in markdown) layers on top of
+   --section-bg via its own inline style.
+   ============================================================ */
+:root {
+  --section-bg: transparent;
+}
+
 /* ── Section ──────────────────────────────────────────────────── */
 
 .section {
   position: relative;
   width: 100%;
+  background-color: var(--section-bg);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -24,7 +35,7 @@
   z-index: 1;
   max-width: 72rem;
   margin: 0 auto;
-  padding: 4rem var(--page-gutter);
+  padding: 4rem 2.5rem;
 }
 
 /* ── Section title ────────────────────────────────────────────── */
@@ -89,9 +100,20 @@
 
 /* ── Responsive ───────────────────────────────────────────────── */
 
+/* 767.98px matches the site's shared mobile breakpoint (App.module.css's
+   sidenav collapse) — reused here for consistency, not because Section
+   cares about the sidenav. It's a wider breakpoint than the 600px one
+   below, so it only changes the horizontal inset on its own; both rules
+   apply together once the viewport also drops under 600px. */
+@media (max-width: 767.98px) {
+  .inner {
+    padding: 4rem 1rem;
+  }
+}
+
 @media (max-width: 600px) {
   .inner {
-    padding: 2.5rem var(--page-gutter);
+    padding: 2.5rem 1rem;
   }
 
   .sectionTitle {

@@ -1,4 +1,4 @@
-import { useMordocData } from '../data-context.js';
+import { useMordocData } from '../../data-context.js';
 import styles from './Footer.module.css';
 
 export function Footer() {

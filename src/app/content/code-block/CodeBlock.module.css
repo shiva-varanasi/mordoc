@@ -4,6 +4,8 @@
 :root {
   --cb-bg:     var(--color-surface);
   --cb-border: var(--color-border);
+  --cb-radius:             10px;
+  --cb-copy-button-radius: 4px;
 }
 
 /* ── Wrapper ────────────────────────────────────────────────── */
@@ -11,7 +13,7 @@
 .wrapper {
   position: relative;
   margin: 1.25rem 0;
-  border-radius: var(--radius-lg);
+  border-radius: var(--cb-radius);
   border: 1px solid var(--cb-border);
   overflow: hidden;
 }
@@ -46,7 +48,7 @@
   border: none;
   color: var(--color-fg-muted);
   cursor: pointer;
-  border-radius: var(--radius-sm);
+  border-radius: var(--cb-copy-button-radius);
   transition: background-color 150ms ease, color 150ms ease;
 }
 
@@ -88,7 +90,7 @@
   padding: 1.25rem 1.5rem;
   background: var(--color-surface);
   border: 1px solid var(--cb-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--cb-radius);
   overflow-x: auto;
   font-family: var(--font-mono);
   font-size: 0.875rem;

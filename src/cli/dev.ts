@@ -26,8 +26,9 @@ export interface DevCommandOptions {
  * that arises from SSR HTML arriving before Vite's client runtime has injected
  * styles, and sidesteps SSR/hydration mismatch noise during development.
  *
- * `document.title` is set by `Content.tsx` via `useEffect` once the route
- * loader resolves — no server-side title injection needed in dev.
+ * `document.title` is set by the route's page component (`ArticlePage.tsx`
+ * or `LandingPage.tsx`) via `useEffect` once the route loader resolves —
+ * no server-side title injection needed in dev.
  *
  * The production `mordoc build` path still runs full SSR + SSG: `entry-server.tsx`
  * and the static-HTML output are exercised at build time.
@@ -86,7 +87,18 @@ export async function runDevCommand(options: DevCommandOptions): Promise<void> {
     //     treats backslash as a separator on Windows too, so the '/' check
     //     above would not by itself catch this case.
     if (!filename || filename.includes('/') || filename.includes('..')) return next();
-    const filePath = path.join(projectRoot, 'config', 'assets', filename);
+    // Custom fonts (site.json's "fonts" field) live one level deeper, in
+    // config/assets/fonts/, but are served at the same flat /_assets/<basename>
+    // URL as everything else — so a miss at the flat path falls back to that
+    // one known subdirectory before giving up.
+    const flatPath = path.join(projectRoot, 'config', 'assets', filename);
+    const fontPath = path.join(projectRoot, 'config', 'assets', 'fonts', filename);
+    let filePath = flatPath;
+    try {
+      await fs.access(flatPath);
+    } catch {
+      filePath = fontPath;
+    }
     try {
       const content = await fs.readFile(filePath);
       const ext = path.extname(filename).slice(1).toLowerCase();
@@ -98,6 +110,9 @@ export async function runDevCommand(options: DevCommandOptions): Promise<void> {
         ico: 'image/x-icon',
         gif: 'image/gif',
         webp: 'image/webp',
+        woff2: 'font/woff2',
+        woff: 'font/woff',
+        ttf: 'font/ttf',
       };
       res.setHeader('Content-Type', mime[ext] ?? 'application/octet-stream');
       res.statusCode = 200;
@@ -128,7 +143,7 @@ export async function runDevCommand(options: DevCommandOptions): Promise<void> {
   //
   // Notably absent: <title> and all <style> tags you'd see in DevTools.
   // Those are never part of this response — <title> is set client-side by
-  // Content.tsx's useEffect once route data resolves, and styles are
+  // ArticlePage.tsx's (or LandingPage.tsx's) useEffect once route data resolves, and styles are
   // injected into the live DOM by Vite's CSS-HMR runtime after main.tsx
   // executes. This handler only ever produces the initial empty-bodied shell.
   server.middlewares.use(async (req, res, next) => {

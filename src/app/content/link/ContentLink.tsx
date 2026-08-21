@@ -7,7 +7,7 @@
  * plain <a> elements — they are in-page scrolls and do not involve routing.
  *
  * Registered as a custom Markdoc `link` node in markdoc-config.ts and wired
- * into the components map in Content.tsx and LandingPage.tsx.
+ * into the components map in ArticlePage.tsx and LandingPage.tsx.
  */
 
 import { Link } from 'react-router';

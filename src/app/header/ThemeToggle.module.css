@@ -1,0 +1,49 @@
+/* ============================================================
+   THEME TOGGLE TOKENS
+   ============================================================ */
+:root {
+  --theme-toggle-size:      40px;
+  --theme-toggle-radius:    8px;
+  --theme-toggle-icon-size: 20px;
+  --theme-toggle-bg:        #ffffff;
+  --theme-toggle-bg-hover:  #f5f5f5;
+  --theme-toggle-border:    #e5e5e5;
+  --theme-toggle-fg:        #1c1c1c;
+}
+
+:global(.dark) {
+  --theme-toggle-bg:       #1a1a1a;
+  --theme-toggle-bg-hover: #242424;
+  --theme-toggle-border:   #2e2e2e;
+  --theme-toggle-fg:       #ebebeb;
+}
+
+@media (max-width: 479px) {
+  :root {
+    --theme-toggle-size:      36px;
+    --theme-toggle-icon-size: 18px;
+  }
+}
+
+.themeToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--theme-toggle-size);
+  height: var(--theme-toggle-size);
+  background: var(--theme-toggle-bg);
+  color: var(--theme-toggle-fg);
+  border: 1px solid var(--theme-toggle-border);
+  border-radius: var(--theme-toggle-radius);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.themeToggle:hover {
+  background: var(--theme-toggle-bg-hover);
+}
+
+.themeToggle:focus-visible {
+  outline: 2px solid var(--accent-emphasis);
+  outline-offset: 2px;
+}

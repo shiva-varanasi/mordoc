@@ -2,10 +2,16 @@
    HERO TOKENS
    ============================================================ */
 :root {
-  --hero-inner-max:  72rem;
-  --hero-title-size: clamp(2rem, 4vw, 3.125rem);
-  --hero-desc-size:  1.125rem;
-  --hero-v-padding:  7rem;
+  /* Solid background color and text colors — design decisions, not
+     content. A `background` image (set per-instance in markdown) layers
+     on top of --hero-bg via its own inline style. */
+  --hero-bg:                 transparent;
+  --hero-title-color:        var(--color-fg);
+  --hero-title-accent-color: var(--accent-emphasis);
+  --hero-desc-color:         var(--color-fg-muted);
+
+  --hero-image-radius: 10px;
+  --hero-image-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
 }
 
 /* ── Base ─────────────────────────────────────────────────────── */
@@ -13,6 +19,7 @@
 .hero {
   position: relative;
   width: 100%;
+  background-color: var(--hero-bg);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -26,9 +33,9 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: var(--hero-inner-max);
+  max-width: 72rem;
   margin: 0 auto;
-  padding: var(--hero-v-padding) var(--page-gutter);
+  padding: 7rem 2.5rem;
   gap: 2.5rem;
 }
 
@@ -47,25 +54,25 @@
 /* ── Title ────────────────────────────────────────────────────── */
 
 .heroTitle {
-  font-size: var(--hero-title-size);
+  font-size: clamp(2rem, 4vw, 3.125rem);
   font-weight: 700;
   line-height: 1.12;
   letter-spacing: -0.025em;
-  color: var(--hero-title-color, var(--color-fg));
+  color: var(--hero-title-color);
   margin: 0;
 }
 
-/* Second title line — accent color by default, overridable per-hero */
+/* Second title line — accent color, see --hero-title-accent-color */
 .titleAccent {
-  color: var(--hero-title-accent-color, var(--accent-emphasis));
+  color: var(--hero-title-accent-color);
 }
 
 /* ── Description ──────────────────────────────────────────────── */
 
 .heroDescription {
-  font-size: var(--hero-desc-size);
+  font-size: 1.125rem;
   line-height: 1.7;
-  color: var(--hero-desc-color, var(--color-fg-muted));
+  color: var(--hero-desc-color);
   margin: 0;
 }
 
@@ -94,15 +101,24 @@
 
 .heroImage {
   width: 100%;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--hero-image-radius);
+  box-shadow: var(--hero-image-shadow);
   display: block;
 }
 
 /* ── Responsive ───────────────────────────────────────────────── */
 
+/* 767.98px matches the site's shared mobile breakpoint (App.module.css's
+   sidenav collapse) — reused here for consistency, not because Hero cares
+   about the sidenav. */
+@media (max-width: 767.98px) {
+  .inner {
+    padding: 7rem 1rem;
+  }
+}
+
 @media (max-width: 600px) {
-  :root {
-    --hero-v-padding: 4rem;
+  .inner {
+    padding: 4rem 1rem;
   }
 }

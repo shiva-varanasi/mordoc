@@ -1,0 +1,150 @@
+/* ============================================================
+   HEADER LINKS TOKENS
+   ============================================================ */
+:root {
+  --header-links-menu-btn-size:   40px;
+  --header-links-menu-btn-radius: 8px;
+
+  --header-links-link-padding:   0.25rem;
+  --header-links-link-font-size: 0.875rem;
+  --header-links-link-radius:    4px;
+
+  --header-links-dropdown-radius:      6px;
+  --header-links-dropdown-item-radius: 4px;
+
+  --header-links-button-height:    2rem;
+  --header-links-button-padding:   0.875rem;
+  --header-links-button-font-size: 0.875rem;
+
+  --header-links-dropdown-item-padding:   0.5rem 0.75rem;
+  --header-links-dropdown-item-font-size: 0.875rem;
+
+  --header-links-link-color:       var(--accent-emphasis);
+  --header-links-link-color-hover: var(--accent-strong);
+}
+
+@media (max-width: 479px) {
+  :root {
+    --header-links-menu-btn-size: 36px;
+  }
+}
+
+/* ── Desktop strip ───────────────────────────────────────── */
+
+/* Overrides --button-* tokens so Button renders at compact header size. */
+.headerLinks {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 8px;
+  margin-right: 4px;
+  border-right: 1px solid var(--color-border);
+  --button-height: var(--header-links-button-height);
+  --button-padding: var(--header-links-button-padding);
+  --button-font-size: var(--header-links-button-font-size);
+}
+
+/* Plain 'link' variant — matches article prose link style */
+.headerLink {
+  display: inline-flex;
+  padding: 0 var(--header-links-link-padding);
+  font-size: var(--header-links-link-font-size);
+  font-weight: 500;
+  color: var(--header-links-link-color);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: transparent;
+  border-radius: var(--header-links-link-radius);
+  white-space: nowrap;
+  transition: color 0.15s, text-decoration-color 0.15s;
+}
+
+.headerLink:hover {
+  color: var(--header-links-link-color-hover);
+  text-decoration-color: var(--header-links-link-color-hover);
+}
+
+/* ── Mobile overflow menu (≤ 767px) ────────────────────── */
+
+/* Wrapper for the ellipsis trigger + dropdown — hidden on desktop */
+.headerLinksMenu {
+  display: none;
+  position: relative;
+}
+
+.headerLinksMenuBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--header-links-menu-btn-size);
+  height: var(--header-links-menu-btn-size);
+  background: transparent;
+  border: 0;
+  border-radius: var(--header-links-menu-btn-radius);
+  color: var(--color-fg);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.headerLinksMenuBtn:hover {
+  background: var(--color-bg-hover);
+}
+
+.headerLinksMenuBtn:focus-visible {
+  outline: 2px solid var(--accent-emphasis);
+  outline-offset: 2px;
+}
+
+.headerLinksDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 160px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--header-links-dropdown-radius);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  padding: 4px;
+  z-index: 200;
+}
+
+:global(.dark) .headerLinksDropdown {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Each row in the dropdown */
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: var(--header-links-dropdown-item-padding);
+  font-size: var(--header-links-dropdown-item-font-size);
+  font-weight: 500;
+  color: var(--color-fg);
+  text-decoration: none;
+  border-radius: var(--header-links-dropdown-item-radius);
+  white-space: nowrap;
+  transition: background 0.12s, color 0.12s;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.dropdownItem:hover {
+  background: var(--color-bg-hover);
+}
+
+/* ════════════════════════════════════════════════════════════
+   Responsive
+   ════════════════════════════════════════════════════════════ */
+
+@media (max-width: 767.98px) {
+  .headerLinks {
+    display: none;
+  }
+
+  .headerLinksMenu {
+    display: block;
+  }
+}

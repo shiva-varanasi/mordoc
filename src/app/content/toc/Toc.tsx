@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import type { TocEntry } from '../../types/content.js';
+import type { TocEntry } from '../../../types/content.js';
 import styles from './Toc.module.css';
 
 interface TocProps {
@@ -47,8 +47,8 @@ export function Toc({ items }: TocProps) {
     e.preventDefault();
     const el = document.getElementById(id);
     if (!el) return;
-    // scroll-margin-top on headings (Content.module.css) accounts for the sticky
-    // header height via --header-total, so scrollIntoView gives the correct offset.
+    // scroll-margin-top on headings (ArticlePage.module.css) accounts for the sticky
+    // header height via --header-height, so scrollIntoView gives the correct offset.
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     history.pushState(null, '', `#${id}`);
   }

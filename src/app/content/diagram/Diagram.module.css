@@ -6,6 +6,13 @@
   --diagram-grid-spacing: 20px;
   --diagram-grid-dot: radial-gradient(circle, var(--color-border) 1px, transparent 1px);
 
+  --diagram-radius: 10px;
+  /* Shared by .closeButton and .zoomControls — both the same floating,
+     blurred-glass chrome pattern, just positioned differently. */
+  --diagram-button-radius: 6px;
+  --diagram-lightbox-radius: 6px;
+  --diagram-zoom-button-radius: 4px;
+
   /* Diagram ink — generic diagram primitives (consumed by a diagram type's
      theme.ts, e.g. src/diagrams/sequence-diagram/theme.ts, via var()
      references baked into the Scene at build time — see that file's doc
@@ -67,7 +74,7 @@
   background-size: var(--diagram-grid-spacing) var(--diagram-grid-spacing);
   background-attachment: local;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--diagram-radius);
   transition: filter 150ms ease;
 }
 
@@ -115,7 +122,7 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-md);
+  border-radius: var(--diagram-button-radius);
   color: #ffffff;
   cursor: pointer;
   transition: background 150ms ease;
@@ -148,7 +155,7 @@
   background-color: var(--color-surface);
   background-image: var(--diagram-grid-dot);
   background-size: var(--diagram-grid-spacing) var(--diagram-grid-spacing);
-  border-radius: var(--radius-md);
+  border-radius: var(--diagram-lightbox-radius);
   animation: diagramFadeIn 180ms ease forwards;
 }
 
@@ -191,7 +198,7 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-md);
+  border-radius: var(--diagram-button-radius);
   padding: 0.375rem;
 }
 
@@ -214,7 +221,7 @@
   height: 2rem;
   background: transparent;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--diagram-zoom-button-radius);
   color: #ffffff;
   font-size: 1.125rem;
   line-height: 1;

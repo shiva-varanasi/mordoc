@@ -7,7 +7,7 @@
  * Markdoc.renderers.react — no special handling needed.
  *
  * Wired via config.tags in markdoc-config.ts, registered in
- * Content.tsx's components map.
+ * ArticlePage.tsx's and LandingPage.tsx's components maps.
  */
 
 import React from 'react';

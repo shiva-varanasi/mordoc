@@ -1,0 +1,81 @@
+/* ── Button tokens ────────────────────────────────────────────── */
+
+:root {
+  --button-primary-fg:           white;
+  --button-height:                2.625rem;
+  --button-padding:               1.375rem;
+  --button-font-size:             0.9375rem;
+  --button-radius:                6px;
+
+  /* Default to the global accent scale (derived), independently
+     overridable per state/variant. */
+  --button-primary-bg:           var(--accent);
+  --button-primary-border:       var(--accent);
+  --button-primary-hover-bg:     var(--accent-strong);
+  --button-primary-hover-border: var(--accent-strong);
+  --button-secondary-fg:         var(--accent);
+  --button-secondary-hover-bg:   var(--accent-subtle);
+
+  /* Off by default (no visual change for themes that don't set these) —
+     a theme with same-color-as-background buttons (e.g. an accent-filled
+     hero on an accent-colored button) can opt in to a shadow so the
+     button still reads as a distinct shape. See card.css's --card-shadow
+     for the same pattern applied to cards. */
+  --button-shadow:       none;
+  --button-shadow-hover: none;
+}
+
+/* ── Button ───────────────────────────────────────────────────── */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--button-height);
+  padding: 0 var(--button-padding);
+  border-radius: var(--button-radius);
+  font-size: var(--button-font-size);
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  box-shadow: var(--button-shadow);
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.button:hover {
+  box-shadow: var(--button-shadow-hover);
+}
+
+/* ── Primary ──────────────────────────────────────────────────── */
+
+.primary {
+  background: var(--button-primary-bg);
+  color: var(--button-primary-fg);
+  border-color: var(--button-primary-border);
+}
+
+.primary:hover {
+  background: var(--button-primary-hover-bg);
+  border-color: var(--button-primary-hover-border);
+}
+
+/* ── Secondary ────────────────────────────────────────────── */
+
+.secondary {
+  background: transparent;
+  color: var(--button-secondary-fg);
+  border-color: transparent;
+}
+
+.secondary:hover {
+  background: var(--button-secondary-hover-bg);
+}
+
+/* Markdoc wraps button body text in <p> — collapse it so the button
+   renders cleanly without affecting inline-flex layout */
+.button :global(p) {
+  display: contents;
+}

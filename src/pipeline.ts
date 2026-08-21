@@ -1,4 +1,4 @@
-import { loadSiteConfig } from './config/site-loader.js';
+import { loadSiteConfig, loadFonts } from './config/site-loader.js';
 import { loadLanguageConfig } from './config/language-loader.js';
 import { loadTopnavConfig } from './config/topnav-loader.js';
 import { loadSidenavConfig } from './config/sidenav-loader.js';
@@ -57,6 +57,7 @@ export async function runPipeline(projectRoot: string): Promise<MordocData> {
   const language = await loadLanguageConfig(projectRoot, site.defaultLanguage);
   const navigation = await loadNavigation(projectRoot);
   const assets = await loadAssets(projectRoot);
+  const fonts = await loadFonts(projectRoot, site);
 
   const contentMap = await loadContent(
     projectRoot,
@@ -83,7 +84,7 @@ export async function runPipeline(projectRoot: string): Promise<MordocData> {
     // optional file — absent is the normal case
   }
 
-  return { site, language, navigation, assets, pages: transformedContent, translations, headerLinks, variables, customHead };
+  return { site, language, navigation, assets, fonts, pages: transformedContent, translations, headerLinks, variables, customHead };
 }
 
 /**

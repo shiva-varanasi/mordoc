@@ -14,7 +14,7 @@
   display: grid;
   grid-template-columns: 1fr var(--toc-width);
   grid-template-areas: "content toc";
-  min-height: calc(100svh - var(--header-total));
+  min-height: calc(100svh - var(--header-height));
 }
 
 .articleArea {
@@ -23,7 +23,7 @@
 }
 
 .article {
-  max-width: var(--content-max-width);
+  max-width: var(--article-max-width);
   width: 100%;
   margin: 0 auto;
   padding: 3rem 1.5rem;
@@ -50,7 +50,7 @@
    background-size is fixed-pixel so the sweep width is constant
    regardless of the block's rendered width. */
 .block {
-  border-radius: var(--radius-sm);
+  border-radius: 4px;
   background-image: linear-gradient(
     90deg,
     var(--color-surface)  0px,

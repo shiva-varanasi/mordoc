@@ -1,3 +1,24 @@
+/* ============================================================
+   APP TOKENS — space App allocates to a region without deriving
+   it from that region's own content (sidenav width), and each
+   Area box's own aesthetic (Step A: App owns Area boxes — box
+   placement AND background/border; components own only their
+   own inner content).
+   Header's own row heights (--primary-area-height, --topnav-area-height,
+   --header-height) live in Header.module.css — Header decides those,
+   App only reads them.
+   ============================================================ */
+:root {
+  --header-area-bg:     #ffffff;
+  --sidenav-area-bg:    #ffffff;
+  --sidenav-area-width: 16rem;
+}
+
+:global(.dark) {
+  --header-area-bg:  rgba(18, 18, 18);
+  --sidenav-area-bg: rgba(18, 18, 18);
+}
+
 /* ── Full page shell ──────────────────────────────────────── */
 .app {
   display: flex;
@@ -7,14 +28,23 @@
   background: var(--color-bg);
 }
 
-/* ── Header area — structural box only ───────────────────── */
-/* Aesthetics (background, border, backdrop) live in Header.module.css */
-/* Height is intentionally auto — the header's flex column drives it */
+/* ── Header area ──────────────────────────────────────────── */
+/* Owns the full box: placement AND aesthetics. Header.module.css only */
+/* styles the inner content (Header's own root is a plain <div>). */
+/* Height is intentionally auto — the header's flex column drives it.
+   The bottom rule is a box-shadow, not a border, so it doesn't add to the
+   element's rendered height — Header.module.css's --header-height must
+   stay exactly equal to the header's actual height, since every sticky
+   offset and viewport-height calc below (.sidenavArea, .contentAreaGrid,
+   .landingLayout) is computed from it. A real border here would silently
+   throw those off by 1px and cause a permanent phantom scrollbar. */
 .headerArea {
   position: sticky;
   top: 0;
   z-index: 50;
   width: 100%;
+  background: var(--header-area-bg);
+  box-shadow: 0 1px 0 0 var(--color-border);
 }
 
 /* ── Body row — sidenav | content ────────────────────────── */
@@ -26,17 +56,21 @@
 }
 
 /* ── Sidenav area ─────────────────────────────────────────── */
-/* Aesthetics (background, border-right) live in Sidenav.module.css */
+/* Owns the full box: placement AND aesthetics — same split as .headerArea. */
+/* Sidenav.module.css only styles the inner content (Sidenav's own root */
+/* is a plain <nav>). Right edge is a box-shadow, not a border, for the same */
+/* reason as .headerArea — a border would need --sidenav-area-width to */
+/* account for it wherever another file derives a size from that token. */
 .sidenavArea {
   position: sticky;
-  top: var(--header-total);
-  align-self: flex-start;
-  width: var(--sidenav-width);
-  height: calc(100dvh - var(--header-total));
+  top: var(--header-height);
+  width: var(--sidenav-area-width);
+  height: calc(100svh - var(--header-height));
   overflow-y: auto;
+  overscroll-behavior: contain;
   flex-shrink: 0;
-  background: var(--color-bg);
-  border-right: 1px solid var(--color-border);
+  background: var(--sidenav-area-bg);
+  box-shadow: 1px 0 0 0 var(--color-border);
 }
 
 /* ── Content area — everything right of sidenav ──────────── */
@@ -49,7 +83,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  top: var(--header-total);
+  top: var(--header-height);
   background: rgba(0, 0, 0, 0.4);
   z-index: 35;
 }
@@ -58,25 +92,29 @@
    Responsive
    ════════════════════════════════════════════════════════════ */
 
-/* TOC visibility is handled in Content.module.css */
+/* TOC visibility is handled in Content.module.css — internal to the
+   content area. */
 
 /* Tablet / mobile — sidenav goes off-canvas */
 @media (max-width: 767.98px) {
-  :root {
-    --page-gutter: 1rem;
-  }
-
   .sidenavArea {
     position: fixed;
-    top: var(--header-total);
+    top: var(--header-height);
     left: 0;
+    width: 100%;
     transform: translateX(-100%);
     transition: transform 200ms ease;
     z-index: 40;
-    height: calc(100dvh - var(--header-total));
+    height: calc(100svh - var(--header-height));
   }
 
   .sidenavAreaOpen {
     transform: translateX(0);
+  }
+
+  /* Full-width drawer fully occludes the scrim — nothing left "outside" to
+     click, so skip painting/hit-testing it under the sidenav. */
+  .overlay {
+    display: none;
   }
 }

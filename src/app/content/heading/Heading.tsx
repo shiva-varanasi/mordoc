@@ -4,7 +4,7 @@
  * Clicking the icon does three things via a plain <a href="#id">:
  *   1. Browser natively updates the URL to currentPath#id
  *   2. Browser natively scrolls the heading into view (scroll-margin-top in
- *      Content.module.css already accounts for the fixed topnav offset)
+ *      ArticlePage.module.css already accounts for the fixed topnav offset)
  *   3. onClick copies the full URL (with hash) to the clipboard and shows
  *      a brief "Copied" tooltip
  *

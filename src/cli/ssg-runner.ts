@@ -51,8 +51,9 @@ function escapeHtml(value: string): string {
 /**
  * Builds the per-route `<head>` HTML injected at `<!--ssr-head-->`.
  *
- * Title format matches `Content.tsx`'s `document.title` assignment so
- * dev and prod are consistent: `Page Title — Site Name`.
+ * Title format matches `ArticlePage.tsx`'s (and `LandingPage.tsx`'s)
+ * `document.title` assignment so dev and prod are consistent:
+ * `Page Title — Site Name`.
  *
  * Always emits:
  *   - `<title>`, `<meta name="description">` (if available), `<link rel="icon">` (if configured)

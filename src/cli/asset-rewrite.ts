@@ -2,6 +2,7 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 import type { MordocData } from '../types/pipeline.js';
 import type { ResolvedAssets } from '../types/assets.js';
+import type { ResolvedFont, ResolvedFonts } from '../types/fonts.js';
 
 /**
  * Public URL prefix used for rewritten asset paths.
@@ -38,10 +39,13 @@ const ASSET_DIR_NAME = '_assets';
  *   in dev.ts — no copy step needed there.
  *
  * Filename strategy:
- *   Output filename = basename of the source file. The current loader
- *   discovers exactly three known assets by convention (favicon, logo,
- *   logo-dark) so basename collisions are impossible by construction.
- *   When the asset surface grows beyond conventional discovery, this
+ *   Output filename = basename of the source file. favicon/logo/logo-dark
+ *   are discovered by fixed convention, so those three can never collide.
+ *   The custom font (site.json's "fonts" field) is a user-supplied filename
+ *   rather than a fixed convention, so collision-freedom there is incidental
+ *   rather than structural: it holds only because font extensions
+ *   (woff2/woff/ttf) never overlap with the image extensions the other
+ *   assets use. If a future asset type reuses an existing extension, this
  *   strategy will need a content-hash suffix to disambiguate.
  *
  * Note on `logoDark` falling back to `logo`:
@@ -64,7 +68,12 @@ export async function copyAndRewriteAssets(
     logoDark: await copyAndRewriteOne(data.assets.logoDark, targetDir),
   };
 
-  return { ...data, assets: rewritten };
+  const fonts: ResolvedFonts = {
+    body: await copyAndRewriteFontFace(data.fonts.body, targetDir),
+    code: await copyAndRewriteFontFace(data.fonts.code, targetDir),
+  };
+
+  return { ...data, assets: rewritten, fonts };
 }
 
 async function copyAndRewriteOne(
@@ -75,4 +84,16 @@ async function copyAndRewriteOne(
   const filename = path.basename(sourcePath);
   await fs.copyFile(sourcePath, path.join(targetDir, filename));
   return `${ASSET_URL_PREFIX}/${filename}`;
+}
+
+async function copyAndRewriteFontFace(
+  face: ResolvedFont | null,
+  targetDir: string,
+): Promise<ResolvedFont | null> {
+  if (!face) return null;
+  return {
+    family: face.family,
+    regular: await copyAndRewriteOne(face.regular, targetDir),
+    italic: await copyAndRewriteOne(face.italic, targetDir),
+  };
 }

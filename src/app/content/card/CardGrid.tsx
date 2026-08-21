@@ -8,7 +8,7 @@
  * in CardGrid.module.css via media queries.
  *
  * Registered as a Markdoc tag (`cardGrid`) in markdoc-config.ts and
- * added to Content.tsx's components map.
+ * added to ArticlePage.tsx's and LandingPage.tsx's components maps.
  */
 
 import React from 'react';

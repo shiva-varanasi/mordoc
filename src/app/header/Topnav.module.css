@@ -1,5 +1,14 @@
-/* Topnav lives in the second header row (.topnavRow in Header.module.css).
-   Links use height: 100% + a bottom-border indicator for the active state. */
+/* Topnav lives in the second header row — Header.module.css's .topnavArea
+   owns that row's placement and height (--topnav-area-height); Topnav
+   only styles its own content. Links use height: 100% + a bottom-border
+   indicator for the active state. */
+:root {
+  --topnav-link-padding:        0.75rem;
+  --topnav-link-font-size:      0.875rem;
+  --topnav-active-border-width: 2px;
+  --topnav-active-border-color: var(--accent-emphasis);
+}
+
 .topnav {
   display: flex;
   align-items: stretch;
@@ -10,15 +19,17 @@
 .link {
   display: flex;
   align-items: center;
-  padding: 0 0.75rem;
+  padding: 0 var(--topnav-link-padding);
   color: var(--color-fg-muted);
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: var(--topnav-link-font-size);
   font-weight: 500;
   white-space: nowrap;
-  border-bottom: 2px solid transparent;
+  border-bottom: var(--topnav-active-border-width) solid transparent;
   transition: color 0.15s, border-color 0.15s;
-  /* Shift content up by 1px so the bottom border doesn't push layout */
+  /* Shift content up by 1px so the bottom border doesn't push layout.
+     This is a fixed optical correction, not derived from
+     --topnav-active-border-width — re-tune by eye if that changes a lot. */
   margin-bottom: -1px;
 }
 
@@ -33,5 +44,5 @@
 
 .link.active {
   color: var(--color-fg);
-  border-bottom-color: var(--accent-emphasis);
+  border-bottom-color: var(--topnav-active-border-color);
 }

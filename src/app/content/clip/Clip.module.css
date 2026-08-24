@@ -1,0 +1,72 @@
+/* ============================================================
+   CLIP TOKENS
+   ============================================================ */
+:root {
+  --clip-caption-color: var(--color-fg-muted);
+  --clip-radius: 6px;
+}
+
+/* ── Inline figure ───────────────────────────────────────────── */
+
+.figure {
+  margin: 1.5rem 0;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.wrap {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  line-height: 0;
+}
+
+.video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--clip-radius);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+}
+
+.caption {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--clip-caption-color);
+  text-align: center;
+  font-style: italic;
+}
+
+/* ── Play/pause toggle ───────────────────────────────────────────
+   Same circular-button vocabulary as Image.module.css's .closeButton,
+   centered over the clip. Stays visible (not hover-only) so touch
+   devices — which have no hover state — can still discover it. */
+
+.toggle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 150ms ease, opacity 150ms ease;
+}
+
+.toggle:hover {
+  background: rgba(0, 0, 0, 0.72);
+}
+
+/* Play icon has a visual right-bias (it's a triangle), nudge it back to
+   optically center inside the circle. */
+.toggle svg {
+  margin-left: 2px;
+}

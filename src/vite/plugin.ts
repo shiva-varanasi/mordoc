@@ -95,6 +95,7 @@ const COMPONENT_THEME_FILES: readonly { name: string; filename: string }[] = [
   { name: 'section', filename: 'section.css' },
   { name: 'diagram', filename: 'diagram.css' },
   { name: 'image', filename: 'image.css' },
+  { name: 'clip', filename: 'clip.css' },
   { name: 'code-block', filename: 'code-block.css' },
   { name: 'callout', filename: 'callout.css' },
   { name: 'card', filename: 'card.css' },

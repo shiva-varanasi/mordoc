@@ -177,6 +177,42 @@ const imageTag: Schema = {
 };
 
 /**
+ * Clip tag — muted, looping demo clips, the recommended replacement for
+ * animated GIFs in content.
+ *
+ * Named `clip` (not `video`) to leave `video` free for a future long-form,
+ * audible tutorial-video tag with native player controls — a different job
+ * with different defaults (no forced mute, no autoplay-on-click, real
+ * scrubbing) that this component deliberately doesn't try to do.
+ *
+ * A plain `<img src="*.gif">` autoplays with no way to pause it, which fails
+ * WCAG 2.2.2 (moving content lasting more than 5s needs a pause mechanism)
+ * and reads as "crowded" next to prose. `<video>` doesn't have that problem
+ * because `HTMLVideoElement` has a real `play()`/`pause()`, so the Clip
+ * component renders paused on `poster` by default and toggles playback on
+ * click, instead of autoplaying like a GIF would.
+ *
+ * `src` (not `path`) because this is a resource the browser loads directly,
+ * the same category as `image.src` above — not a navigable destination like
+ * `link`/`button`/`card`'s `path`, which get routed through `isExternal()`.
+ *
+ * Self-closing, same reasoning as `imageTag`: `poster`/`title`/`alt` are
+ * attributes, not children — a clip embed has no nested content to parse.
+ *
+ * Authors use: {% clip src="/videos/demo.mp4" poster="/images/demo-poster.jpg" title="..." /%}
+ */
+const clip: Schema = {
+  render: 'Clip',
+  children: [],
+  attributes: {
+    src:    { type: String, required: true },
+    poster: { type: String },
+    title:  { type: String },
+    alt:    { type: String },
+  },
+};
+
+/**
  * Callout block tag — renders note, warning, danger, and tip callout boxes.
  *
  * Authors use: {% callout type="note" title="..." %}...{% /callout %}
@@ -294,10 +330,11 @@ const button: Schema = {
  *   - Custom `card` / `cardGrid` tags (routes to Card / CardGrid components).
  *   - `link` / `image` tags (variable-capable counterparts to the native
  *     `link` / `image` nodes above — see their own doc comments).
+ *   - `clip` tag (click-to-play demo clips — see its own doc comment).
  */
 export function createDefaultMarkdocConfig(): Config {
   return {
     nodes: { heading, link, fence, image },
-    tags: { callout, card, cardGrid, hero, section, button, link: linkTag, image: imageTag },
+    tags: { callout, card, cardGrid, hero, section, button, link: linkTag, image: imageTag, clip },
   };
 }

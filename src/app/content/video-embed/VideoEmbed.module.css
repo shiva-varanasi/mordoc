@@ -1,24 +1,3 @@
-/* ============================================================
-   VIDEO EMBED TOKENS
-   ============================================================ */
-:root {
-  --video-embed-caption-color: var(--color-fg-muted);
-  --video-embed-radius: 6px;
-  /* Fixed dark background, deliberately not theme-reactive — real video
-     players (YouTube, Vimeo, native browser controls) always show dark
-     chrome regardless of the surrounding page's light/dark mode, and the
-     play toggle below is already fixed-dark for the same reason. A
-     theme-following background would be the one inconsistent piece.
-     #121212 is this site's own dark-mode --color-bg value, reused as a
-     literal so it stays constant in light mode too; the glow uses the
-     site's base --accent (stable across light/dark, unlike --accent-muted)
-     for a touch of brand identity instead of a dead-flat black. */
-  --video-embed-fallback-bg: radial-gradient(circle at center, color-mix(in oklch, var(--accent) 35%, black), #121212 70%);
-  /* Same values as Card.module.css's --card-shadow, for a consistent
-     "floating card" feel across content components. */
-  --video-embed-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-}
-
 /* ── Inline figure ───────────────────────────────────────────── */
 
 .figure {
@@ -27,24 +6,23 @@
   max-width: 640px;
 }
 
-/* 16:9 by default (right for the large majority of video, and the only
-   sane guess when there's no thumbnail to go on). VideoEmbed.tsx overrides
-   this with an inline `aspectRatio` style once it measures the real
-   `thumbnail` image's natural dimensions on load, so the box matches
-   whatever shape the author's thumbnail actually is — see the component's
-   doc comment. That measured value persists across the click-to-play swap,
-   so the thumbnail and the iframe that replaces it always share the same
-   footprint; a mismatch only happens if the thumbnail's aspect ratio
-   doesn't match the real video's, which is on the author to fix by
-   cropping the thumbnail to match. */
+/* 16:9 by default — right for YouTube/Vimeo almost always, and a reasonable
+   guess for Loom too, though Loom recordings inherit whatever shape the
+   recorder's screen/window was and often aren't 16:9. VideoEmbed.tsx
+   overrides this with an inline `aspectRatio` style when the author passes
+   the `aspectRatio` prop, or (in the unrecognized-provider fallback case
+   only) once it measures the real `thumbnail` image's natural dimensions on
+   load — see the component's doc comment. */
 .wrap {
   position: relative;
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: var(--video-embed-radius);
+  border-radius: 6px;
   overflow: hidden;
-  box-shadow: var(--video-embed-shadow);
+  /* Same values as Card.module.css's --card-shadow, for a consistent
+     "floating card" feel across content components. */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .iframe {
@@ -54,7 +32,9 @@
   border: 0;
 }
 
-/* ── Facade card (thumbnail-or-fallback + toggle) ───────── */
+/* ── Fallback link-out card (thumbnail-or-fallback + toggle), used only
+   when `src` doesn't resolve to a recognized provider — a real provider
+   iframe renders its own cover state instead of this. ───────── */
 
 .card {
   position: relative;
@@ -75,16 +55,25 @@
   object-fit: cover;
 }
 
+/* Fixed dark background, deliberately not theme-reactive — real video
+   players (YouTube, Vimeo, native browser controls) always show dark
+   chrome regardless of the surrounding page's light/dark mode, and the play
+   toggle below is already fixed-dark for the same reason. A theme-following
+   background would be the one inconsistent piece. #121212 is this site's
+   own dark-mode --color-bg value, reused as a literal so it stays constant
+   in light mode too; the glow uses the site's base --accent (stable across
+   light/dark, unlike --accent-muted) for a touch of brand identity instead
+   of a dead-flat black. */
 .fallback {
   width: 100%;
   height: 100%;
-  background: var(--video-embed-fallback-bg);
+  background: radial-gradient(circle at center, color-mix(in oklch, var(--accent) 35%, black), #121212 70%);
 }
 
 .caption {
   margin: 0.5rem 0 0;
   font-size: 0.8125rem;
-  color: var(--video-embed-caption-color);
+  color: var(--color-fg-muted);
   text-align: center;
   font-style: italic;
 }

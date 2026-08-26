@@ -8,7 +8,7 @@
  * This is deliberately just a small static table, not a thumbnail-fetching
  * service — see the `videoEmbed` tag's doc comment in markdoc-config.ts for
  * why VideoEmbed never calls a provider's oEmbed API at build time. Adding a
- * new provider (Loom, etc.) means adding one entry here, nothing else.
+ * new provider (Wistia, etc.) means adding one entry here, nothing else.
  */
 
 interface VideoProvider {
@@ -51,6 +51,16 @@ const providers: VideoProvider[] = [
       // vimeo.com/<id> — the id is the entire pathname.
       const match = /^\/(?:video\/)?(\d+)/.exec(url.pathname);
       return match ? `https://player.vimeo.com/video/${match[1]}` : null;
+    },
+  },
+  {
+    name: 'Loom',
+    matches: (hostname) => hostname === 'loom.com' || hostname === 'www.loom.com',
+    embedUrl: (url) => {
+      // loom.com/share/<id> — the pasted, watch-page shape.
+      // loom.com/embed/<id> — already embed-shaped.
+      const match = /^\/(?:share|embed)\/([^/?]+)/.exec(url.pathname);
+      return match ? `https://www.loom.com/embed/${match[1]}` : null;
     },
   },
 ];

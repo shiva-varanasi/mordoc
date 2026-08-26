@@ -1,40 +1,44 @@
 /**
- * VideoEmbed — click-to-load embed for a video hosted on YouTube, Vimeo, or
- * another recognized provider.
+ * VideoEmbed — embeds a video hosted on YouTube, Vimeo, Loom, or another
+ * recognized provider (as opposed to `clip`'s self-hosted file).
  *
- * Renders a static facade (thumbnail or generic fallback card + play icon)
- * until clicked; only then does the real provider `<iframe>` get mounted.
- * This matters for page weight, not just aesthetics — a YouTube/Vimeo
- * iframe loads several hundred KB of player JS the instant it's in the DOM,
- * whether or not the reader ever presses play, so a doc page with a few
- * embeds pays that cost on every visit unless the iframe is deferred until
- * an actual click. This is the same "facade" pattern the popular
- * `lite-youtube-embed` library uses.
+ * Mounts the provider's real embed iframe immediately — no click-to-load
+ * facade, no author-supplied `thumbnail` required for a recognized
+ * provider. This is a deliberate trade-off, not an oversight:
+ * YouTube/Vimeo/Loom's own embedded players already render a "cover" state
+ * — the video's real thumbnail, title, and a play button — the instant
+ * their iframe loads, even without `autoplay`. Building a facade on top of
+ * that would just be reproducing, by hand and per-author, a thumbnail these
+ * providers already give away for free (this component used to require an
+ * author-supplied `thumbnail` for exactly that reason — see git history).
  *
- * Deliberately does not fetch a real thumbnail from the provider's oEmbed
- * API at build time — that would be this pipeline's first build-time
- * network dependency (every other content feature is local-file-only), and
- * it'd be a new failure mode with no local equivalent (offline build, video
- * went private/deleted, rate limiting). Authors who want a real screenshot
- * supply `thumbnail` themselves, same as `Clip`; otherwise this renders a
- * generic on-brand fallback card with a play icon, which is the same
- * "always show *something* structured, never a blank box" rule
- * link-preview cards (Slack, Twitter, Notion) fall back to when they have
- * no image either.
+ * The cost side of that trade-off: unlike `Clip` (which *does* defer a
+ * heavy asset until click, because there's no provider iframe to lean on
+ * for a self-hosted file), every `videoEmbed` here now loads its provider's
+ * player JS/CSS on page load whether or not a reader ever presses play —
+ * measured at ~200KB+ of network transfer per distinct YouTube video.
+ * `loading="lazy"` below softens this for below-the-fold embeds (deferred
+ * until near-viewport, no click required) but doesn't eliminate it. This
+ * mirrors how Mintlify and most other docs tooling embed video, and was
+ * chosen over the old click-to-load design specifically to get correct
+ * thumbnails/aspect ratios for free — see the `videoEmbed` tag's doc
+ * comment in markdoc-config.ts for the full trade-off discussion.
+ *
+ * `aspectRatio` lets an author override the default 16:9 box (e.g. "4 / 3",
+ * "9 / 16") — mainly needed for Loom, whose recordings inherit whatever
+ * shape the recorder's screen/window was, unlike YouTube/Vimeo which are
+ * almost always 16:9.
  *
  * If `src` doesn't resolve to a recognized provider/video ID (see
- * providers.ts), there's nothing to embed — the card links out to `src` in
- * a new tab instead of trying to render a broken iframe.
+ * providers.ts), there's no provider iframe to lean on for a cover state —
+ * the card falls back to the old thumbnail-or-fallback + play icon facade
+ * and links out to `src` in a new tab instead of trying to render a broken
+ * iframe. `thumbnail` only matters in this fallback case.
  *
- * The container's box shape follows `thumbnail`'s own natural aspect ratio
- * (measured once via the image's `onLoad`, since a cross-origin `<iframe>`
- * has no way to report its embedded video's real dimensions back to us —
- * some explicit box size always has to come from our side). That measured
- * ratio is kept in state rather than read fresh each render, so it persists
- * across the click-to-play swap: the iframe that replaces the thumbnail
- * inherits the exact same box, no separate handling needed. Defaults to
- * 16:9 (set in VideoEmbed.module.css) until measured, or permanently when
- * no `thumbnail` is given at all.
+ * The container's box shape follows `aspectRatio` when given; otherwise, in
+ * the fallback case, it follows `thumbnail`'s own natural aspect ratio
+ * (measured once via the image's `onLoad`, same reasoning as `Clip`); it
+ * defaults to 16:9 (set in VideoEmbed.module.css) otherwise.
  *
  * Wired via the `videoEmbed` tag in markdoc-config.ts, registered in
  * ArticlePage.tsx's and LandingPage.tsx's components maps.
@@ -50,56 +54,45 @@ interface VideoEmbedProps {
   thumbnail?: string;
   title?: string;
   alt?: string;
+  aspectRatio?: string;
 }
 
-export function VideoEmbed({ src, thumbnail, title, alt }: VideoEmbedProps) {
-  const [isActive, setIsActive] = useState(false);
-  const [aspectRatio, setAspectRatio] = useState<string | undefined>(undefined);
+export function VideoEmbed({ src, thumbnail, title, alt, aspectRatio }: VideoEmbedProps) {
+  const [measuredRatio, setMeasuredRatio] = useState<string | undefined>(undefined);
   const embed = resolveVideoEmbed(src);
+  const ratio = aspectRatio ?? measuredRatio;
 
   const label = alt ?? title ?? (embed ? `${embed.name} video` : 'External video');
 
   const handleThumbnailLoad = (e: SyntheticEvent<HTMLImageElement>) => {
     const { naturalWidth, naturalHeight } = e.currentTarget;
-    if (naturalWidth && naturalHeight) setAspectRatio(`${naturalWidth} / ${naturalHeight}`);
+    if (naturalWidth && naturalHeight) setMeasuredRatio(`${naturalWidth} / ${naturalHeight}`);
   };
-
-  // Shared facade markup for both the "click to embed" and "link out to an
-  // unrecognized provider" cases below — they only differ in wrapper
-  // element and click behavior.
-  const facade = (
-    <>
-      {thumbnail ? (
-        <img className={styles.thumbnail} src={thumbnail} alt="" onLoad={handleThumbnailLoad} />
-      ) : (
-        <div className={styles.fallback} />
-      )}
-      <span className={styles.toggle}>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M7 5.5v13a1 1 0 0 0 1.53.848l10.5-6.5a1 1 0 0 0 0-1.696l-10.5-6.5A1 1 0 0 0 7 5.5Z" fill="currentColor" />
-        </svg>
-      </span>
-    </>
-  );
 
   return (
     <figure className={styles.figure}>
-      <div className={styles.wrap} style={aspectRatio ? { aspectRatio } : undefined}>
-        {isActive && embed ? (
+      <div className={styles.wrap} style={ratio ? { aspectRatio: ratio } : undefined}>
+        {embed ? (
           <iframe
             className={styles.iframe}
-            src={`${embed.embedUrl}?autoplay=1`}
+            src={embed.embedUrl}
             title={label}
+            loading="lazy"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
-        ) : embed ? (
-          <button type="button" className={styles.card} onClick={() => setIsActive(true)} aria-label={`Play: ${label}`}>
-            {facade}
-          </button>
         ) : (
           <a href={src} target="_blank" rel="noreferrer noopener" className={styles.card} aria-label={`Open: ${label}`}>
-            {facade}
+            {thumbnail ? (
+              <img className={styles.thumbnail} src={thumbnail} alt="" onLoad={handleThumbnailLoad} />
+            ) : (
+              <div className={styles.fallback} />
+            )}
+            <span className={styles.toggle}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 5.5v13a1 1 0 0 0 1.53.848l10.5-6.5a1 1 0 0 0 0-1.696l-10.5-6.5A1 1 0 0 0 7 5.5Z" fill="currentColor" />
+              </svg>
+            </span>
           </a>
         )}
       </div>

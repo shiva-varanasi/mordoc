@@ -5,7 +5,7 @@
  * tag's doc comment in markdoc-config.ts for why): a plain GIF autoplays
  * with no way to stop it, which is both a WCAG 2.2.2 violation (moving
  * content lasting more than 5s needs a pause mechanism) and distracting
- * next to prose. This component renders paused on `poster` by default and
+ * next to prose. This component renders paused on `thumbnail` by default and
  * only plays once the reader clicks it — same "always animating" look as a
  * GIF once playing, but under the reader's control.
  *
@@ -25,12 +25,12 @@ import styles from './Clip.module.css';
 
 interface ClipProps {
   src: string;
-  poster?: string;
+  thumbnail?: string;
   title?: string;
   alt?: string;
 }
 
-export function Clip({ src, poster, title, alt }: ClipProps) {
+export function Clip({ src, thumbnail, title, alt }: ClipProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -51,7 +51,7 @@ export function Clip({ src, poster, title, alt }: ClipProps) {
           ref={videoRef}
           className={styles.video}
           src={src}
-          poster={poster}
+          poster={thumbnail}
           muted
           loop
           playsInline

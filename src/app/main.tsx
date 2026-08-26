@@ -40,6 +40,8 @@ import 'virtual:mordoc/theme/hero';
 import 'virtual:mordoc/theme/section';
 import 'virtual:mordoc/theme/diagram';
 import 'virtual:mordoc/theme/image';
+import 'virtual:mordoc/theme/clip';
+import 'virtual:mordoc/theme/video-embed';
 import 'virtual:mordoc/theme/code-block';
 import 'virtual:mordoc/theme/callout';
 import 'virtual:mordoc/theme/card';

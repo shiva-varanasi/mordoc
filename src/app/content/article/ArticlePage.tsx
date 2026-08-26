@@ -10,6 +10,7 @@ import type { SidenavConfig } from '../../../types/navigation.js';
 import { CodeBlock } from '../code-block/CodeBlock.js';
 import { Image } from '../image/Image.js';
 import { Clip } from '../clip/Clip.js';
+import { VideoEmbed } from '../video-embed/VideoEmbed.js';
 import { Diagram } from '../diagram/Diagram.js';
 import { Callout } from '../callout/Callout.js';
 import { Card } from '../card/Card.js';
@@ -163,7 +164,7 @@ export function ArticlePage() {
   }, [pageData.frontmatter.title, site.name]);
 
   const rendered = Markdoc.renderers.react(pageData.renderable, React, {
-    components: { CodeBlock, Image, Clip, Callout, Card, CardGrid, ContentLink, Heading, Button, Diagram },
+    components: { CodeBlock, Image, Clip, VideoEmbed, Callout, Card, CardGrid, ContentLink, Heading, Button, Diagram },
   });
 
   return (

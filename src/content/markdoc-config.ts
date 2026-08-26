@@ -189,26 +189,65 @@ const imageTag: Schema = {
  * WCAG 2.2.2 (moving content lasting more than 5s needs a pause mechanism)
  * and reads as "crowded" next to prose. `<video>` doesn't have that problem
  * because `HTMLVideoElement` has a real `play()`/`pause()`, so the Clip
- * component renders paused on `poster` by default and toggles playback on
+ * component renders paused on `thumbnail` by default and toggles playback on
  * click, instead of autoplaying like a GIF would.
  *
  * `src` (not `path`) because this is a resource the browser loads directly,
  * the same category as `image.src` above — not a navigable destination like
  * `link`/`button`/`card`'s `path`, which get routed through `isExternal()`.
  *
- * Self-closing, same reasoning as `imageTag`: `poster`/`title`/`alt` are
+ * `thumbnail` (not `poster`, though it maps to the native `<video poster>`
+ * attribute under the hood) — "poster" is filmmaking jargon; "thumbnail" is
+ * what content authors actually call this, and it's the same name used by
+ * the `videoEmbed` tag below, which has no native `poster` attribute to
+ * mirror at all since it isn't a real `<video>` element.
+ *
+ * Self-closing, same reasoning as `imageTag`: `thumbnail`/`title`/`alt` are
  * attributes, not children — a clip embed has no nested content to parse.
  *
- * Authors use: {% clip src="/videos/demo.mp4" poster="/images/demo-poster.jpg" title="..." /%}
+ * Authors use: {% clip src="/videos/demo.mp4" thumbnail="/images/demo-thumb.jpg" title="..." /%}
  */
 const clip: Schema = {
   render: 'Clip',
   children: [],
   attributes: {
-    src:    { type: String, required: true },
-    poster: { type: String },
-    title:  { type: String },
-    alt:    { type: String },
+    src:       { type: String, required: true },
+    thumbnail: { type: String },
+    title:     { type: String },
+    alt:       { type: String },
+  },
+};
+
+/**
+ * VideoEmbed tag — a video hosted on YouTube, Vimeo, or another recognized
+ * provider (as opposed to `clip`'s self-hosted file). See the VideoEmbed
+ * component's own doc comment for the full reasoning; summary here:
+ *
+ * `src` is the video's ordinary public page URL — whatever an author would
+ * paste from their browser, in any of that provider's URL shapes
+ * (`youtube.com/watch?v=`, `youtu.be/`, `vimeo.com/`, …). `providers.ts`
+ * resolves it to a provider name + iframe embed URL; an unrecognized host
+ * or an unparseable video ID falls back to a plain link-out card rather
+ * than a broken iframe.
+ *
+ * `thumbnail` is optional, same name and role as `clip.thumbnail`, but
+ * there's no oEmbed fetch to auto-derive one here — omit it and readers
+ * get a generic branded fallback card (provider badge + play icon)
+ * instead of a real screenshot. See the component doc comment for why this
+ * pipeline deliberately doesn't call provider APIs at build time.
+ *
+ * Self-closing, same reasoning as `clip`/`imageTag`.
+ *
+ * Authors use: {% videoEmbed src="https://youtu.be/dQw4w9WgXcQ" title="..." /%}
+ */
+const videoEmbed: Schema = {
+  render: 'VideoEmbed',
+  children: [],
+  attributes: {
+    src:       { type: String, required: true },
+    thumbnail: { type: String },
+    title:     { type: String },
+    alt:       { type: String },
   },
 };
 
@@ -331,10 +370,11 @@ const button: Schema = {
  *   - `link` / `image` tags (variable-capable counterparts to the native
  *     `link` / `image` nodes above — see their own doc comments).
  *   - `clip` tag (click-to-play demo clips — see its own doc comment).
+ *   - `videoEmbed` tag (YouTube/Vimeo embeds — see its own doc comment).
  */
 export function createDefaultMarkdocConfig(): Config {
   return {
     nodes: { heading, link, fence, image },
-    tags: { callout, card, cardGrid, hero, section, button, link: linkTag, image: imageTag, clip },
+    tags: { callout, card, cardGrid, hero, section, button, link: linkTag, image: imageTag, clip, videoEmbed },
   };
 }

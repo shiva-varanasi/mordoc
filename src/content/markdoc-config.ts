@@ -232,9 +232,9 @@ const clip: Schema = {
  *
  * `thumbnail` is optional, same name and role as `clip.thumbnail`, but
  * there's no oEmbed fetch to auto-derive one here — omit it and readers
- * get a generic branded fallback card (provider badge + play icon)
- * instead of a real screenshot. See the component doc comment for why this
- * pipeline deliberately doesn't call provider APIs at build time.
+ * get a generic branded fallback card (play icon on an accent-tinted dark
+ * card) instead of a real screenshot. See the component doc comment for
+ * why this pipeline deliberately doesn't call provider APIs at build time.
  *
  * Self-closing, same reasoning as `clip`/`imageTag`.
  *

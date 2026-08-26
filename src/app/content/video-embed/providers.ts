@@ -1,9 +1,9 @@
 /**
  * Provider lookup for the `videoEmbed` tag — turns a video's public page URL
  * (whatever a reader would paste from their browser's address bar) into the
- * two things VideoEmbed.tsx needs: a small display badge ("YouTube",
- * "Vimeo") for the generic fallback card, and the actual iframe `src` to
- * swap in once the reader clicks play.
+ * two things VideoEmbed.tsx needs: a provider name ("YouTube", "Vimeo") used
+ * for the accessible label when the author doesn't supply `alt`/`title`, and
+ * the actual iframe `src` to swap in once the reader clicks play.
  *
  * This is deliberately just a small static table, not a thumbnail-fetching
  * service — see the `videoEmbed` tag's doc comment in markdoc-config.ts for

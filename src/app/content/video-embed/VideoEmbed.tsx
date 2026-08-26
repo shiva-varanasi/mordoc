@@ -2,7 +2,7 @@
  * VideoEmbed — click-to-load embed for a video hosted on YouTube, Vimeo, or
  * another recognized provider.
  *
- * Renders a static facade (thumbnail or generic fallback card + play badge)
+ * Renders a static facade (thumbnail or generic fallback card + play icon)
  * until clicked; only then does the real provider `<iframe>` get mounted.
  * This matters for page weight, not just aesthetics — a YouTube/Vimeo
  * iframe loads several hundred KB of player JS the instant it's in the DOM,
@@ -17,10 +17,10 @@
  * it'd be a new failure mode with no local equivalent (offline build, video
  * went private/deleted, rate limiting). Authors who want a real screenshot
  * supply `thumbnail` themselves, same as `Clip`; otherwise this renders a
- * generic on-brand fallback card with the provider's name and a play icon,
- * which is the same "always show *something* structured, never a blank
- * box" rule link-preview cards (Slack, Twitter, Notion) fall back to when
- * they have no image either.
+ * generic on-brand fallback card with a play icon, which is the same
+ * "always show *something* structured, never a blank box" rule
+ * link-preview cards (Slack, Twitter, Notion) fall back to when they have
+ * no image either.
  *
  * If `src` doesn't resolve to a recognized provider/video ID (see
  * providers.ts), there's nothing to embed — the card links out to `src` in
@@ -66,7 +66,7 @@ export function VideoEmbed({ src, thumbnail, title, alt }: VideoEmbedProps) {
 
   // Shared facade markup for both the "click to embed" and "link out to an
   // unrecognized provider" cases below — they only differ in wrapper
-  // element, click behavior, and badge text.
+  // element and click behavior.
   const facade = (
     <>
       {thumbnail ? (
@@ -79,7 +79,6 @@ export function VideoEmbed({ src, thumbnail, title, alt }: VideoEmbedProps) {
           <path d="M7 5.5v13a1 1 0 0 0 1.53.848l10.5-6.5a1 1 0 0 0 0-1.696l-10.5-6.5A1 1 0 0 0 7 5.5Z" fill="currentColor" />
         </svg>
       </span>
-      <span className={styles.badge}>{embed ? embed.name : 'External video'}</span>
     </>
   );
 

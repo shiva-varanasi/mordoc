@@ -7,8 +7,8 @@
   /* Fixed dark background, deliberately not theme-reactive — real video
      players (YouTube, Vimeo, native browser controls) always show dark
      chrome regardless of the surrounding page's light/dark mode, and the
-     play toggle/badge below are already fixed-dark for the same reason.
-     A theme-following background would be the one inconsistent piece.
+     play toggle below is already fixed-dark for the same reason. A
+     theme-following background would be the one inconsistent piece.
      #121212 is this site's own dark-mode --color-bg value, reused as a
      literal so it stays constant in light mode too; the glow uses the
      site's base --accent (stable across light/dark, unlike --accent-muted)
@@ -54,7 +54,7 @@
   border: 0;
 }
 
-/* ── Facade card (thumbnail-or-fallback + toggle + badge) ───────── */
+/* ── Facade card (thumbnail-or-fallback + toggle) ───────── */
 
 .card {
   position: relative;
@@ -116,21 +116,4 @@
    optically center inside the circle. */
 .toggle svg {
   margin-left: 2px;
-}
-
-/* ── Provider badge ──────────────────────────────────────────────
-   Free to show even without a real thumbnail — the provider name comes
-   from a hostname match, not a network call, so there's no cost to
-   always displaying it. */
-
-.badge {
-  position: absolute;
-  bottom: 0.625rem;
-  left: 0.625rem;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #ffffff;
-  background: rgba(0, 0, 0, 0.55);
-  border-radius: 4px;
 }

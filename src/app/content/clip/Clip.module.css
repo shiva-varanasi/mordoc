@@ -42,22 +42,39 @@
 }
 
 /* ── Play/pause toggle ───────────────────────────────────────────
-   Same circular-button vocabulary as Image.module.css's .closeButton,
+   Same circular-button vocabulary as VideoEmbed.module.css's toggle,
    centered over the clip. Stays visible (not hover-only) so touch
-   devices — which have no hover state — can still discover it. */
+   devices — which have no hover state — can still discover it.
 
-.toggle {
+   .toggleMask (not .toggle) owns position/size/border-radius/overflow —
+   it's a non-interactive span that clips the real <button> inside it to a
+   circle. This isn't decorative: without a separate clipping ancestor, the
+   browser's native button chrome (a default 3D bevel some browsers/OS
+   accessibility themes paint on real <button> elements) spills past the
+   circle's edge — overflow:hidden on .toggle itself wouldn't help, since
+   that only clips a *different* element's content, never the element's
+   own border. This mirrors why VideoEmbed's .card button never shows the
+   same artifact: it sits inside its own overflow-hidden .wrap. */
+
+.toggleMask {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.toggle {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 3rem;
-  height: 3rem;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.55);
-  border-radius: 50%;
+  border: 0;
   color: #ffffff;
   cursor: pointer;
   transition: background 150ms ease, opacity 150ms ease;

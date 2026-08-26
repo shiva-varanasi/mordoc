@@ -59,23 +59,32 @@ export function Clip({ src, thumbnail, title, alt }: ClipProps) {
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
         />
-        <button
-          type="button"
-          className={styles.toggle}
-          onClick={toggle}
-          aria-label={isPlaying ? `Pause${alt ? `: ${alt}` : ''}` : `Play${alt ? `: ${alt}` : ''}`}
-        >
-          {isPlaying ? (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" />
-              <rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" />
-            </svg>
-          ) : (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M7 5.5v13a1 1 0 0 0 1.53.848l10.5-6.5a1 1 0 0 0 0-1.696l-10.5-6.5A1 1 0 0 0 7 5.5Z" fill="currentColor" />
-            </svg>
-          )}
-        </button>
+        {/* .toggleMask clips the button below to a circle — not decorative,
+            it's what keeps the browser's native button chrome (see Clip's
+            own investigation notes) from spilling past the circle's edge,
+            the same way VideoEmbed's overflow-hidden .wrap contains its
+            .card button. Without this wrapper, overflow:hidden on .toggle
+            itself wouldn't help: it only clips a *different* element's
+            content, never the element's own border. */}
+        <span className={styles.toggleMask}>
+          <button
+            type="button"
+            className={styles.toggle}
+            onClick={toggle}
+            aria-label={isPlaying ? `Pause${alt ? `: ${alt}` : ''}` : `Play${alt ? `: ${alt}` : ''}`}
+          >
+            {isPlaying ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" />
+                <rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" />
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 5.5v13a1 1 0 0 0 1.53.848l10.5-6.5a1 1 0 0 0 0-1.696l-10.5-6.5A1 1 0 0 0 7 5.5Z" fill="currentColor" />
+              </svg>
+            )}
+          </button>
+        </span>
       </div>
       {title && <figcaption className={styles.caption}>{title}</figcaption>}
     </figure>

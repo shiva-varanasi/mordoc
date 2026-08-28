@@ -1,0 +1,11 @@
+/* Reuses Accordion.module.css's --accordion-* tokens (declared once there,
+   in that file's :root block) rather than declaring its own — see that
+   file's token block comment for why. */
+.accordions {
+  margin: 1.25rem 0;
+  background: var(--accordion-bg);
+  border: 1px solid var(--accordion-border);
+  border-radius: var(--accordion-radius);
+  overflow: hidden;
+  box-shadow: var(--accordion-shadow);
+}

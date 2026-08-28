@@ -46,6 +46,7 @@ import 'virtual:mordoc/theme/code-block';
 import 'virtual:mordoc/theme/callout';
 import 'virtual:mordoc/theme/card';
 import 'virtual:mordoc/theme/button';
+import 'virtual:mordoc/theme/accordion';
 
 /**
  * Browser entry. Assembles `ShellData` from the eager virtual modules

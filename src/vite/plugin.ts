@@ -101,6 +101,7 @@ const COMPONENT_THEME_FILES: readonly { name: string; filename: string }[] = [
   { name: 'callout', filename: 'callout.css' },
   { name: 'card', filename: 'card.css' },
   { name: 'button', filename: 'button.css' },
+  { name: 'accordion', filename: 'accordion.css' },
 ];
 
 /**

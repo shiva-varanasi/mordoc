@@ -369,6 +369,53 @@ const button: Schema = {
 };
 
 /**
+ * Accordion tag — a single collapsible section: `title` drives the
+ * clickable header, and the body accepts the same broad content model as
+ * `section` (headings, paragraphs, lists, code fences, images, and any
+ * nested custom tag), so authors can put callouts, clips, embeds, cards —
+ * even another accordion — inside it, same as writing plain article body
+ * content.
+ *
+ * Works standalone, or nested inside `accordions` for grouped/coordinated
+ * behavior — see the `accordions` tag and the Accordion component's own doc
+ * comment for the mechanism.
+ *
+ * Authors use: {% accordion title="..." %}...{% /accordion %}
+ */
+const accordion: Schema = {
+  render: 'Accordion',
+  children: ['heading', 'paragraph', 'list', 'fence', 'blockquote', 'tag', 'hr'],
+  attributes: {
+    title:       { type: String, required: true },
+    defaultOpen: { type: Boolean, default: false },
+  },
+};
+
+/**
+ * Accordions tag — optional group wrapper for several `accordion` tags.
+ *
+ * `type="single"` (default) makes the group exclusive: opening one item
+ * closes any other open item in the group. `type="multiple"` makes items
+ * independent (still visually grouped, but any number can stay open at
+ * once). See the Accordions component's own doc comment for how the
+ * exclusive behavior is implemented with no JS via native
+ * `<details name="...">`.
+ *
+ * Authors use:
+ *   {% accordions %}
+ *     {% accordion title="..." %}...{% /accordion %}
+ *     {% accordion title="..." %}...{% /accordion %}
+ *   {% /accordions %}
+ */
+const accordions: Schema = {
+  render: 'Accordions',
+  children: ['tag'],
+  attributes: {
+    type: { type: String, default: 'single', matches: ['single', 'multiple'] },
+  },
+};
+
+/**
  * The default Markdoc config used by Mordoc's content transformer.
  *
  * Currently minimal:
@@ -381,10 +428,12 @@ const button: Schema = {
  *     `link` / `image` nodes above — see their own doc comments).
  *   - `clip` tag (click-to-play demo clips — see its own doc comment).
  *   - `videoEmbed` tag (YouTube/Vimeo/Loom embeds — see its own doc comment).
+ *   - `accordion` / `accordions` tags (collapsible sections — see their own
+ *     doc comments).
  */
 export function createDefaultMarkdocConfig(): Config {
   return {
     nodes: { heading, link, fence, image },
-    tags: { callout, card, cardGrid, hero, section, button, link: linkTag, image: imageTag, clip, videoEmbed },
+    tags: { callout, card, cardGrid, hero, section, button, link: linkTag, image: imageTag, clip, videoEmbed, accordion, accordions },
   };
 }

@@ -30,6 +30,8 @@ import { VideoEmbed } from '../video-embed/VideoEmbed.js';
 import { Callout } from '../callout/Callout.js';
 import { Card } from '../card/Card.js';
 import { CardGrid } from '../card/CardGrid.js';
+import { Accordion } from '../accordion/Accordion.js';
+import { Accordions } from '../accordion/Accordions.js';
 import { ContentLink } from '../link/ContentLink.js';
 import { Heading } from '../heading/Heading.js';
 import { Hero } from './hero/Hero.js';
@@ -48,7 +50,7 @@ export function LandingPage() {
   }, [pageData.frontmatter.title, site.name]);
 
   const rendered = Markdoc.renderers.react(pageData.renderable, React, {
-    components: { CodeBlock, Image, Clip, VideoEmbed, Callout, Card, CardGrid, ContentLink, Heading, Hero, Section, Button },
+    components: { CodeBlock, Image, Clip, VideoEmbed, Callout, Card, CardGrid, Accordion, Accordions, ContentLink, Heading, Hero, Section, Button },
   });
 
   return (

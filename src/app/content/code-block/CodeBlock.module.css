@@ -2,10 +2,11 @@
    CODE BLOCK TOKENS
    ============================================================ */
 :root {
-  --cb-bg:     var(--color-surface);
-  --cb-border: var(--color-border);
-  --cb-radius:             10px;
-  --cb-copy-button-radius: 4px;
+  --cb-bg:         var(--color-surface);
+  --cb-border:     var(--color-border);
+  --cb-radius:                 10px;
+  --cb-copy-button-radius:      4px;
+  --cb-max-height:            480px;
 }
 
 /* ── Wrapper ────────────────────────────────────────────────── */
@@ -68,6 +69,8 @@
   padding: 1.25rem 1.5rem;
   background-color: var(--color-bg);
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: var(--cb-max-height);
   font-family: var(--font-mono);
   font-size: 0.875rem;
   line-height: 1.7;
@@ -92,6 +95,8 @@
   border: 1px solid var(--cb-border);
   border-radius: var(--cb-radius);
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: var(--cb-max-height);
   font-family: var(--font-mono);
   font-size: 0.875rem;
   line-height: 1.7;

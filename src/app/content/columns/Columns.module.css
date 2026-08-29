@@ -1,0 +1,31 @@
+/* ── Columns ──────────────────────────────────────────────────── */
+
+.columns {
+  display: flex;
+  gap: 2rem;
+}
+
+/* Vertical rule between columns, opt-in via the `divider` attribute.
+   `> * + *` targets every direct child but the first purely structurally,
+   so it works regardless of column count and doesn't need to know
+   Column's own (hashed) class name. */
+.divided > * + * {
+  border-left: 1px solid var(--color-border);
+  padding-left: 2rem;
+}
+
+/* Stack to a single column below this viewport — same breakpoint
+   CardGrid.module.css collapses at. */
+@media (max-width: 960px) {
+  .columns {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .divided > * + * {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid var(--color-border);
+    padding-top: 1.5rem;
+  }
+}

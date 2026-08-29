@@ -416,6 +416,46 @@ const accordions: Schema = {
 };
 
 /**
+ * Column tag — a single column inside `columns`.
+ *
+ * No attributes: content accepts the same broad model as `section`/
+ * `accordion` (headings, paragraphs, lists, code fences, images, and any
+ * nested custom tag), so a column reads exactly like normal article content.
+ *
+ * Authors use: {% column %}...{% /column %}, nested inside `columns`.
+ */
+const column: Schema = {
+  render: 'Column',
+  children: ['heading', 'paragraph', 'list', 'fence', 'blockquote', 'tag', 'hr'],
+};
+
+/**
+ * Columns tag — lays out its `column` children side by side, equal width.
+ *
+ * An ordinary block-level tag, so it needs no special handling to appear
+ * mid-page: normal content, then a `{% columns %}...{% /columns %}` block,
+ * then normal content again — or the author wraps the whole page body in
+ * one `columns` block. Column count follows however many `column` children
+ * are nested; there's no `cols` attribute to keep in sync with them.
+ *
+ * `divider` (default `false`) draws a vertical rule between columns.
+ * Collapses to a single stacked column on narrow viewports.
+ *
+ * Authors use:
+ *   {% columns %}
+ *     {% column %}...{% /column %}
+ *     {% column %}...{% /column %}
+ *   {% /columns %}
+ */
+const columns: Schema = {
+  render: 'Columns',
+  children: ['tag'],
+  attributes: {
+    divider: { type: Boolean, default: false },
+  },
+};
+
+/**
  * The default Markdoc config used by Mordoc's content transformer.
  *
  * Currently minimal:
@@ -430,10 +470,12 @@ const accordions: Schema = {
  *   - `videoEmbed` tag (YouTube/Vimeo/Loom embeds — see its own doc comment).
  *   - `accordion` / `accordions` tags (collapsible sections — see their own
  *     doc comments).
+ *   - `column` / `columns` tags (side-by-side content — see their own doc
+ *     comments).
  */
 export function createDefaultMarkdocConfig(): Config {
   return {
     nodes: { heading, link, fence, image },
-    tags: { callout, card, cardGrid, hero, section, button, link: linkTag, image: imageTag, clip, videoEmbed, accordion, accordions },
+    tags: { callout, card, cardGrid, hero, section, button, link: linkTag, image: imageTag, clip, videoEmbed, accordion, accordions, column, columns },
   };
 }

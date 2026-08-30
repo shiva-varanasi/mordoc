@@ -13,6 +13,7 @@
  */
 
 import React, { useState } from 'react';
+import { useUiStrings } from '../../i18n/useUiStrings.js';
 import styles from './Heading.module.css';
 
 interface HeadingProps {
@@ -42,6 +43,7 @@ function LinkIcon() {
 
 export function Heading({ id, level, children }: HeadingProps) {
   const [copied, setCopied] = useState(false);
+  const t = useUiStrings();
   const Tag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
@@ -63,10 +65,10 @@ export function Heading({ id, level, children }: HeadingProps) {
         href={`#${id}`}
         onClick={handleClick}
         className={styles.anchor}
-        aria-label="Copy link to this section"
+        aria-label={t.heading.copyLinkLabel}
       >
         <LinkIcon />
-        {copied && <span className={styles.tooltip}>Copied</span>}
+        {copied && <span className={styles.tooltip}>{t.heading.copiedTooltip}</span>}
       </a>
     </Tag>
   );

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { TocEntry } from '../../../types/content.js';
+import { useUiStrings } from '../../i18n/useUiStrings.js';
 import styles from './Toc.module.css';
 
 interface TocProps {
@@ -9,6 +10,7 @@ interface TocProps {
 export function Toc({ items }: TocProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const t = useUiStrings();
 
   useEffect(() => {
     if (items.length === 0) return;
@@ -56,8 +58,8 @@ export function Toc({ items }: TocProps) {
   if (items.length === 0) return null;
 
   return (
-    <nav className={styles.toc} aria-label="On this page">
-      <p className={styles.heading}>On this page</p>
+    <nav className={styles.toc} aria-label={t.toc.onThisPage}>
+      <p className={styles.heading}>{t.toc.onThisPage}</p>
       <ul className={styles.list}>
         {items.map((entry) => (
           <li key={entry.id} className={styles.item}>

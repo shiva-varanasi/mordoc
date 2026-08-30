@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { useUiStrings } from '../i18n/useUiStrings.js';
+import { formatUiString } from '../i18n/format.js';
 import styles from './LanguagePicker.module.css';
 
 /**
@@ -116,6 +118,7 @@ function GlobeIcon() {
 export function LanguagePicker({ languages, currentLang, onChange }: LanguagePickerProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const t = useUiStrings();
 
   useEffect(() => {
     if (!open) return;
@@ -145,14 +148,14 @@ export function LanguagePicker({ languages, currentLang, onChange }: LanguagePic
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label={`Language: ${getLanguageName(currentLang)}`}
+        aria-label={formatUiString(t.nav.languageTriggerLabel, { language: getLanguageName(currentLang) })}
       >
         <GlobeIcon />
         <span className={styles.code}>{getLanguageName(currentLang)}</span>
       </button>
 
       {open && (
-        <ul className={styles.dropdown} role="listbox" aria-label="Select language">
+        <ul className={styles.dropdown} role="listbox" aria-label={t.nav.selectLanguageLabel}>
           {languages.map((lang) => (
             <li
               key={lang}

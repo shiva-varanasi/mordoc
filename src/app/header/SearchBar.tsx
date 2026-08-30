@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useUiStrings } from '../i18n/useUiStrings.js';
 import styles from './SearchBar.module.css';
 
 export function SearchBar({ onOpen }: { onOpen: () => void }) {
   const [shortcut, setShortcut] = useState('Ctrl K');
+  const t = useUiStrings();
 
   // Detect Mac after mount — navigator is unavailable during SSR.
   // Starting with 'Ctrl K' keeps the server and initial client render
@@ -30,7 +32,7 @@ export function SearchBar({ onOpen }: { onOpen: () => void }) {
         <circle cx="11" cy="11" r="8" />
         <line x1="21" y1="21" x2="16.65" y2="16.65" />
       </svg>
-      <span className={styles.placeholder}>Search...</span>
+      <span className={styles.placeholder}>{t.search.placeholder}</span>
       <kbd className={styles.kbd}>{shortcut}</kbd>
     </button>
   );

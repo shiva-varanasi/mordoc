@@ -13,20 +13,26 @@
 import { useLocation } from 'react-router';
 import { Button } from '../landing/button/Button.js';
 import { Footer } from '../footer/Footer.js';
+import { useUiStrings } from '../../i18n/useUiStrings.js';
 import styles from './NotFound.module.css';
 
 export function NotFound() {
   const location = useLocation();
+  const t = useUiStrings();
+  // `{path}` is rendered as a styled <code> element rather than plain text,
+  // so this splits the template around the placeholder instead of using
+  // formatUiString (which only produces a plain string).
+  const [beforePath, afterPath] = t.notFound.description.split('{path}');
   return (
     <div className={styles.page}>
       <div className={styles.articleArea}>
         <div className={styles.article}>
           <p className={styles.code404} aria-hidden="true">404</p>
-          <h1 className={styles.title}>Page not found</h1>
+          <h1 className={styles.title}>{t.notFound.title}</h1>
           <p className={styles.description}>
-            No page exists at <code className={styles.path}>{location.pathname}</code>.
+            {beforePath}<code className={styles.path}>{location.pathname}</code>{afterPath}
           </p>
-          <Button path="/">Go home</Button>
+          <Button path="/">{t.notFound.goHomeButton}</Button>
         </div>
       </div>
       <Footer />

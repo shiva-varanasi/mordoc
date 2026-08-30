@@ -5,6 +5,8 @@ import Markdoc from '@markdoc/markdoc';
 import { useMordocData } from '../../data-context.js';
 import { detectCurrentLang, buildLangPrefix, stripLangPrefix, resolveLabel, applyLangToSidenav } from '../../lang-utils.js';
 import { samePath } from '../../path-utils.js';
+import { useUiStrings } from '../../i18n/useUiStrings.js';
+import { formatUiString } from '../../i18n/format.js';
 import type { PageData } from '../../../types/content.js';
 import type { SidenavConfig } from '../../../types/navigation.js';
 import { CodeBlock } from '../code-block/CodeBlock.js';
@@ -108,10 +110,11 @@ function BreadcrumbSep() {
 }
 
 function Breadcrumb({ entries }: { entries: BreadcrumbEntry[] }) {
+  const t = useUiStrings();
   if (entries.length === 0) return null;
   const lastIndex = entries.length - 1;
   return (
-    <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+    <nav className={styles.breadcrumb} aria-label={t.breadcrumb.ariaLabel}>
       {entries.map((entry, i) => {
         const isCurrent = i === lastIndex;
         const isLink = !isCurrent && entry.path !== undefined;
@@ -140,6 +143,7 @@ export function ArticlePage() {
   const pageData = useLoaderData() as PageData;
   const { site, navigation, language, translations } = useMordocData();
   const { pathname } = useLocation();
+  const t = useUiStrings();
 
   const currentLang = detectCurrentLang(pathname, language, site.defaultLanguage);
   const contentPath = stripLangPrefix(pathname, currentLang, site.defaultLanguage);
@@ -153,7 +157,7 @@ export function ArticlePage() {
     ? resolveLabel(sectionLabel, currentLang, site.defaultLanguage, translations)
     : null;
   const breadcrumb: BreadcrumbEntry[] = [
-    { label: 'Home', path: prefix || '/' },
+    { label: t.breadcrumb.home, path: prefix || '/' },
     ...(resolvedSectionLabel && sectionPath
       ? [{ label: resolvedSectionLabel, path: `${prefix}${sectionPath}` }]
       : []),
@@ -182,7 +186,7 @@ export function ArticlePage() {
           <p className={styles.description}>{pageData.frontmatter.description}</p>
         )}
         <div className={styles.metaRow} data-pagefind-ignore>
-          <span className={styles.readTime}>{readTime} MIN READ</span>
+          <span className={styles.readTime}>{formatUiString(t.article.readTime, { count: readTime })}</span>
         </div>
       </header>
       <div className={styles.prose}>{rendered}</div>

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { Button } from '../content/landing/button/Button.js';
 import type { HeaderLink } from '../../types/navigation.js';
+import { useUiStrings } from '../i18n/useUiStrings.js';
 import styles from './HeaderLinks.module.css';
 
 function EllipsisIcon() {
@@ -65,6 +66,7 @@ function HeaderLinkItem({ item }: { item: HeaderLink }) {
 function HeaderLinksOverflowMenu({ links }: { links: HeaderLink[] }) {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const t = useUiStrings();
 
   useEffect(() => {
     if (!open) return;
@@ -82,7 +84,7 @@ function HeaderLinksOverflowMenu({ links }: { links: HeaderLink[] }) {
       <button
         className={styles.headerLinksMenuBtn}
         onClick={() => setOpen((o) => !o)}
-        aria-label="More links"
+        aria-label={t.nav.moreLinksLabel}
         aria-expanded={open}
         aria-haspopup="true"
       >

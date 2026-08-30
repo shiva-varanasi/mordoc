@@ -1,11 +1,13 @@
 import { NavLink, useLocation } from 'react-router';
 import { useMordocData } from '../data-context.js';
 import { detectCurrentLang, buildLangPrefix, resolveLabel } from '../lang-utils.js';
+import { useUiStrings } from '../i18n/useUiStrings.js';
 import styles from './Topnav.module.css';
 
 export function Topnav() {
   const { navigation, language, site, translations } = useMordocData();
   const { pathname } = useLocation();
+  const t = useUiStrings();
 
   if (navigation.kind !== 'topnav') return null;
 
@@ -13,7 +15,7 @@ export function Topnav() {
   const prefix = buildLangPrefix(currentLang, site.defaultLanguage);
 
   return (
-    <nav className={styles.topnav} aria-label="Top navigation">
+    <nav className={styles.topnav} aria-label={t.nav.topNavigationLabel}>
       {navigation.topnav.map((item) => (
         <NavLink
           key={item.path}

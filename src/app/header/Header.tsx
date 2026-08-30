@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router';
 import { useMordocData } from '../data-context.js';
 import { detectCurrentLang, buildLangPrefix, stripLangPrefix, resolveLabel } from '../lang-utils.js';
+import { useUiStrings } from '../i18n/useUiStrings.js';
 import { SearchBar } from './SearchBar.js';
 import { Topnav } from './Topnav.js';
 import { LanguagePicker } from './LanguagePicker.js';
@@ -59,6 +60,7 @@ export function Header({ sidenavOpen, onMenuToggle, onSearchOpen, showMenu = tru
   const location = useLocation();
   const navigate = useNavigate();
   const theme = useTheme();
+  const t = useUiStrings();
 
   const currentLang = detectCurrentLang(location.pathname, language, site.defaultLanguage);
   const currentContentPath = stripLangPrefix(location.pathname, currentLang, site.defaultLanguage);
@@ -87,7 +89,7 @@ export function Header({ sidenavOpen, onMenuToggle, onSearchOpen, showMenu = tru
             <button
               className={styles.menuBtn}
               onClick={onMenuToggle}
-              aria-label={sidenavOpen ? 'Close menu' : 'Open menu'}
+              aria-label={sidenavOpen ? t.nav.closeMenu : t.nav.openMenu}
               aria-expanded={sidenavOpen}
             >
               {sidenavOpen ? <CloseIcon /> : <HamburgerIcon />}

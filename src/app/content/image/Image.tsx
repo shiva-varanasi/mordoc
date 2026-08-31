@@ -14,6 +14,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { useUiStrings } from '../../i18n/useUiStrings.js';
 import styles from './Image.module.css';
 
 interface ImageProps {
@@ -24,6 +25,7 @@ interface ImageProps {
 
 export function Image({ src, alt = '', title }: ImageProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const t = useUiStrings();
 
   const open = () => setIsOpen(true);
 
@@ -52,12 +54,12 @@ export function Image({ src, alt = '', title }: ImageProps) {
       onClick={close}
       role="dialog"
       aria-modal="true"
-      aria-label={alt || 'Image preview'}
+      aria-label={alt || t.image.previewFallbackLabel}
     >
       <button
         className={styles.closeButton}
         onClick={close}
-        aria-label="Close image preview"
+        aria-label={t.image.closePreviewLabel}
         type="button"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

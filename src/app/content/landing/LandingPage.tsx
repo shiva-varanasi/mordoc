@@ -25,9 +25,15 @@ import Markdoc from '@markdoc/markdoc';
 import { useMordocData } from '../../data-context.js';
 import { CodeBlock } from '../code-block/CodeBlock.js';
 import { Image } from '../image/Image.js';
+import { Clip } from '../clip/Clip.js';
+import { VideoEmbed } from '../video-embed/VideoEmbed.js';
 import { Callout } from '../callout/Callout.js';
 import { Card } from '../card/Card.js';
 import { CardGrid } from '../card/CardGrid.js';
+import { Accordion } from '../accordion/Accordion.js';
+import { Accordions } from '../accordion/Accordions.js';
+import { Column } from '../columns/Column.js';
+import { Columns } from '../columns/Columns.js';
 import { ContentLink } from '../link/ContentLink.js';
 import { Heading } from '../heading/Heading.js';
 import { Hero } from './hero/Hero.js';
@@ -46,7 +52,7 @@ export function LandingPage() {
   }, [pageData.frontmatter.title, site.name]);
 
   const rendered = Markdoc.renderers.react(pageData.renderable, React, {
-    components: { CodeBlock, Image, Callout, Card, CardGrid, ContentLink, Heading, Hero, Section, Button },
+    components: { CodeBlock, Image, Clip, VideoEmbed, Callout, Card, CardGrid, Accordion, Accordions, Column, Columns, ContentLink, Heading, Hero, Section, Button },
   });
 
   return (

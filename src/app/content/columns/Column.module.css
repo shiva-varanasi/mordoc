@@ -1,0 +1,9 @@
+/* ── Column ───────────────────────────────────────────────────── */
+
+.column {
+  flex: 1;
+  /* Without this, a long code line or wide image inside a column can force
+     that flex item wider than its equal share instead of wrapping/scrolling
+     within it — the classic flex min-width:auto trap. */
+  min-width: 0;
+}

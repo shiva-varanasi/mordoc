@@ -18,6 +18,7 @@ import { useState, useEffect, useLayoutEffect, useCallback, useRef, type CSSProp
 import { createPortal } from 'react-dom';
 import { SceneSvg } from './SceneSvg.js';
 import type { Scene } from '../../../diagrams/generic/scene.js';
+import { useUiStrings } from '../../i18n/useUiStrings.js';
 import styles from './Diagram.module.css';
 
 interface DiagramProps {
@@ -36,6 +37,7 @@ export function Diagram({ scene }: DiagramProps) {
   const [zoom, setZoom] = useState(1);
   const [fitScale, setFitScale] = useState<number | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const t = useUiStrings();
 
   // Each open starts back at 100% (freshly re-fit) rather than remembering
   // the last zoom level from a previous visit to the lightbox.
@@ -97,12 +99,12 @@ export function Diagram({ scene }: DiagramProps) {
       onClick={close}
       role="dialog"
       aria-modal="true"
-      aria-label="Diagram preview"
+      aria-label={t.diagram.previewAriaLabel}
     >
       <button
         className={styles.closeButton}
         onClick={close}
-        aria-label="Close diagram preview"
+        aria-label={t.diagram.closePreviewLabel}
         type="button"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -115,7 +117,7 @@ export function Diagram({ scene }: DiagramProps) {
           className={styles.zoomButton}
           onClick={zoomOut}
           disabled={zoom <= ZOOM_MIN}
-          aria-label="Zoom out"
+          aria-label={t.diagram.zoomOutLabel}
           type="button"
         >
           −
@@ -125,7 +127,7 @@ export function Diagram({ scene }: DiagramProps) {
           className={styles.zoomButton}
           onClick={zoomIn}
           disabled={zoom >= ZOOM_MAX}
-          aria-label="Zoom in"
+          aria-label={t.diagram.zoomInLabel}
           type="button"
         >
           +

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useUiStrings } from '../i18n/useUiStrings.js';
+import { formatUiString } from '../i18n/format.js';
 import styles from './SearchModal.module.css';
 
 /**
@@ -87,6 +89,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const t = useUiStrings();
 
   const isDev = import.meta.env.DEV;
 
@@ -175,7 +178,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       role="dialog"
       aria-modal="true"
-      aria-label="Search"
+      aria-label={t.search.modalAriaLabel}
     >
       <div className={styles.modal} onKeyDown={handleKeyDown}>
         <div className={styles.inputRow}>
@@ -198,16 +201,16 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
             ref={inputRef}
             className={styles.input}
             type="text"
-            placeholder={isDev ? 'Search unavailable in dev mode' : 'Search docs…'}
+            placeholder={isDev ? t.search.modalPlaceholderDev : t.search.modalPlaceholder}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             disabled={isDev}
-            aria-label="Search"
+            aria-label={t.search.inputAriaLabel}
           />
           <button
             className={styles.closeBtn}
             onClick={onClose}
-            aria-label="Close search"
+            aria-label={t.search.closeAriaLabel}
             type="button"
           >
             <kbd>esc</kbd>
@@ -216,16 +219,16 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
 
         {isDev && (
           <div className={styles.notice}>
-            Build your site to enable search.
+            {t.search.buildRequiredNotice}
           </div>
         )}
 
         {!isDev && isLoading && (
-          <div className={styles.status}>Loading search index…</div>
+          <div className={styles.status}>{t.search.loading}</div>
         )}
 
         {!isDev && !isLoading && query.trim() && results.length === 0 && (
-          <div className={styles.status}>No results for &ldquo;{query}&rdquo;</div>
+          <div className={styles.status}>{formatUiString(t.search.noResults, { query })}</div>
         )}
 
         {results.length > 0 && (

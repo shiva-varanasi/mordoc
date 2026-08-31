@@ -62,6 +62,13 @@ declare module 'virtual:mordoc/header-links' {
   export default value;
 }
 
+declare module 'virtual:mordoc/footer' {
+  // Null when config/navigation/footer.yaml is absent — the shell falls
+  // back to Mordoc's built-in default footer in that case.
+  const value: import('../types/navigation.js').FooterConfig | null;
+  export default value;
+}
+
 // CSS-only side-effect import; resolves to config/styles/theme.css when present.
 declare module 'virtual:mordoc/theme' {}
 

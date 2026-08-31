@@ -1,6 +1,6 @@
 import type { SiteConfig } from './site.js';
 import type { LanguageConfig } from './language.js';
-import type { ResolvedTopnavConfig, SidenavConfig, HeaderLink } from './navigation.js';
+import type { ResolvedTopnavConfig, SidenavConfig, HeaderLink, FooterConfig } from './navigation.js';
 import type { ResolvedAssets } from './assets.js';
 import type { ResolvedFonts } from './fonts.js';
 import type { PageMeta, TransformedPage } from './content.js';
@@ -45,6 +45,12 @@ export interface MordocData {
   /** Header action links from config/navigation/headernav.yaml. Empty array when file is absent. */
   headerLinks: HeaderLink[];
   /**
+   * Footer columns from config/navigation/footer.yaml. Null when the file is
+   * absent — render Mordoc's built-in default footer. An object with no (or
+   * all-empty) zones means the author configured no footer at all.
+   */
+  footer: FooterConfig | null;
+  /**
    * User-defined variables from config/variables.yaml, injected into every
    * Markdoc transform so authors can write `{{ $VAR_NAME }}` in content.
    * Empty object when the file is absent.
@@ -84,4 +90,10 @@ export interface ShellData {
   translations: Record<string, Record<string, string>>;
   /** Header action links from config/navigation/headernav.yaml. Empty array when file is absent. */
   headerLinks: HeaderLink[];
+  /**
+   * Footer columns from config/navigation/footer.yaml. Null when the file is
+   * absent — render Mordoc's built-in default footer. An object with no (or
+   * all-empty) zones means the author configured no footer at all.
+   */
+  footer: FooterConfig | null;
 }

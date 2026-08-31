@@ -177,6 +177,91 @@ const imageTag: Schema = {
 };
 
 /**
+ * Clip tag — muted, looping demo clips, the recommended replacement for
+ * animated GIFs in content.
+ *
+ * Named `clip` (not `video`) to leave `video` free for a future long-form,
+ * audible tutorial-video tag with native player controls — a different job
+ * with different defaults (no forced mute, no autoplay-on-click, real
+ * scrubbing) that this component deliberately doesn't try to do.
+ *
+ * A plain `<img src="*.gif">` autoplays with no way to pause it, which fails
+ * WCAG 2.2.2 (moving content lasting more than 5s needs a pause mechanism)
+ * and reads as "crowded" next to prose. `<video>` doesn't have that problem
+ * because `HTMLVideoElement` has a real `play()`/`pause()`, so the Clip
+ * component renders paused on `thumbnail` by default and toggles playback on
+ * click, instead of autoplaying like a GIF would.
+ *
+ * `src` (not `path`) because this is a resource the browser loads directly,
+ * the same category as `image.src` above — not a navigable destination like
+ * `link`/`button`/`card`'s `path`, which get routed through `isExternal()`.
+ *
+ * `thumbnail` (not `poster`, though it maps to the native `<video poster>`
+ * attribute under the hood) — "poster" is filmmaking jargon; "thumbnail" is
+ * what content authors actually call this, and it's the same name used by
+ * the `videoEmbed` tag below, which has no native `poster` attribute to
+ * mirror at all since it isn't a real `<video>` element.
+ *
+ * Self-closing, same reasoning as `imageTag`: `thumbnail`/`title`/`alt` are
+ * attributes, not children — a clip embed has no nested content to parse.
+ *
+ * Authors use: {% clip src="/videos/demo.mp4" thumbnail="/images/demo-thumb.jpg" title="..." /%}
+ */
+const clip: Schema = {
+  render: 'Clip',
+  children: [],
+  attributes: {
+    src:       { type: String, required: true },
+    thumbnail: { type: String },
+    title:     { type: String },
+    alt:       { type: String },
+  },
+};
+
+/**
+ * VideoEmbed tag — a video hosted on YouTube, Vimeo, Loom, or another
+ * recognized provider (as opposed to `clip`'s self-hosted file). See the
+ * VideoEmbed component's own doc comment for the full reasoning; summary
+ * here:
+ *
+ * `src` is the video's ordinary public page URL — whatever an author would
+ * paste from their browser, in any of that provider's URL shapes
+ * (`youtube.com/watch?v=`, `youtu.be/`, `vimeo.com/`, `loom.com/share/`,
+ * …). `providers.ts` resolves it to a provider name + iframe embed URL; an
+ * unrecognized host or an unparseable video ID falls back to a plain
+ * link-out card rather than a broken iframe.
+ *
+ * For a recognized provider, that iframe is mounted immediately and
+ * unconditionally — no author-supplied `thumbnail` needed, because
+ * YouTube/Vimeo/Loom's own players already render a real thumbnail + play
+ * button the instant they load. `thumbnail` (optional, same name and role
+ * as `clip.thumbnail`) only does anything in the *unrecognized*-provider
+ * case: omit it there and readers get a generic branded fallback card
+ * instead of a real screenshot. See the component doc comment for the
+ * trade-off this implies (every recognized-provider embed now pays that
+ * provider's player-JS weight on page load, not just on click).
+ *
+ * `aspectRatio` (optional, e.g. `"4 / 3"`, `"9 / 16"`) overrides the 16:9
+ * default box. Mainly needed for Loom, whose recordings inherit whatever
+ * shape the recorder's screen/window was rather than a fixed video ratio.
+ *
+ * Self-closing, same reasoning as `clip`/`imageTag`.
+ *
+ * Authors use: {% videoEmbed src="https://youtu.be/dQw4w9WgXcQ" title="..." /%}
+ */
+const videoEmbed: Schema = {
+  render: 'VideoEmbed',
+  children: [],
+  attributes: {
+    src:         { type: String, required: true },
+    thumbnail:   { type: String },
+    title:       { type: String },
+    alt:         { type: String },
+    aspectRatio: { type: String },
+  },
+};
+
+/**
  * Callout block tag — renders note, warning, danger, and tip callout boxes.
  *
  * Authors use: {% callout type="note" title="..." %}...{% /callout %}
@@ -284,6 +369,87 @@ const button: Schema = {
 };
 
 /**
+ * Accordion tag — a single collapsible section: `title` drives the
+ * clickable header, and the body accepts the same broad content model as
+ * `section` (headings, paragraphs, lists, code fences, images, and any
+ * nested custom tag), so authors can put callouts, clips, embeds, cards —
+ * even another accordion — inside it, same as writing plain article body
+ * content.
+ *
+ * Works standalone, or nested inside `accordions` for grouped/coordinated
+ * behavior — see the `accordions` tag and the Accordion component's own doc
+ * comment for the mechanism.
+ *
+ * Authors use: {% accordion title="..." %}...{% /accordion %}
+ */
+const accordion: Schema = {
+  render: 'Accordion',
+  children: ['heading', 'paragraph', 'list', 'fence', 'blockquote', 'tag', 'hr'],
+  attributes: {
+    title:       { type: String, required: true },
+    defaultOpen: { type: Boolean, default: false },
+  },
+};
+
+/**
+ * Accordions tag — optional group wrapper for several `accordion` tags.
+ *
+ * Makes the group exclusive: opening one item closes any other open item
+ * in the group. See the Accordions component's own doc comment for how
+ * this is implemented with no JS via native `<details name="...">`.
+ *
+ * Authors use:
+ *   {% accordions %}
+ *     {% accordion title="..." %}...{% /accordion %}
+ *     {% accordion title="..." %}...{% /accordion %}
+ *   {% /accordions %}
+ */
+const accordions: Schema = {
+  render: 'Accordions',
+  children: ['tag'],
+};
+
+/**
+ * Column tag — a single column inside `columns`.
+ *
+ * No attributes: content accepts the same broad model as `section`/
+ * `accordion` (headings, paragraphs, lists, code fences, images, and any
+ * nested custom tag), so a column reads exactly like normal article content.
+ *
+ * Authors use: {% column %}...{% /column %}, nested inside `columns`.
+ */
+const column: Schema = {
+  render: 'Column',
+  children: ['heading', 'paragraph', 'list', 'fence', 'blockquote', 'tag', 'hr'],
+};
+
+/**
+ * Columns tag — lays out its `column` children side by side, equal width.
+ *
+ * An ordinary block-level tag, so it needs no special handling to appear
+ * mid-page: normal content, then a `{% columns %}...{% /columns %}` block,
+ * then normal content again — or the author wraps the whole page body in
+ * one `columns` block. Column count follows however many `column` children
+ * are nested; there's no `cols` attribute to keep in sync with them.
+ *
+ * `divider` (default `false`) draws a vertical rule between columns.
+ * Collapses to a single stacked column on narrow viewports.
+ *
+ * Authors use:
+ *   {% columns %}
+ *     {% column %}...{% /column %}
+ *     {% column %}...{% /column %}
+ *   {% /columns %}
+ */
+const columns: Schema = {
+  render: 'Columns',
+  children: ['tag'],
+  attributes: {
+    divider: { type: Boolean, default: false },
+  },
+};
+
+/**
  * The default Markdoc config used by Mordoc's content transformer.
  *
  * Currently minimal:
@@ -294,10 +460,16 @@ const button: Schema = {
  *   - Custom `card` / `cardGrid` tags (routes to Card / CardGrid components).
  *   - `link` / `image` tags (variable-capable counterparts to the native
  *     `link` / `image` nodes above — see their own doc comments).
+ *   - `clip` tag (click-to-play demo clips — see its own doc comment).
+ *   - `videoEmbed` tag (YouTube/Vimeo/Loom embeds — see its own doc comment).
+ *   - `accordion` / `accordions` tags (collapsible sections — see their own
+ *     doc comments).
+ *   - `column` / `columns` tags (side-by-side content — see their own doc
+ *     comments).
  */
 export function createDefaultMarkdocConfig(): Config {
   return {
     nodes: { heading, link, fence, image },
-    tags: { callout, card, cardGrid, hero, section, button, link: linkTag, image: imageTag },
+    tags: { callout, card, cardGrid, hero, section, button, link: linkTag, image: imageTag, clip, videoEmbed, accordion, accordions, column, columns },
   };
 }

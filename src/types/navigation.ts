@@ -56,3 +56,33 @@ export interface HeaderLink {
 
 /** Shape of the config/navigation/headernav.yaml file. */
 export type HeaderLinksConfig = HeaderLink[];
+
+/**
+ * One footer line. Plain string, rendered top-to-bottom in a column
+ * alongside the rest of its zone (see {@link FooterConfig}). Supports
+ * CommonMark-style `[text](url)` links, resolved at render time rather than
+ * by the loader — everything outside the brackets renders as plain text,
+ * the bracketed part as a link. External URLs (http/https/protocol-relative)
+ * open in a new tab; anything else is treated as an internal route.
+ * Translated the same way nav labels are: keyed on this literal string in
+ * config/navigation/translations/<lang>.yaml, link syntax kept intact by
+ * the translator.
+ */
+export type FooterLine = string;
+
+/**
+ * Shape of the config/navigation/footer.yaml file: up to three named
+ * columns, each an ordered list of {@link FooterLine}s stacked one per line.
+ * `start`/`center`/`end` are writing-direction-relative (not `left`/`right`)
+ * so the layout stays correct if the shell ever adds RTL support. All three
+ * are optional and independently omittable.
+ *
+ * Absent from a project entirely (see {@link loadFooterConfig}) is distinct
+ * from an explicit empty object / all-empty columns — the former falls back
+ * to Mordoc's built-in default footer, the latter renders no footer at all.
+ */
+export interface FooterConfig {
+  start?: FooterLine[];
+  center?: FooterLine[];
+  end?: FooterLine[];
+}

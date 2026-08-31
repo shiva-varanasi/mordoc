@@ -3,6 +3,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router';
 import { useMordocData } from '../data-context.js';
 import { detectCurrentLang, buildLangPrefix, stripLangPrefix, resolveLabel, applyLangToSidenav } from '../lang-utils.js';
 import { samePath } from '../path-utils.js';
+import { useUiStrings } from '../i18n/useUiStrings.js';
 import type { SidenavConfig, SidenavItem } from '../../types/navigation.js';
 import styles from './Sidenav.module.css';
 
@@ -194,13 +195,14 @@ export function MobileTopnavSection({ onNavigate }: { onNavigate?: () => void } 
 export function Sidenav({ onNavigate }: { onNavigate?: () => void } = {}) {
   const { navigation, language, site, translations } = useMordocData();
   const { pathname } = useLocation();
+  const t = useUiStrings();
 
   const currentLang = detectCurrentLang(pathname, language, site.defaultLanguage);
   const contentPath = stripLangPrefix(pathname, currentLang, site.defaultLanguage);
   const sidenav = resolveActiveSidenav(navigation, contentPath);
 
   if (sidenav.length === 0) {
-    return <nav className={styles.sidenav} aria-label="Side navigation" />;
+    return <nav className={styles.sidenav} aria-label={t.nav.sideNavigationLabel} />;
   }
 
   const prefix = buildLangPrefix(currentLang, site.defaultLanguage);
@@ -213,7 +215,7 @@ export function Sidenav({ onNavigate }: { onNavigate?: () => void } = {}) {
   );
 
   return (
-    <nav className={styles.sidenav} aria-label="Side navigation">
+    <nav className={styles.sidenav} aria-label={t.nav.sideNavigationLabel}>
       <SidenavList items={processedSidenav} depth={0} onNavigate={onNavigate} />
     </nav>
   );

@@ -13,6 +13,7 @@
 
 import { useState } from 'react';
 import Prism from 'prismjs';
+import { useUiStrings } from '../../i18n/useUiStrings.js';
 
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-typescript';
@@ -56,6 +57,7 @@ function displayName(normalized: string): string {
 
 export function CodeBlock({ language = '', content = '' }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
+  const t = useUiStrings();
 
   const code = content.trim();
 
@@ -96,7 +98,7 @@ export function CodeBlock({ language = '', content = '' }: CodeBlockProps) {
         <button
           className={styles.copyButton}
           onClick={handleCopy}
-          aria-label="Copy code"
+          aria-label={t.codeBlock.copyLabel}
           type="button"
         >
           {copied ? (

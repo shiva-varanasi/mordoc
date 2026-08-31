@@ -9,6 +9,7 @@
  * styles. The shimmer animation is driven purely by CSS — no JS timers.
  */
 
+import { useUiStrings } from '../../i18n/useUiStrings.js';
 import styles from './Skeleton.module.css';
 
 function Block({ width = '100%', height = '1rem' }: { width?: string; height?: string }) {
@@ -16,8 +17,9 @@ function Block({ width = '100%', height = '1rem' }: { width?: string; height?: s
 }
 
 export function Skeleton() {
+  const t = useUiStrings();
   return (
-    <div className={styles.page} aria-busy="true" aria-label="Loading page">
+    <div className={styles.page} aria-busy="true" aria-label={t.loading.pageAriaLabel}>
       <div className={styles.articleArea}>
         <div className={styles.article}>
 

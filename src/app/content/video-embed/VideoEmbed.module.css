@@ -1,0 +1,108 @@
+/* ── Inline figure ───────────────────────────────────────────── */
+
+.figure {
+  margin: 1.5rem 0;
+  display: block;
+  max-width: 640px;
+}
+
+/* 16:9 by default — right for YouTube/Vimeo almost always, and a reasonable
+   guess for Loom too, though Loom recordings inherit whatever shape the
+   recorder's screen/window was and often aren't 16:9. VideoEmbed.tsx
+   overrides this with an inline `aspectRatio` style when the author passes
+   the `aspectRatio` prop, or (in the unrecognized-provider fallback case
+   only) once it measures the real `thumbnail` image's natural dimensions on
+   load — see the component's doc comment. */
+.wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 6px;
+  overflow: hidden;
+  /* Same values as Card.module.css's --card-shadow, for a consistent
+     "floating card" feel across content components. */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* ── Fallback link-out card (thumbnail-or-fallback + toggle), used only
+   when `src` doesn't resolve to a recognized provider — a real provider
+   iframe renders its own cover state instead of this. ───────── */
+
+.card {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.thumbnail {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Fixed dark background, deliberately not theme-reactive — real video
+   players (YouTube, Vimeo, native browser controls) always show dark
+   chrome regardless of the surrounding page's light/dark mode, and the play
+   toggle below is already fixed-dark for the same reason. A theme-following
+   background would be the one inconsistent piece. #121212 is this site's
+   own dark-mode --color-bg value, reused as a literal so it stays constant
+   in light mode too; the glow uses the site's base --accent (stable across
+   light/dark, unlike --accent-muted) for a touch of brand identity instead
+   of a dead-flat black. */
+.fallback {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, color-mix(in oklch, var(--accent) 35%, black), #121212 70%);
+}
+
+.caption {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-fg-muted);
+  text-align: center;
+  font-style: italic;
+}
+
+/* ── Play toggle — same circular-button vocabulary as Clip.module.css's
+   .toggle and Image.module.css's .closeButton, centered over the card. ── */
+
+.toggle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 50%;
+  color: #ffffff;
+  transition: background 150ms ease;
+}
+
+.card:hover .toggle {
+  background: rgba(0, 0, 0, 0.72);
+}
+
+/* Play icon has a visual right-bias (it's a triangle), nudge it back to
+   optically center inside the circle. */
+.toggle svg {
+  margin-left: 2px;
+}

@@ -8,6 +8,7 @@ import assets from 'virtual:mordoc/assets';
 import pagesIndex from 'virtual:mordoc/pages-index';
 import translations from 'virtual:mordoc/translations';
 import headerLinks from 'virtual:mordoc/header-links';
+import footer from 'virtual:mordoc/footer';
 import type { ShellData } from '../types/pipeline.js';
 import './index.css';
 import { MordocDataContext } from './data-context.js';
@@ -40,10 +41,13 @@ import 'virtual:mordoc/theme/hero';
 import 'virtual:mordoc/theme/section';
 import 'virtual:mordoc/theme/diagram';
 import 'virtual:mordoc/theme/image';
+import 'virtual:mordoc/theme/clip';
+import 'virtual:mordoc/theme/video-embed';
 import 'virtual:mordoc/theme/code-block';
 import 'virtual:mordoc/theme/callout';
 import 'virtual:mordoc/theme/card';
 import 'virtual:mordoc/theme/button';
+import 'virtual:mordoc/theme/accordion';
 
 /**
  * Browser entry. Assembles `ShellData` from the eager virtual modules
@@ -86,6 +90,7 @@ const shellData: ShellData = {
   pagesIndex,
   translations,
   headerLinks,
+  footer,
 };
 
 const hydrationData = window.__staticRouterHydrationData;

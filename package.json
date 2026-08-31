@@ -20,7 +20,8 @@
   },
   "author": "Shiva Varanasi",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "documentation",

@@ -9,6 +9,7 @@ import {
   loadNavigation,
   loadNavTranslations,
   loadHeaderLinks,
+  loadFooterConfig,
   replaceTransformedPage,
   reparsePage,
   runPipeline,
@@ -36,6 +37,7 @@ export const EAGER_VIRTUAL_IDS = [
   'virtual:mordoc/page-loaders',
   'virtual:mordoc/translations',
   'virtual:mordoc/header-links',
+  'virtual:mordoc/footer',
 ];
 
 /**
@@ -252,6 +254,8 @@ export function generateVirtualModule(id: string, data: MordocData): string | nu
       return `export default ${JSON.stringify(data.translations)};`;
     case 'virtual:mordoc/header-links':
       return `export default ${JSON.stringify(data.headerLinks)};`;
+    case 'virtual:mordoc/footer':
+      return `export default ${JSON.stringify(data.footer)};`;
     default:
       return null;
   }
@@ -473,8 +477,10 @@ async function applyMordocWatchBatch(
   if (isNavStructureChange) {
     data.navigation = await loadNavigation(projectRoot);
     data.headerLinks = await loadHeaderLinks(projectRoot);
+    data.footer = await loadFooterConfig(projectRoot);
     invalidateVirtualModule(server, 'virtual:mordoc/navigation');
     invalidateVirtualModule(server, 'virtual:mordoc/header-links');
+    invalidateVirtualModule(server, 'virtual:mordoc/footer');
     changed = true;
   }
 

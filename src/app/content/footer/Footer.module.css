@@ -15,12 +15,37 @@
   }
 }
 
-.inner {
+/* Three columns (start/center/end) side by side on desktop. */
+.columns {
   border-top: 1px solid var(--color-border);
   padding-top: 2rem;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: row;
+  gap: 2rem;
+}
+
+/* Below 768px, columns stack top to bottom (start, then center, then end)
+ * instead of sitting side by side — see the Footer/small-screens design
+ * discussion for why merging everything into one undifferentiated row was
+ * rejected in favor of keeping each zone's grouping intact. */
+@media (max-width: 767.98px) {
+  .columns {
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+}
+
+/* Each column stacks its own lines vertically, one per line. */
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.line {
+  overflow-wrap: break-word;
 }
 
 .link {

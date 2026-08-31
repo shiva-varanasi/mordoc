@@ -8,6 +8,7 @@ import assets from 'virtual:mordoc/assets';
 import pagesIndex from 'virtual:mordoc/pages-index';
 import translations from 'virtual:mordoc/translations';
 import headerLinks from 'virtual:mordoc/header-links';
+import footer from 'virtual:mordoc/footer';
 import type { ShellData } from '../types/pipeline.js';
 import './index.css';
 import { MordocDataContext } from './data-context.js';
@@ -89,6 +90,7 @@ const shellData: ShellData = {
   pagesIndex,
   translations,
   headerLinks,
+  footer,
 };
 
 const hydrationData = window.__staticRouterHydrationData;

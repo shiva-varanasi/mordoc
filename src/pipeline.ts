@@ -7,11 +7,12 @@ import { loadVariables } from './config/variables-loader.js';
 import { loadContent } from './content/content-loader.js';
 import { loadNavTranslations } from './config/translations-loader.js';
 import { loadHeaderLinks } from './config/header-loader.js';
+import { loadFooterConfig } from './config/footer-loader.js';
 import { parseContent } from './content/content-parser.js';
 import { transformContent } from './content/content-transformer.js';
 import path from 'node:path';
 import fs from 'node:fs/promises';
-export { loadNavTranslations, loadHeaderLinks };
+export { loadNavTranslations, loadHeaderLinks, loadFooterConfig };
 import type { ContentEntry, PageMeta, TransformedPage } from './types/content.js';
 import type { MordocData, NavigationConfig, ShellData } from './types/pipeline.js';
 
@@ -71,6 +72,7 @@ export async function runPipeline(projectRoot: string): Promise<MordocData> {
     site.defaultLanguage,
   );
   const headerLinks = await loadHeaderLinks(projectRoot);
+  const footer = await loadFooterConfig(projectRoot);
 
   const variables = await loadVariables(projectRoot);
   const parsedContent = await parseContent(contentMap);
@@ -84,7 +86,7 @@ export async function runPipeline(projectRoot: string): Promise<MordocData> {
     // optional file — absent is the normal case
   }
 
-  return { site, language, navigation, assets, fonts, pages: transformedContent, translations, headerLinks, variables, customHead };
+  return { site, language, navigation, assets, fonts, pages: transformedContent, translations, headerLinks, footer, variables, customHead };
 }
 
 /**
@@ -152,6 +154,7 @@ export function toShellData(data: MordocData): ShellData {
     }),
     translations: data.translations,
     headerLinks: data.headerLinks,
+    footer: data.footer,
   };
 }
 

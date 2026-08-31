@@ -43,7 +43,7 @@ function ChevronIcon() {
 
 export function Accordion({ title, defaultOpen = false, children }: AccordionProps) {
   const group = useContext(AccordionsContext);
-  const name = group?.type === 'single' ? group.name : undefined;
+  const name = group?.name;
 
   return (
     <details

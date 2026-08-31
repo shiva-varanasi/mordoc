@@ -394,12 +394,9 @@ const accordion: Schema = {
 /**
  * Accordions tag — optional group wrapper for several `accordion` tags.
  *
- * `type="single"` (default) makes the group exclusive: opening one item
- * closes any other open item in the group. `type="multiple"` makes items
- * independent (still visually grouped, but any number can stay open at
- * once). See the Accordions component's own doc comment for how the
- * exclusive behavior is implemented with no JS via native
- * `<details name="...">`.
+ * Makes the group exclusive: opening one item closes any other open item
+ * in the group. See the Accordions component's own doc comment for how
+ * this is implemented with no JS via native `<details name="...">`.
  *
  * Authors use:
  *   {% accordions %}
@@ -410,9 +407,6 @@ const accordion: Schema = {
 const accordions: Schema = {
   render: 'Accordions',
   children: ['tag'],
-  attributes: {
-    type: { type: String, default: 'single', matches: ['single', 'multiple'] },
-  },
 };
 
 /**

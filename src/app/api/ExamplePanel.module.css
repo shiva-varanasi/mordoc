@@ -67,11 +67,26 @@
   border-color: var(--color-border);
 }
 
-/* The "payment method" example selector — a plain, compact dropdown. */
+/* The "payment method" example selector — a plain, compact dropdown.
+   Width tracks --select-chars (set inline per-panel in ExamplePanel.tsx, to
+   the longest example label's character count) rather than a fixed px value
+   — a fixed width truncated whichever label was longer than it, while the
+   native dropdown popup itself always sizes to fit its widest option.
+   The +5 (not the padding/border math you'd expect to be enough) is
+   empirical, not derived: measured in an isolated page, a bare native
+   <select> needs noticeably more than content-width + declared padding +
+   border to render its selected value without clipping — its closed-state
+   text draws through the browser's own form-control chrome, which reserves
+   space beyond anything visible to `getComputedStyle`/`scrollWidth` (both
+   still reported *no* overflow on a build that was visibly clipping
+   "AmazonPay"). So this is a verified-safe buffer, not a tightly-derived
+   one — checked against widths from 99px (clips) up to 160px (clean) via
+   screenshot, landing a comfortable margin past the ~120px where it first
+   renders cleanly, expressed in `ch` so it still scales with font-size. */
 .select {
   display: block;
   flex-shrink: 0;
-  width: 150px;
+  width: calc((var(--select-chars, 15) + 5) * 1ch + 2rem);
   height: 32px;
   font: inherit;
   font-family: var(--font-mono);

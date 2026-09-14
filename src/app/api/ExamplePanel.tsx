@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { CodeBlock } from '../content/code-block/CodeBlock.js';
 import type { ExampleView, OperationView } from '../../types/api.js';
 import styles from './ExamplePanel.module.css';
@@ -77,6 +77,10 @@ export function RequestExamplePanel({ view }: { view: OperationView }) {
             {requests.length > 1 && (
               <select
                 className={styles.select}
+                // Sized to the longest label so the closed box never
+                // truncates any of them — see .select in
+                // ExamplePanel.module.css.
+                style={{ '--select-chars': Math.max(...requests.map((r) => r.label.length)) } as CSSProperties}
                 value={Math.min(activeExample, requests.length - 1)}
                 onChange={(event) => setActiveExample(Number(event.target.value))}
                 aria-label="Choose request example"
@@ -132,6 +136,7 @@ export function ResponseExamplePanel({
             {responses.length > 1 && (
               <select
                 className={styles.select}
+                style={{ '--select-chars': Math.max(...responses.map((r) => r.label.length)) } as CSSProperties}
                 value={Math.min(active, responses.length - 1)}
                 onChange={(event) => setActive(Number(event.target.value))}
                 aria-label="Choose response example"

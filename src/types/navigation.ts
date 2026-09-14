@@ -1,9 +1,34 @@
 /** A single item in the side navigation tree. */
 export interface SidenavItem {
-  /** Display text shown in the sidebar. */
-  label: string;
+  /**
+   * Display text shown in the sidebar.
+   *
+   * Required in an authored nav file, with one exception: an item using
+   * `operation` may omit it, in which case the spec's `summary` is filled in
+   * when the reference is resolved. Supply it anyway when the sidebar wants
+   * something shorter than the page title — "Create" under a "Payments"
+   * group, against "Create a payment" as the heading.
+   */
+  label?: string;
   /** Route path for this item. Absent when the item is a group-only heading. */
   path?: string;
+  /**
+   * An API operation to link to, by `operationId`, as an alternative to
+   * spelling out `path`. Resolved to a real route once specs and navigation
+   * are both loaded, after which this item carries an ordinary `path` and
+   * the rest of the shell treats it like any other entry — this is not a
+   * union or a new node kind.
+   *
+   * Preferred over `path` for operations on three counts: the writer uses
+   * the identifier straight from the spec rather than deriving
+   * `createPayment` → `create-payment` by hand; moving the API's content
+   * folder touches only the registry; and the coverage check compares two
+   * sets of identifiers instead of string-matching computed routes against
+   * the nav tree.
+   *
+   * When `label` is omitted, the spec's `summary` is used.
+   */
+  operation?: string;
   /** Nested child items. Present for both group-only and navigable parents. */
   children?: SidenavItem[];
   /**

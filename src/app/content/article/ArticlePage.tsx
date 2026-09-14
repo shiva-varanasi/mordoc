@@ -9,21 +9,7 @@ import { useUiStrings } from '../../i18n/useUiStrings.js';
 import { formatUiString } from '../../i18n/format.js';
 import type { PageData } from '../../../types/content.js';
 import type { SidenavConfig } from '../../../types/navigation.js';
-import { CodeBlock } from '../code-block/CodeBlock.js';
-import { Image } from '../image/Image.js';
-import { Clip } from '../clip/Clip.js';
-import { VideoEmbed } from '../video-embed/VideoEmbed.js';
-import { Diagram } from '../diagram/Diagram.js';
-import { Callout } from '../callout/Callout.js';
-import { Card } from '../card/Card.js';
-import { CardGrid } from '../card/CardGrid.js';
-import { Accordion } from '../accordion/Accordion.js';
-import { Accordions } from '../accordion/Accordions.js';
-import { Column } from '../columns/Column.js';
-import { Columns } from '../columns/Columns.js';
-import { ContentLink } from '../link/ContentLink.js';
-import { Heading } from '../heading/Heading.js';
-import { Button } from '../landing/button/Button.js';
+import { contentComponents } from '../component-map.js';
 import styles from './ArticlePage.module.css';
 
 /**
@@ -55,7 +41,7 @@ function findBreadcrumb(
   ancestors: BreadcrumbEntry[],
 ): BreadcrumbEntry[] | null {
   for (const item of items) {
-    const current: BreadcrumbEntry = { label: item.label, path: item.path };
+    const current: BreadcrumbEntry = { label: item.label ?? '', path: item.path };
     if (item.path !== undefined && samePath(item.path, targetPath)) {
       return [...ancestors, current];
     }
@@ -172,7 +158,7 @@ export function ArticlePage() {
   }, [pageData.frontmatter.title, site.name]);
 
   const rendered = Markdoc.renderers.react(pageData.renderable, React, {
-    components: { CodeBlock, Image, Clip, VideoEmbed, Callout, Card, CardGrid, Accordion, Accordions, Column, Columns, ContentLink, Heading, Button, Diagram },
+    components: contentComponents,
   });
 
   return (

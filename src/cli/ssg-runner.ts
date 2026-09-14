@@ -4,8 +4,29 @@ import { pathToFileURL } from 'node:url';
 import { toShellData } from '../pipeline.js';
 import { detectCurrentLang } from '../utils/lang-utils.js';
 import type { MordocData, ShellData } from '../types/pipeline.js';
-import type { TransformedPage } from '../types/content.js';
 import type { SiteConfig } from '../types/site.js';
+
+/**
+ * What the head builder needs from a route, regardless of which flavor
+ * produced it.
+ *
+ * Introduced so an operation page — which has no frontmatter and no markdown
+ * file behind it — can share one head builder with authored pages rather
+ * than growing a near-duplicate of it. Everything below the projection is
+ * identical for both: canonical URL, OpenGraph, Twitter Card.
+ */
+interface RouteHead {
+  routePath: string;
+  language: string;
+  title: string;
+  description: string | undefined;
+  /**
+   * True when the route serves default-language content at a
+   * language-prefixed URL: an untranslated guide, or any non-default-language
+   * operation page (the API reference is the same in every language).
+   */
+  isFallback: boolean;
+}
 
 /** Markers in `index.html` substituted at SSG time. */
 const SSR_LANG_MARKER = '<!--ssr-lang-->';
@@ -39,6 +60,48 @@ export interface SsgRunnerOptions {
   ssrOutDir: string;
 }
 
+/**
+ * Lifts a short plain-text summary out of a renderable tree, for use as an
+ * operation page's `<meta name="description">`.
+ *
+ * Walks text nodes only — tags contribute their children, not their markup —
+ * and stops at the first sentence boundary or 160 characters, whichever
+ * comes first, since search engines truncate around there anyway.
+ */
+function firstSentence(tree: unknown): string | undefined {
+  if (!tree) return undefined;
+
+  let text = '';
+  const walk = (node: unknown): void => {
+    if (text.length > 300) return;
+    if (typeof node === 'string') {
+      text += node;
+      return;
+    }
+    if (Array.isArray(node)) {
+      for (const child of node) walk(child);
+      return;
+    }
+    if (typeof node === 'object' && node !== null && 'children' in node) {
+      walk((node as { children: unknown }).children);
+      // Block boundaries carry no text of their own, so without a separator
+      // a paragraph ending in "capture." would fuse with the next heading
+      // into "capture.Idempotency" — and the sentence-boundary cut below,
+      // which looks for punctuation followed by whitespace, would sail past
+      // it and emit the whole page as one run-on description.
+      text += ' ';
+    }
+  };
+  walk(tree);
+
+  const collapsed = text.replace(/\s+/g, ' ').trim();
+  if (collapsed === '') return undefined;
+
+  const boundary = collapsed.search(/[.!?](\s|$)/);
+  if (boundary !== -1 && boundary < 160) return collapsed.slice(0, boundary + 1);
+  return collapsed.length > 160 ? `${collapsed.slice(0, 157)}…` : collapsed;
+}
+
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -66,27 +129,23 @@ function escapeHtml(value: string): string {
  *     `twitter:description`, `twitter:image`) when `twitterCard` is declared — without
  *     `twitter:card` the other twitter tags have no effect, so the whole block is gated on it.
  */
-function buildHeadHtml(
-  page: TransformedPage,
-  site: SiteConfig,
-  faviconUrl: string | null,
-  routePath: string,
-): string {
-  const pageTitle = page.frontmatter.title;
+function buildHeadHtml(route: RouteHead, site: SiteConfig, faviconUrl: string | null): string {
+  const routePath = route.routePath;
+  const pageTitle = route.title;
   const title = pageTitle
     ? `${escapeHtml(pageTitle)} — ${escapeHtml(site.name)}`
     : escapeHtml(site.name);
 
   // Page description with fallback to site description for social tags only.
-  const pageDescription = page.frontmatter.description;
+  const pageDescription = route.description;
   const socialDescription = pageDescription ?? site.description;
 
   // Fallback pages duplicate default-language content at a language-prefixed
   // URL. Point their canonical at the authoritative default-language URL so
   // search engines consolidate ranking signals there instead of splitting them.
   let canonicalRoutePath = routePath;
-  if (page.entry.isFallback) {
-    const prefix = `/${page.entry.language}`;
+  if (route.isFallback) {
+    const prefix = `/${route.language}`;
     canonicalRoutePath = routePath === prefix ? '/' : routePath.slice(prefix.length);
   }
   const canonicalUrl = `${site.baseUrl}${canonicalRoutePath}`;
@@ -212,13 +271,39 @@ export async function runSsg(options: SsgRunnerOptions): Promise<void> {
 
   const shellData = toShellData(data);
 
-  for (const page of data.pages) {
-    const routePath = page.entry.routePath;
+  // Both flavors render through the same SSR entry and the same route table;
+  // only the head projection differs. Pre-rendering operations here is what
+  // makes them SEO-visible and Pagefind-indexable — the indexer walks the
+  // built HTML, so an operation page that only existed client-side would be
+  // invisible to search.
+  const routes: RouteHead[] = [
+    ...data.pages.map((page) => ({
+      routePath: page.entry.routePath,
+      language: page.entry.language,
+      title: page.frontmatter.title,
+      description: page.frontmatter.description,
+      isFallback: page.entry.isFallback === true,
+    })),
+    ...data.operations.map((view) => ({
+      routePath: view.routePath,
+      language: view.language,
+      title: view.summary,
+      // The narrative is a renderable tree rather than a string, so the meta
+      // description is lifted from its text. Better than omitting it: an
+      // operation page with no description is the one a search result can
+      // least afford to be terse about.
+      description: firstSentence(view.narrative) ?? `${view.method} ${view.path}`,
+      isFallback: view.isFallback === true,
+    })),
+  ];
+
+  for (const route of routes) {
+    const routePath = route.routePath;
     const request = new Request(`http://localhost${routePath}`);
     const { html: appHtml } = await ssrModule.render(request, shellData);
 
     const pageLang = detectCurrentLang(routePath, data.language, data.site.defaultLanguage);
-    const headHtml = buildHeadHtml(page, data.site, data.assets.favicon, routePath);
+    const headHtml = buildHeadHtml(route, data.site, data.assets.favicon);
     const fullHeadHtml = data.customHead ? `${headHtml}\n  ${data.customHead}` : headHtml;
     // lang is a plain ASCII code — string-form replace is safe (no $-patterns)
     const withLang = template.replace(SSR_LANG_MARKER, pageLang);

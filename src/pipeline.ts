@@ -16,6 +16,28 @@ export { loadNavTranslations, loadHeaderLinks, loadFooterConfig };
 import type { ContentEntry, PageMeta, TransformedPage } from './types/content.js';
 import type { MordocData, NavigationConfig, ShellData } from './types/pipeline.js';
 
+/** The subset of `src/api/index.ts` the pipeline calls, kept local so the import can stay dynamic. */
+type ApiModule = typeof import('./api/index.js');
+
+/**
+ * Loads the API reference module, but only for projects that registered a
+ * spec.
+ *
+ * The existence check is what buys the cost isolation: a project without
+ * `config/api.yaml` never imports `src/api/`, and so never loads the
+ * OpenAPI library behind it. That gets most of the benefit of shipping the
+ * feature as a separate package without designing a plugin API against a
+ * sample size of one.
+ */
+async function loadApiModule(projectRoot: string): Promise<ApiModule | null> {
+  try {
+    await fs.access(path.join(projectRoot, 'config', 'api.yaml'));
+  } catch {
+    return null;
+  }
+  return import('./api/index.js');
+}
+
 /**
  * Loads the project's navigation configuration.
  *
@@ -44,6 +66,10 @@ export async function loadNavigation(projectRoot: string): Promise<NavigationCon
  *   2. Discover content files and build the route manifest.
  *   3. Parse each markdown file into frontmatter + Markdoc AST.
  *   4. Transform each AST into a renderable tree with TOC.
+ *   5. For projects with `config/api.yaml`: load and bundle the specs,
+ *      discover and parse enrichment under `api/enrichment/`, join them into
+ *      `OperationView`s, and run the navigation checks. Skipped entirely —
+ *      module never imported — otherwise.
  *
  * Returns a single, JSON-serializable `MordocData`. This is the canonical
  * hand-off shape consumed by both the Vite plugin (in dev) and the SSG
@@ -78,6 +104,26 @@ export async function runPipeline(projectRoot: string): Promise<MordocData> {
   const parsedContent = await parseContent(contentMap);
   const transformedContent = transformContent(parsedContent, variables);
 
+  // Runs after navigation and content are both in hand, because the
+  // navigation checks compare the spec's operations against the authored nav
+  // tree and resolve `operation:` references into routes. `navigation` is
+  // mutated in place by that pass; `loadNavigation` itself is untouched and
+  // keeps its independent-HMR contract.
+  const api = await loadApiModule(projectRoot);
+  const registry = api ? await api.loadApiRegistry(projectRoot) : null;
+  const operations =
+    api && registry
+      ? await api.runApiStages({
+          projectRoot,
+          registry,
+          contentMap,
+          navigation,
+          variables,
+          defaultLanguage: site.defaultLanguage,
+          languages: contentMap.languages,
+        })
+      : [];
+
   let customHead: string | null = null;
   try {
     const raw = await fs.readFile(path.join(projectRoot, 'config', 'custom-head.html'), 'utf-8');
@@ -86,7 +132,7 @@ export async function runPipeline(projectRoot: string): Promise<MordocData> {
     // optional file — absent is the normal case
   }
 
-  return { site, language, navigation, assets, fonts, pages: transformedContent, translations, headerLinks, footer, variables, customHead };
+  return { site, language, navigation, assets, fonts, pages: transformedContent, operations, translations, headerLinks, footer, variables, customHead };
 }
 
 /**
@@ -134,8 +180,45 @@ export function pagesRouteSignature(pages: TransformedPage[]): string {
     .join('|');
 }
 
-/** Projects `MordocData` to `ShellData`. Used by `ssg-runner.ts` to build 
- * the data passed into `entry-server.tsx`'s `render()`. 
+/**
+ * Builds the route index: every authored page followed by every generated
+ * operation page.
+ *
+ * The two flavors share one list because they share one route table and one
+ * per-route lazy-module channel — `kind` is the only thing the shell needs
+ * to pick the right component. Sorted by route so the emitted virtual module
+ * is stable across builds regardless of discovery order.
+ *
+ * Exported because the Vite plugin builds the same index for
+ * `virtual:mordoc/pages-index` and must not drift from what the SSG renders.
+ */
+export function buildPagesIndex(data: MordocData): PageMeta[] {
+  const pages: PageMeta[] = data.pages.map((p) => {
+    const meta: PageMeta = {
+      routePath: p.entry.routePath,
+      language: p.entry.language,
+      kind: 'page',
+    };
+    if (p.frontmatter.layout === 'landing') meta.layout = 'landing';
+    if (p.entry.isFallback) meta.isFallback = true;
+    return meta;
+  });
+
+  const operations: PageMeta[] = data.operations.map((view) => {
+    const meta: PageMeta = {
+      routePath: view.routePath,
+      language: view.language,
+      kind: 'operation',
+    };
+    if (view.isFallback) meta.isFallback = true;
+    return meta;
+  });
+
+  return [...pages, ...operations].sort((a, b) => a.routePath.localeCompare(b.routePath));
+}
+
+/** Projects `MordocData` to `ShellData`. Used by `ssg-runner.ts` to build
+ * the data passed into `entry-server.tsx`'s `render()`.
  */
 export function toShellData(data: MordocData): ShellData {
   return {
@@ -143,15 +226,7 @@ export function toShellData(data: MordocData): ShellData {
     language: data.language,
     navigation: data.navigation,
     assets: data.assets,
-    pagesIndex: data.pages.map((p) => {
-      const meta: PageMeta = {
-        routePath: p.entry.routePath,
-        language: p.entry.language,
-      };
-      if (p.frontmatter.layout === 'landing') meta.layout = 'landing';
-      if (p.entry.isFallback) meta.isFallback = true;
-      return meta;
-    }),
+    pagesIndex: buildPagesIndex(data),
     translations: data.translations,
     headerLinks: data.headerLinks,
     footer: data.footer,

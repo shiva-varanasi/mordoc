@@ -1,0 +1,74 @@
+/* ============================================================
+   ENDPOINT TOKENS — method pill colors.
+
+   Deliberately independent of the site accent. HTTP method colors
+   are a shared vocabulary across every API reference a reader has
+   ever used, and that recognition is worth more than brand
+   consistency on this one element.
+   ============================================================ */
+:root {
+  --endpoint-radius:       6px;
+  --endpoint-bg:           #f8fafc;
+  --endpoint-border:       #e2e8f0;
+  --endpoint-path-color:   #0f172a;
+
+  --method-get-color:      #1a7f5a;
+  --method-post-color:     #1d63b5;
+  --method-put-color:      #b06d10;
+  --method-patch-color:    #8a5cd6;
+  --method-delete-color:   #c22c2c;
+  --method-default-color:  #475569;
+}
+
+:global(.dark) {
+  --endpoint-bg:           #1a1a1a;
+  --endpoint-border:       #2e2e2e;
+  --endpoint-path-color:   #f1f5f9;
+
+  --method-get-color:      #4ec99a;
+  --method-post-color:     #63a8f5;
+  --method-put-color:      #e6a94a;
+  --method-patch-color:    #b795ee;
+  --method-delete-color:   #f07070;
+  --method-default-color:  #94a3b8;
+}
+
+.endpoint {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--endpoint-border);
+  border-radius: var(--endpoint-radius);
+  background-color: var(--endpoint-bg);
+}
+
+.method {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--method-default-color);
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 0.125rem 0.4375rem;
+  line-height: 1.4;
+}
+
+.get    { color: var(--method-get-color); }
+.post   { color: var(--method-post-color); }
+.put    { color: var(--method-put-color); }
+.patch  { color: var(--method-patch-color); }
+.delete { color: var(--method-delete-color); }
+
+.path {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--endpoint-path-color);
+  /* A long path template must scroll inside the pill rather than
+     stretching the article column. */
+  overflow-x: auto;
+  white-space: nowrap;
+}

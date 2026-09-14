@@ -1,0 +1,212 @@
+/* ============================================================
+   OPERATION PAGE TOKENS
+   ============================================================ */
+:root {
+  --operation-rail-width:   26rem;
+  --operation-max-width:    48rem;
+  --operation-title-color:  #0f172a;
+  --operation-meta-color:   #64748b;
+  --operation-border:       #e2e8f0;
+  --operation-status-bg:    #f1f5f9;
+  --operation-status-active-bg: #0f172a;
+  --operation-status-active-color: #f8fafc;
+}
+
+:global(.dark) {
+  --operation-title-color:  #f1f5f9;
+  --operation-meta-color:   #94a3b8;
+  --operation-border:       #2e2e2e;
+  --operation-status-bg:    #262626;
+  --operation-status-active-bg: #f1f5f9;
+  --operation-status-active-color: #0f172a;
+}
+
+/* ── Layout ──────────────────────────────────────────────────
+   Request and Response are two independent sections, each its
+   own [fields | sample] grid. Each section's sample column
+   sticks only for the height of that section, then hands off to
+   the next section's sample column — a single rail spanning the
+   whole page would have nowhere to hand off to. Padding replaces
+   the old page-spanning grid, since nothing here needs to line
+   up in columns across sections any more.
+   ─────────────────────────────────────────────────────────── */
+.page {
+  min-height: calc(100svh - var(--header-height));
+  padding: 3rem 2rem 4rem;
+}
+
+.articleArea {
+  min-width: 0;
+}
+
+.header,
+.narrative {
+  max-width: var(--operation-max-width);
+}
+
+.footerArea {
+  max-width: var(--operation-max-width);
+}
+
+/* ── Sections ───────────────────────────────────────────────── */
+
+.sectionRow {
+  display: grid;
+  /* The rail's width is a minimum, not a cap — it flexes to fill whatever
+     space is left once the fields column hits its own max-width, the same
+     way Content.module.css's main column (`1fr`) fills past its fixed TOC
+     rail. Capping both columns (the previous behavior) left the leftover
+     viewport width unclaimed as dead space past the two columns instead of
+     handing it to the rail, which is what made the sample card so much
+     narrower than Redocly's for the same content. */
+  grid-template-columns: minmax(0, var(--operation-max-width)) minmax(var(--operation-rail-width), 1fr);
+  column-gap: 3rem;
+  align-items: start;
+  margin-top: 2.5rem;
+}
+
+.fieldsCol {
+  min-width: 0;
+}
+
+.railCol {
+  min-width: 0;
+  position: sticky;
+  top: calc(var(--header-height) + 1.5rem);
+  /* Cap to the visible viewport below the sticky offset, not a fixed pixel
+     count — the code sample inside grows to fill whatever screen space is
+     actually free (more on a short schema, less on a small window) and
+     scrolls internally past that, rather than either stopping at a flat
+     480px regardless of available room or spilling below the fold with no
+     way to reach the rest while pinned. `min-height: 0` lets a flex child
+     shrink below its content size, which `max-height` alone can't force. */
+  max-height: calc(100svh - var(--header-height) - 3rem);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  /* The code block's own fixed cap would otherwise fight this one — this is
+     the only height limit that should apply inside the rail. */
+  --cb-max-height: none;
+}
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--operation-title-color);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--operation-border);
+  margin: 0 0 0.5rem;
+}
+
+.subsection {
+  margin-top: 1.75rem;
+}
+
+.subsectionTitle {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--operation-meta-color);
+  margin: 0 0 0.25rem;
+}
+
+.mediaType {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--operation-meta-color);
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--operation-title-color);
+  margin: 0 0 0.75rem;
+}
+
+.deprecated {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--operation-meta-color);
+  margin: 0 0 0.75rem;
+}
+
+.narrative {
+  font-size: 1rem;
+  line-height: 1.75;
+  margin-bottom: 2rem;
+}
+
+/* ── Response status tabs ───────────────────────────────────── */
+
+.statusTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-bottom: 0.75rem;
+}
+
+.statusTab {
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  padding: 0.1875rem 0.625rem;
+  border: 1px solid var(--operation-border);
+  border-radius: 4px;
+  background-color: var(--operation-status-bg);
+  color: var(--operation-title-color);
+  cursor: pointer;
+}
+
+.statusTabActive {
+  background-color: var(--operation-status-active-bg);
+  color: var(--operation-status-active-color);
+  border-color: var(--operation-status-active-bg);
+}
+
+.responseDescription {
+  font-size: 0.875rem;
+  color: var(--operation-meta-color);
+  margin: 0 0 0.75rem;
+}
+
+/* ── Responsive — side-by-side collapses to stacked ─────────── */
+@media (max-width: 1279.98px) {
+  .page {
+    padding: 2rem 1.25rem 3rem;
+  }
+
+  .sectionRow {
+    grid-template-columns: 1fr;
+    row-gap: 1.5rem;
+  }
+
+  /* The sample drops below its section's fields (natural DOM order) rather
+     than sticking beside them — it no longer needs `order` to reach that
+     position at all. Putting it first read fine when it was only as tall as
+     its own content, but now that it grows to fill most of the viewport
+     height (see the max-height rule above), leading with it would bury the
+     schema — the thing a reader who isn't just copy-pasting a curl command
+     actually came for — under a nearly full-screen, independently-scrolling
+     code block. */
+  .railCol {
+    position: static;
+  }
+}

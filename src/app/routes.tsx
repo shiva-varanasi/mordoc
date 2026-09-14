@@ -4,6 +4,7 @@ import pagesIndex from 'virtual:mordoc/pages-index';
 import loaders from 'virtual:mordoc/page-loaders';
 import { App } from './App.js';
 import { Content } from './content/Content.js';
+import { Operation } from './api/Operation.js';
 import { NotFound } from './content/not-found/NotFound.js';
 
 /**
@@ -47,9 +48,13 @@ export function buildRoutes(): RouteObject[] {
           `virtual:mordoc/pages-index and virtual:mordoc/page-loaders are out of sync.`,
       );
     }
+    // Both flavors resolve their payload through the same lazy per-route
+    // module; `kind` decides only which component consumes it. Operation
+    // pages therefore inherit code-splitting, preloading and SSR hydration
+    // from the existing machinery rather than needing a parallel path.
     const common = {
       loader: async () => (await pageLoader()).default,
-      Component: Content,
+      Component: pageIndex.kind === 'operation' ? Operation : Content,
       handle: { layout: pageIndex.layout ?? 'content' },
     };
     return pageIndex.routePath === '/'

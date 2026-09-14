@@ -220,10 +220,15 @@ async function writeSitemapAndRobots(data: MordocData, clientOutDir: string): Pr
 
   // Fallback pages serve default-language content at a language-prefixed URL;
   // their canonical already points elsewhere, so omitting them from the sitemap
-  // avoids advertising duplicate URLs to crawlers.
-  const indexedPages = data.pages.filter((page) => !page.entry.isFallback);
-  const urlEntries = indexedPages
-    .map((page) => `  <url>\n    <loc>${escapeXml(baseUrl + page.entry.routePath)}</loc>\n  </url>`)
+  // avoids advertising duplicate URLs to crawlers. That covers every
+  // non-default-language operation page too.
+  const indexedRoutes = [
+    ...data.pages.filter((page) => !page.entry.isFallback).map((page) => page.entry.routePath),
+    ...data.operations.filter((view) => !view.isFallback).map((view) => view.routePath),
+  ].sort();
+
+  const urlEntries = indexedRoutes
+    .map((routePath) => `  <url>\n    <loc>${escapeXml(baseUrl + routePath)}</loc>\n  </url>`)
     .join('\n');
 
   const sitemap =
@@ -233,7 +238,7 @@ async function writeSitemapAndRobots(data: MordocData, clientOutDir: string): Pr
     '</urlset>\n';
 
   await fs.writeFile(path.join(clientOutDir, 'sitemap.xml'), sitemap, 'utf-8');
-  console.log(`  sitemap.xml  (${indexedPages.length} URL${indexedPages.length === 1 ? '' : 's'})`);
+  console.log(`  sitemap.xml  (${indexedRoutes.length} URL${indexedRoutes.length === 1 ? '' : 's'})`);
 
   const robots =
     'User-agent: *\n' +

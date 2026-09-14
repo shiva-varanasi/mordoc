@@ -6,6 +6,7 @@ import type { ResolvedAssets } from '../types/assets.js';
 import type { ResolvedFont, ResolvedFonts } from '../types/fonts.js';
 import { loadSiteConfig, loadFonts, fontFormat } from '../config/site-loader.js';
 import {
+  buildPagesIndex,
   loadNavigation,
   loadNavTranslations,
   loadHeaderLinks,
@@ -15,7 +16,7 @@ import {
   runPipeline,
 } from '../pipeline.js';
 import type { MordocData } from '../types/pipeline.js';
-import type { PageData, PageMeta, TransformedPage } from '../types/content.js';
+import type { PageData, TransformedPage } from '../types/content.js';
 
 /**
  * The set of "eager" virtual module IDs this plugin exposes.
@@ -104,6 +105,10 @@ const COMPONENT_THEME_FILES: readonly { name: string; filename: string }[] = [
   { name: 'card', filename: 'card.css' },
   { name: 'button', filename: 'button.css' },
   { name: 'accordion', filename: 'accordion.css' },
+  { name: 'operation', filename: 'operation.css' },
+  { name: 'endpoint', filename: 'endpoint.css' },
+  { name: 'field-tree', filename: 'field-tree.css' },
+  { name: 'example-panel', filename: 'example-panel.css' },
 ];
 
 /**
@@ -155,24 +160,15 @@ function routePathFromPageModuleId(id: string): string {
 }
 
 /**
- * Projects a `TransformedPage` down to its route identity.
+ * Every route this project serves — authored pages and generated operation
+ * pages together, in the order `pages-index` and `page-loaders` both use.
  *
- * Everything else the page carries (frontmatter, TOC, renderable tree)
- * ships with the per-route lazy chunk that the shell only fetches on
- * navigation. See the rationale in the `PageMeta` type's doc comment.
+ * The two modules must agree exactly (routes.tsx throws at bootstrap if they
+ * don't), so they are generated from this one list rather than from two
+ * walks that could drift.
  */
-function toPageMeta(page: TransformedPage): PageMeta {
-  const meta: PageMeta = {
-    routePath: page.entry.routePath,
-    language: page.entry.language,
-  };
-  if (page.frontmatter.layout === 'landing') {
-    meta.layout = 'landing';
-  }
-  if (page.entry.isFallback) {
-    meta.isFallback = true;
-  }
-  return meta;
+function allRoutePaths(data: MordocData): string[] {
+  return buildPagesIndex(data).map((meta) => meta.routePath);
 }
 
 /**
@@ -208,11 +204,11 @@ function toPageData(page: TransformedPage): PageData {
  * any escaping the routePath might require.
  */
 function generatePageLoadersSource(data: MordocData): string {
-  if (data.pages.length === 0) {
+  const routePaths = allRoutePaths(data);
+  if (routePaths.length === 0) {
     return 'export default {};';
   }
-  const entries = data.pages.map((page) => {
-    const routePath = page.entry.routePath;
+  const entries = routePaths.map((routePath) => {
     const key = JSON.stringify(routePath);
     const specifier = JSON.stringify(`${PAGE_MODULE_PREFIX}${routePath}`);
     return `  ${key}: () => import(${specifier})`;
@@ -247,7 +243,7 @@ export function generateVirtualModule(id: string, data: MordocData): string | nu
     case 'virtual:mordoc/assets':
       return `export default ${JSON.stringify(data.assets)};`;
     case 'virtual:mordoc/pages-index':
-      return `export default ${JSON.stringify(data.pages.map(toPageMeta))};`;
+      return `export default ${JSON.stringify(buildPagesIndex(data))};`;
     case 'virtual:mordoc/page-loaders':
       return generatePageLoadersSource(data);
     case 'virtual:mordoc/translations':
@@ -335,15 +331,24 @@ export function generateFontFaceCss(fonts: ResolvedFonts): string {
 
 /**
  * Builds the JS source for the lazy `virtual:mordoc/page/<routePath>`
- * module that carries a single page's full `PageData`. Returns null if
- * no page matches the given routePath.
+ * module. Returns null if no route matches.
+ *
+ * Serves both route flavors through one prefix: an authored page emits its
+ * `PageData`, an operation page emits its `OperationView`. Keeping them on
+ * one channel is what lets the route table stay a single list with a `kind`
+ * discriminant, and means operation pages get code-splitting, preloading and
+ * SSR hydration for free rather than needing a parallel mechanism.
  *
  * Pure function, mirrors {@link generateVirtualModule} for the lazy side.
  */
 export function generatePageModule(routePath: string, data: MordocData): string | null {
   const page = data.pages.find((p) => p.entry.routePath === routePath);
-  if (!page) return null;
-  return `export default ${JSON.stringify(toPageData(page))};`;
+  if (page) return `export default ${JSON.stringify(toPageData(page))};`;
+
+  const operation = data.operations.find((view) => view.routePath === routePath);
+  if (operation) return `export default ${JSON.stringify(operation)};`;
+
+  return null;
 }
 
 /**
@@ -389,16 +394,13 @@ function invalidateVirtualModule(server: ViteDevServer, virtualId: string): void
  * anything (route set, navigation, every page) may have changed, so there's
  * no cheaper way to know which specific ids are now stale.
  */
-function invalidateAllMordocVirtualModules(
-  server: ViteDevServer,
-  pages: TransformedPage[],
-): void {
+function invalidateAllMordocVirtualModules(server: ViteDevServer, data: MordocData): void {
   for (const id of EAGER_VIRTUAL_IDS) {
     invalidateVirtualModule(server, id);
   }
   invalidateVirtualModule(server, FONT_FACE_CSS_ID);
-  for (const page of pages) {
-    invalidateVirtualModule(server, `${PAGE_MODULE_PREFIX}${page.entry.routePath}`);
+  for (const routePath of allRoutePaths(data)) {
+    invalidateVirtualModule(server, `${PAGE_MODULE_PREFIX}${routePath}`);
   }
 }
 
@@ -421,19 +423,42 @@ async function applyMordocWatchBatch(
 
   const contentEvents = rels.filter(({ rel }) => rel.startsWith('content/'));
   const configEvents = rels.filter(({ rel }) => rel.startsWith('config/'));
+  const apiEvents = rels.filter(({ rel }) => rel.startsWith('api/'));
 
   const hasContentStructural = contentEvents.some(
     ({ abs }) => batch.get(abs) !== 'change',
   );
 
+  // Editing a nav file re-resolves `operation:` references, which needs the
+  // specs — so once a project has operations, nav changes take the full path
+  // rather than the targeted `loadNavigation` branch below.
+  const navTouchesApi =
+    data.operations.length > 0 &&
+    configEvents.some(
+      ({ rel }) =>
+        rel.startsWith('config/navigation/') &&
+        !rel.startsWith('config/navigation/translations/'),
+    );
+
   // Structural content changes (route set may differ), language.json
   // (can add/remove fallback pages), and variables.yaml (invalidates every
   // page's transform output) all require re-running the full pipeline —
-  // a targeted reparse isn't safe/sufficient for any of these.
+  // a targeted reparse isn't safe/sufficient for any of these. So does
+  // anything under api/ (a spec edit changes every operation page) and the
+  // registry itself (which decides which specs and folders are read).
+  //
+  // Per-file granularity for enrichment edits — re-running stage D only for
+  // the operations referencing the edited schema — is a deliberate v2 item;
+  // a full re-run is correct today, just less surgical.
   const needsFullPipeline =
     hasContentStructural ||
+    apiEvents.length > 0 ||
+    navTouchesApi ||
     configEvents.some(
-      ({ rel }) => rel === 'config/language.json' || rel === 'config/variables.yaml',
+      ({ rel }) =>
+        rel === 'config/language.json' ||
+        rel === 'config/variables.yaml' ||
+        rel === 'config/api.yaml',
     );
 
   if (needsFullPipeline) {
@@ -549,7 +574,7 @@ async function rerunPipelineForDev(
   if (!prev) return;
   const next = await runPipeline(projectRoot);
   setData(next);
-  invalidateAllMordocVirtualModules(server, next.pages);
+  invalidateAllMordocVirtualModules(server, next);
   server.ws.send({ type: 'full-reload', path: '*' });
 }
 
@@ -703,6 +728,9 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
       // than imported, so they must be added explicitly to be watched.
       server.watcher.add(path.join(projectRoot, 'content'));
       server.watcher.add(path.join(projectRoot, 'config'));
+      // Specs, examples and enrichment live outside content/ because they
+      // are language-neutral, but editing one still changes operation pages.
+      server.watcher.add(path.join(projectRoot, 'api'));
 
       server.watcher.on('all', (event, rawPath) => {
         // Ignore watcher events we don't handle (e.g. directory add/unlink).
@@ -712,10 +740,12 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
         // Path is outside the project root, or otherwise not expressible
         // as a forward-slash relative path.
         if (!rel) return;
-        // Only content/config changes affect MordocData; ignore anything
+        // Only content/config/api changes affect MordocData; ignore anything
         // else the watcher happens to report (e.g. from a broader chokidar
         // config elsewhere).
-        if (!rel.startsWith('content/') && !rel.startsWith('config/')) return;
+        if (!rel.startsWith('content/') && !rel.startsWith('config/') && !rel.startsWith('api/')) {
+          return;
+        }
         schedule(absPath, event as WatchEvent);
       });
     },

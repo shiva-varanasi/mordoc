@@ -53,7 +53,9 @@ export function applyLangToSidenav(
 ): SidenavConfig {
   return items.map((item) => ({
     ...item,
-    label: resolveLabel(item.label, lang, defaultLanguage, translations),
+    // `label` is only ever absent on an unresolved `operation:` item, which
+    // the build fills in from the spec's summary before navigation ships.
+    label: resolveLabel(item.label ?? '', lang, defaultLanguage, translations),
     path: item.path !== undefined ? `${prefix}${item.path}` : undefined,
     children: item.children
       ? applyLangToSidenav(item.children, prefix, lang, defaultLanguage, translations)

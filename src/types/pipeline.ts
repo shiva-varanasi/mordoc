@@ -4,6 +4,7 @@ import type { ResolvedTopnavConfig, SidenavConfig, HeaderLink, FooterConfig } fr
 import type { ResolvedAssets } from './assets.js';
 import type { ResolvedFonts } from './fonts.js';
 import type { PageMeta, TransformedPage } from './content.js';
+import type { OperationView } from './api.js';
 
 /**
  * Resolved navigation for the site, discriminated by `kind`:
@@ -40,6 +41,17 @@ export interface MordocData {
   /** Custom fonts declared via site.json's "fonts" field, one slot per CSS role. Each slot null when absent — falls back to the default stack for that role. */
   fonts: ResolvedFonts;
   pages: TransformedPage[];
+  /**
+   * Generated API operation pages, one per operation × language. Empty for
+   * projects with no `config/api.yaml`.
+   *
+   * A sibling of `pages` rather than a member of it: an operation page has
+   * no frontmatter, no TOC and no markdown file behind it, and its content
+   * is a resolved data structure rather than a single renderable tree. They
+   * meet again at the route table, where `PageMeta.kind` is the one bit that
+   * tells them apart.
+   */
+  operations: OperationView[];
   /** Nav label translations keyed by language code. Empty for single-language projects. */
   translations: Record<string, Record<string, string>>;
   /** Header action links from config/navigation/headernav.yaml. Empty array when file is absent. */

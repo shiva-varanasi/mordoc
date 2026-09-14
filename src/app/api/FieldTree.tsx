@@ -61,6 +61,23 @@ function BadgeChip({ badge }: { badge: Badge }) {
   return <span className={`${styles.badge} ${styles[`badge_${badge}`] ?? ''}`}>{badge}</span>;
 }
 
+/** Plus/Minus glyphs for the disclosure button — inline rather than a dependency, since no icon library is installed. */
+function PlusIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+function MinusIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 12h14" />
+    </svg>
+  );
+}
+
 interface FieldProps {
   field: FieldView;
   anchorPrefix: string;
@@ -98,14 +115,11 @@ function Field({ field, anchorPrefix, expanded, onToggle, depth }: FieldProps) {
             reads as "object" whether or not it happens to be a named schema. */}
         <span className={styles.type}>{field.type}</span>
 
-        {/* §6 still asks for the `$ref` name to be discoverable, so a writer
-            finds `schemas/Address.md` — but as a quiet secondary label, not
-            the primary type. */}
-        {field.schemaRef && (
-          <span className={styles.schemaRef} title={`schemas/${field.schemaRef}.md`}>
-            {field.schemaRef}
-          </span>
-        )}
+        {/* The named schema behind this field — useful to a real reader too
+            (it's the same object `getCustomer` returns), so it ships as
+            plain text with no tooltip: this page is seen by API clients,
+            not just the writers who'd know what to do with a file path. */}
+        {field.schemaRef && <span className={styles.schemaRef}>{`<${field.schemaRef}>`}</span>}
 
         {field.format && <span className={styles.format}>{field.format}</span>}
 
@@ -158,8 +172,8 @@ function Field({ field, anchorPrefix, expanded, onToggle, depth }: FieldProps) {
         </p>
       )}
 
-      {/* The expand affordance: a "+"/"−" icon plus a count, in the manner of
-          Redoc's nested-schema expander — not the type name doubling as a
+      {/* The expand affordance: a plus/minus icon plus a count, in the manner
+          of Redoc's nested-schema expander — not the type name doubling as a
           button. */}
       {hasChildren && !field.recursiveRef && (
         <button
@@ -170,7 +184,7 @@ function Field({ field, anchorPrefix, expanded, onToggle, depth }: FieldProps) {
           onClick={() => onToggle(anchorId)}
         >
           <span className={styles.expandIcon} aria-hidden="true">
-            {isOpen ? '−' : '+'}
+            {isOpen ? <MinusIcon /> : <PlusIcon />}
           </span>
           {isOpen ? 'Hide' : 'Show'} {childCountLabel(field, hasVariants)}
         </button>

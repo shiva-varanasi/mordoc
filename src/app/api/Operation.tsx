@@ -4,6 +4,8 @@ import { useLoaderData, useLocation } from 'react-router';
 import { contentComponents } from '../content/component-map.js';
 import { Footer } from '../content/footer/Footer.js';
 import { useMordocData } from '../data-context.js';
+import { Breadcrumb } from '../breadcrumb/Breadcrumb.js';
+import { useBreadcrumbEntries } from '../breadcrumb/useBreadcrumb.js';
 import { Endpoint } from './Endpoint.js';
 import { RequestExamplePanel, ResponseExamplePanel } from './ExamplePanel.js';
 import { FieldTree } from './FieldTree.js';
@@ -70,6 +72,7 @@ export function Operation() {
   const view = useLoaderData() as OperationView;
   const { site } = useMordocData();
   const { hash } = useLocation();
+  const breadcrumb = useBreadcrumbEntries();
 
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const [selectedStatus, setSelectedStatus] = useState<string | undefined>(
@@ -124,13 +127,19 @@ export function Operation() {
   return (
     <div className={styles.page}>
       <article className={styles.articleArea} lang="en" data-pagefind-body>
-        <header className={styles.header}>
+        <div className={styles.breadcrumbRow} data-pagefind-ignore>
+          <Breadcrumb entries={breadcrumb} />
+        </div>
+
+        <header>
           <h1 className={styles.title} data-pagefind-meta="title">
             {view.summary}
           </h1>
           {view.deprecated && <p className={styles.deprecated}>This operation is deprecated.</p>}
           <Endpoint method={view.method} path={view.path} />
         </header>
+
+        <hr className={styles.separator} />
 
         {narrative && <div className={styles.narrative}>{narrative}</div>}
 
@@ -183,7 +192,7 @@ export function Operation() {
                       }`}
                       onClick={() => setSelectedStatus(response.status)}
                     >
-                      {response.status}
+                      <span className={styles.statusCode}>{response.status}</span>
                     </button>
                   ))}
                 </div>

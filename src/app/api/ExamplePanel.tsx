@@ -55,39 +55,41 @@ export function RequestExamplePanel({ view }: { view: OperationView }) {
     <div className={styles.panel}>
       <section className={styles.group}>
         <div className={styles.groupHeader}>
-          <h2 className={styles.groupTitle}>Request</h2>
-          {languages.length > 1 && (
-            <div className={styles.tabs} role="tablist">
-              {languages.map((lang, index) => (
-                <button
-                  key={lang}
-                  type="button"
-                  role="tab"
-                  aria-selected={index === activeLanguage}
-                  className={`${styles.tab} ${index === activeLanguage ? styles.tabActive : ''}`}
-                  onClick={() => setActiveLanguage(index)}
-                >
-                  {lang === 'curl' ? 'cURL' : lang}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+          <h2 className={styles.groupTitle}>Example request</h2>
+          <div className={styles.headerControls}>
+            {languages.length > 1 && (
+              <div className={styles.tabs} role="tablist">
+                {languages.map((lang, index) => (
+                  <button
+                    key={lang}
+                    type="button"
+                    role="tab"
+                    aria-selected={index === activeLanguage}
+                    className={`${styles.tab} ${index === activeLanguage ? styles.tabActive : ''}`}
+                    onClick={() => setActiveLanguage(index)}
+                  >
+                    {lang === 'curl' ? 'cURL' : lang}
+                  </button>
+                ))}
+              </div>
+            )}
 
-        {requests.length > 1 && (
-          <select
-            className={styles.select}
-            value={Math.min(activeExample, requests.length - 1)}
-            onChange={(event) => setActiveExample(Number(event.target.value))}
-            aria-label="Choose request example"
-          >
-            {requests.map((req, index) => (
-              <option key={req.key} value={index}>
-                {req.label}
-              </option>
-            ))}
-          </select>
-        )}
+            {requests.length > 1 && (
+              <select
+                className={styles.select}
+                value={Math.min(activeExample, requests.length - 1)}
+                onChange={(event) => setActiveExample(Number(event.target.value))}
+                aria-label="Choose request example"
+              >
+                {requests.map((req, index) => (
+                  <option key={req.key} value={index}>
+                    {req.label}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+        </div>
 
         <CodeBlock language={sample.language} content={sample.code} />
       </section>
@@ -125,25 +127,26 @@ export function ResponseExamplePanel({
     <div className={styles.panel}>
       <section className={styles.group}>
         <div className={styles.groupHeader}>
-          <h2 className={styles.groupTitle}>Response</h2>
+          <h2 className={styles.groupTitle}>Example response</h2>
+          <div className={styles.headerControls}>
+            {responses.length > 1 && (
+              <select
+                className={styles.select}
+                value={Math.min(active, responses.length - 1)}
+                onChange={(event) => setActive(Number(event.target.value))}
+                aria-label="Choose response example"
+              >
+                {responses.map((res, index) => (
+                  <option key={res.key} value={index}>
+                    {res.label}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
         </div>
 
         {mediaType && <p className={styles.contentType}>{mediaType}</p>}
-
-        {responses.length > 1 && (
-          <select
-            className={styles.select}
-            value={Math.min(active, responses.length - 1)}
-            onChange={(event) => setActive(Number(event.target.value))}
-            aria-label="Choose response example"
-          >
-            {responses.map((res, index) => (
-              <option key={res.key} value={index}>
-                {res.label}
-              </option>
-            ))}
-          </select>
-        )}
 
         <CodeBlock language="json" content={JSON.stringify(current.json, null, 2)} />
       </section>

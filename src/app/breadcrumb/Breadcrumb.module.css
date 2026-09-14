@@ -1,0 +1,52 @@
+/* ============================================================
+   BREADCRUMB — text-sm, muted-foreground; active item foreground.
+   Uses the shared root tokens (index.css) rather than its own
+   palette, so it tracks the site's theme automatically.
+   ============================================================ */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.sep {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--color-fg-muted);
+}
+
+.link {
+  color: var(--color-fg-muted);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+
+.link:hover {
+  color: var(--color-fg);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--accent-emphasis);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.muted {
+  color: var(--color-fg-muted);
+}
+
+.current {
+  color: var(--color-fg);
+  font-weight: 400;
+}

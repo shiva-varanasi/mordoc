@@ -8,22 +8,45 @@
 
 /* ── Content container ─────────────────────────────────────
    mx-auto max-w-[1440px] px-5 py-8 lg:px-10 lg:py-12
+
+   Grid rows [content: 1fr] / [footer: auto], same structure as
+   Content.module.css's .contentAreaGrid — content grows to fill the
+   min-height, footer hugs the bottom instead of floating right below
+   short article content.
+
+   No bottom padding here, deliberately — bottom padding on this box
+   would (with the global border-box sizing) eat into the fixed
+   min-height from the inside and shove the auto footer row up above
+   the box's true bottom edge before it ever reaches it. The guide
+   page avoids this the same way: Content.module.css's grid carries no
+   padding of its own either, and ArticlePage.module.css's .article
+   owns the vertical rhythm instead, confined to the 1fr content row.
+   Here that same bottom spacing lives on .articleArea below.
    ─────────────────────────────────────────────────────────── */
 .page {
+  display: grid;
+  grid-template-rows: 1fr auto;
   min-height: calc(100svh - var(--header-height));
   max-width: 1440px;
   margin: 0 auto;
-  padding: 2rem 1.25rem;
+  padding: 2rem 1.25rem 0;
 }
 
 @media (min-width: 1024px) {
   .page {
-    padding: 3rem 2.5rem;
+    padding: 3rem 2.5rem 0;
   }
 }
 
 .articleArea {
   min-width: 0;
+  padding-bottom: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .articleArea {
+    padding-bottom: 3rem;
+  }
 }
 
 .footerArea {

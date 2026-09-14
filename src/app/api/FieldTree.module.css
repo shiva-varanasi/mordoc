@@ -43,18 +43,69 @@
 
 .field {
   padding: 0.75rem 0;
-  /* Deep-linked fields are scrolled to by the browser; offset so the sticky
-     header doesn't cover the row that was just navigated to. */
-  scroll-margin-top: calc(var(--header-height) + 1rem);
 }
 
 /* ── Header row ─────────────────────────────────────────────── */
 
+/* This is an <h4> (see FieldTree.tsx) purely so Pagefind can anchor search
+   sub-results to it — reset every default heading style so it still renders
+   as a plain metadata row, not a heading. */
 .row {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
   gap: 0.5rem;
+  margin: 0;
+  font-size: inherit;
+  font-weight: normal;
+  /* Deep-linked fields are scrolled to by the browser; offset so the sticky
+     header doesn't cover the row that was just navigated to. Lives here now
+     rather than on .field because .row is the element the id (and so the
+     scroll target) actually lives on. */
+  scroll-margin-top: calc(var(--header-height) + 1rem);
+}
+
+.anchorLink {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  opacity: 0;
+  color: var(--color-fg-muted);
+  text-decoration: none;
+  transition: opacity 0.15s ease, color 0.15s ease;
+  position: relative;
+}
+
+.row:hover .anchorLink {
+  opacity: 1;
+}
+
+.anchorLink:hover {
+  color: var(--field-accent-color);
+}
+
+.anchorLink:focus-visible {
+  outline: 2px solid var(--field-accent-color);
+  outline-offset: 2px;
+  border-radius: 2px;
+  opacity: 1;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-surface);
+  color: var(--color-fg);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 0.2em 0.55em;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 .name {
@@ -62,6 +113,12 @@
   font-size: 13px;
   font-weight: 500;
   color: var(--color-fg);
+}
+
+/* See Sep() in FieldTree.tsx — a real space character, zero-width. */
+.sep {
+  font-size: 0;
+  line-height: 0;
 }
 
 .type,

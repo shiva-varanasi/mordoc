@@ -16,6 +16,7 @@
   --method-patch-color:    #7c3aed;
   --method-delete-color:   #c22c2c;
   --method-default-color:  #475569;
+  --method-webhook-color:  #64748b;
 }
 
 .endpoint {
@@ -43,6 +44,7 @@
 .put    { background-color: var(--method-put-color); }
 .patch  { background-color: var(--method-patch-color); }
 .delete { background-color: var(--method-delete-color); }
+.webhook { background-color: var(--method-webhook-color); }
 
 .path {
   font-family: var(--font-mono);

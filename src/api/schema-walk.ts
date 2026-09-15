@@ -277,7 +277,19 @@ function deriveConditions(schema: Schema): Map<string, string> {
 // Type naming
 // ---------------------------------------------------------------------------
 
-/** Renders a schema's type for display: "string", "object", "array<Money>". */
+/**
+ * Naive pluralization for the closed set of words `typeName` can produce as
+ * an array's inner type ("object", "string", "number", "integer", "boolean",
+ * "oneOf", "any") — appending "s" is correct for all of them. Left alone
+ * when `word` is itself already a phrase (a nested "array of …"), so
+ * `array<array<string>>` reads as "array of array of strings" rather than
+ * clipping an "s" onto the end of that whole phrase.
+ */
+function pluralize(word: string): string {
+  return word.includes(' ') ? word : `${word}s`;
+}
+
+/** Renders a schema's type for display: "string", "object", "array of strings". */
 function typeName(document: OpenApiDocument, schema: Schema, refName: string | null): string {
   const rawType = schema['type'];
   const type = Array.isArray(rawType)
@@ -290,10 +302,14 @@ function typeName(document: OpenApiDocument, schema: Schema, refName: string | n
     const items = schema['items'];
     if (isObject(items)) {
       const resolvedItems = resolve(document, items);
-      const inner =
-        resolvedItems.name ??
-        typeName(document, mergeAllOf(document, resolvedItems.schema), null);
-      return `array<${inner}>`;
+      // `refName: null` even when the item is itself a named `$ref` — same
+      // rule as a bare object field (see FieldTree's comment on `.type`):
+      // the type label never substitutes a component name, because
+      // `linkTarget` below already surfaces it via `schemaRef`. Passing the
+      // name through here as well used to render "array<Money> <Money>" —
+      // the same fact twice on one row.
+      const inner = typeName(document, mergeAllOf(document, resolvedItems.schema), null);
+      return `array of ${pluralize(inner)}`;
     }
     return 'array';
   }

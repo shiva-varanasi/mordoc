@@ -136,7 +136,7 @@ export function Operation() {
             {view.summary}
           </h1>
           {view.deprecated && <p className={styles.deprecated}>This operation is deprecated.</p>}
-          <Endpoint method={view.method} path={view.path} />
+          <Endpoint method={view.method} path={view.path} isWebhook={view.isWebhook} />
         </header>
 
         <hr className={styles.separator} />
@@ -204,15 +204,17 @@ export function Operation() {
                 <p className={styles.responseDescription}>{selectedResponse.description}</p>
               )}
 
-              <div className={styles.subsection}>
-                <h3 className={styles.subsectionTitle}>Body</h3>
-                <FieldTree
-                  fields={selectedResponse.fields}
-                  anchorPrefix={`response-${selectedResponse.status}-`}
-                  expanded={expanded}
-                  onToggle={toggle}
-                />
-              </div>
+              {selectedResponse.fields.length > 0 && (
+                <div className={styles.subsection}>
+                  <h3 className={styles.subsectionTitle}>Body</h3>
+                  <FieldTree
+                    fields={selectedResponse.fields}
+                    anchorPrefix={`response-${selectedResponse.status}-`}
+                    expanded={expanded}
+                    onToggle={toggle}
+                  />
+                </div>
+              )}
             </div>
             <div className={styles.railCol} data-pagefind-ignore>
               <ResponseExamplePanel

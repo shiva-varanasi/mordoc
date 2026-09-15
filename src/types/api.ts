@@ -196,7 +196,7 @@ export interface FieldView {
   name: string;
   /** Dotted path from the namespace root: "billing_address.city". Also the anchor id. */
   path: string;
-  /** Rendered type: "string", "object", "array<Money>". */
+  /** Rendered type: "string", "object", "array of objects". */
   type: string;
   /** Component schema name behind this field, when it is a `$ref`. Drives the type link. */
   schemaRef?: string;
@@ -280,7 +280,11 @@ export interface OperationView {
   operationId: string;
   /** Uppercased for display: "POST". */
   method: string;
-  /** The spec path template: "/payments/{id}". */
+  /**
+   * The spec path template: "/payments/{id}". For a webhook (`isWebhook`
+   * true) this is instead the `webhooks` map key — a name, not a callable
+   * URL, e.g. "payment.captured".
+   */
   path: string;
   /** Language-prefixed route this page is served at. */
   routePath: string;
@@ -294,6 +298,16 @@ export interface OperationView {
   isFallback?: boolean;
   /** Registry id of the owning spec. */
   specId: string;
+  /**
+   * True when this came from the spec's top-level `webhooks` map (OpenAPI
+   * 3.1) rather than `paths` — the API delivers this to the integrator's
+   * own endpoint, instead of the integrator calling it. Everything else
+   * about the page works identically: same routing, same enrichment
+   * targeting, same `operation:` nav reference. The only other effect is on
+   * `samples`, which is always `[]` for a webhook — there is nothing to
+   * curl.
+   */
+  isWebhook?: boolean;
   /** The spec's `summary` — page title and nav label fallback. */
   summary: string;
   /** Enrichment narrative if present, else the spec's `description`, as a renderable tree. */

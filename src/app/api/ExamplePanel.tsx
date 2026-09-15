@@ -17,6 +17,11 @@ import styles from './ExamplePanel.module.css';
  * payload" block next to it was always showing the same fact twice — one
  * card with an example dropdown that feeds whichever language sample is
  * active is both fewer moving parts and what Redocly's reference UI does.
+ *
+ * A webhook operation has no request side to curl — it's delivered to the
+ * integrator, not called — so its Request-section card (`RequestExamplePanel`
+ * delegating to `WebhookPayloadPanel`) drops the language tabs and just shows
+ * the payload, the same way `ResponseExamplePanel` already does.
  */
 
 /** One code sample matching a language and a request example, or the closest fallback. */
@@ -33,6 +38,52 @@ function pickSample(
 }
 
 /**
+ * The sticky column for a webhook's payload: raw JSON only, with an example
+ * dropdown when there's more than one case — no language tabs and no code
+ * sample, since `view.samples` is always empty for a webhook (there is
+ * nothing to curl). Structurally this is `ResponseExamplePanel` with a
+ * different title and a request-example source instead of a response one;
+ * kept as its own small function rather than parameterizing that one, since
+ * the two already diverge on what selects the current example (a `status`
+ * prop there vs. local state here).
+ */
+function WebhookPayloadPanel({ requests }: { requests: ExampleView[] }) {
+  const [active, setActive] = useState(0);
+  if (requests.length === 0) return null;
+
+  const current = requests[Math.min(active, requests.length - 1)] as ExampleView;
+
+  return (
+    <div className={styles.panel}>
+      <section className={styles.group}>
+        <div className={styles.groupHeader}>
+          <h2 className={styles.groupTitle}>Example payload</h2>
+          <div className={styles.headerControls}>
+            {requests.length > 1 && (
+              <select
+                className={styles.select}
+                style={{ '--select-chars': Math.max(...requests.map((r) => r.label.length)) } as CSSProperties}
+                value={Math.min(active, requests.length - 1)}
+                onChange={(event) => setActive(Number(event.target.value))}
+                aria-label="Choose payload example"
+              >
+                {requests.map((req, index) => (
+                  <option key={req.key} value={index}>
+                    {req.label}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+        </div>
+
+        <CodeBlock language="json" content={JSON.stringify(current.json, null, 2)} />
+      </section>
+    </div>
+  );
+}
+
+/**
  * The sticky column for the Request section: one card with a language
  * selector (just cURL today; the shape is ready for more), an example
  * dropdown when the operation has more than one request example, and the
@@ -40,6 +91,12 @@ function pickSample(
  */
 export function RequestExamplePanel({ view }: { view: OperationView }) {
   const requests = view.examples.filter((e) => e.kind === 'request');
+
+  // A webhook has no code sample to select a language for — it's delivered
+  // to the integrator, never called — so it gets the raw-JSON-only card
+  // instead of the language-tabbed one below.
+  if (view.isWebhook) return <WebhookPayloadPanel requests={requests} />;
+
   const languages = [...new Set(view.samples.map((s) => s.language))];
   const [activeLanguage, setActiveLanguage] = useState(0);
   const [activeExample, setActiveExample] = useState(0);

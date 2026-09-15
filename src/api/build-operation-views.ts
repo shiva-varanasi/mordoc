@@ -55,6 +55,15 @@ interface OperationSource {
   operation: Schema;
   /** Parameters declared on the path item, shared by every method under it. */
   pathLevelParameters: Schema[];
+  /**
+   * True when this operation came from the spec's top-level `webhooks` map
+   * rather than `paths`. Both are the same PathItem shape — a webhook's map
+   * key is a name ("payment.captured"), not a URL — so this flag is the only
+   * thing that distinguishes them from here on: it turns off cURL sample
+   * generation (a webhook is delivered *to* the integrator, never called)
+   * and rides along into `OperationView` for the UI's "Webhook" badge.
+   */
+  isWebhook: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -62,21 +71,45 @@ interface OperationSource {
 // ---------------------------------------------------------------------------
 
 /**
- * Enumerates every operation in a spec.
+ * Enumerates every operation in a spec — from `paths`, and, per OpenAPI
+ * 3.1's `webhooks` keyword, inbound webhooks.
  *
  * An operation with no `operationId` fails the build. Mordoc requires it:
  * it is both the route slug and the enrichment filename, and inventing a
  * fallback slug would make published URLs move whenever the spec is
- * reordered.
+ * reordered. `operationId` uniqueness is checked across `paths` and
+ * `webhooks` together, not per collection — they already share one
+ * `enrichment/operations/*.md` folder and one sidenav `operation:` map, so a
+ * collision between a webhook and a path operation is the same failure as a
+ * collision between two paths.
  */
 function collectOperations(spec: ResolvedSpec, diagnostics: Diagnostics): OperationSource[] {
-  const paths = spec.document['paths'];
-  if (!isObject(paths)) return [];
-
   const out: OperationSource[] = [];
   const seen = new Map<string, string>();
 
-  for (const [path, rawItem] of Object.entries(paths)) {
+  collectFromItemMap(spec, spec.document['paths'], false, out, seen, diagnostics);
+  collectFromItemMap(spec, spec.document['webhooks'], true, out, seen, diagnostics);
+
+  return out;
+}
+
+/**
+ * Walks one `paths`- or `webhooks`-shaped map, appending every operation it
+ * finds to `out`. Both keywords hold the same PathItem shape — only the
+ * diagnostic wording and the `isWebhook` flag carried onto each
+ * `OperationSource` differ.
+ */
+function collectFromItemMap(
+  spec: ResolvedSpec,
+  rawMap: unknown,
+  isWebhook: boolean,
+  out: OperationSource[],
+  seen: Map<string, string>,
+  diagnostics: Diagnostics,
+): void {
+  if (!isObject(rawMap)) return;
+
+  for (const [path, rawItem] of Object.entries(rawMap)) {
     if (!isObject(rawItem)) continue;
     const item = resolveSchema(spec.document, rawItem).schema;
 
@@ -89,10 +122,17 @@ function collectOperations(spec: ResolvedSpec, diagnostics: Diagnostics): Operat
       if (!isObject(raw)) continue;
       const operation = raw;
 
+      // A webhook's map key is a name ("payment.captured"), not a URL — say
+      // so in every diagnostic that names it, so a build failure points at
+      // the right map instead of reading like a stray path operation.
+      const reference = isWebhook
+        ? `webhook ${method.toUpperCase()} ${path}`
+        : `${method.toUpperCase()} ${path}`;
+
       const operationId = operation['operationId'];
       if (typeof operationId !== 'string' || operationId === '') {
         diagnostics.fail(
-          `${spec.id}: ${method.toUpperCase()} ${path} has no "operationId". ` +
+          `${spec.id}: ${reference} has no "operationId". ` +
             `Mordoc requires one — it is both the page's route slug and the name of ` +
             `its enrichment file.`,
         );
@@ -103,17 +143,15 @@ function collectOperations(spec: ResolvedSpec, diagnostics: Diagnostics): Operat
       if (previous) {
         diagnostics.fail(
           `${spec.id}: operationId "${operationId}" is used by both ${previous} and ` +
-            `${method.toUpperCase()} ${path}. Operation ids must be unique.`,
+            `${reference}. Operation ids must be unique.`,
         );
         continue;
       }
-      seen.set(operationId, `${method.toUpperCase()} ${path}`);
+      seen.set(operationId, reference);
 
-      out.push({ spec, operationId, method, path, operation, pathLevelParameters });
+      out.push({ spec, operationId, method, path, operation, pathLevelParameters, isWebhook });
     }
   }
-
-  return out;
 }
 
 /** Merges path-level and operation-level parameters, the operation's own winning. */
@@ -435,7 +473,7 @@ function buildOne(input: BuildOneInput): OperationView {
     diagnostics,
   } = input;
   const { document } = walkOptions;
-  const { operation, operationId, method, path } = source;
+  const { operation, operationId, method, path, isWebhook } = source;
 
   const routePath = `${spec.routePrefix}/${operationSlug(operationId)}`;
 
@@ -546,8 +584,13 @@ function buildOne(input: BuildOneInput): OperationView {
       body,
     }),
   });
-  const samples =
-    requestExamples.length > 0
+  // A webhook is delivered *to* the integrator, not called — there is
+  // nothing to curl. It gets no code samples at all; the payload examples
+  // above still render, and the example panel shows them as raw JSON
+  // instead of wrapping them in an invocation nobody would run.
+  const samples = isWebhook
+    ? []
+    : requestExamples.length > 0
       ? requestExamples.map((example) => curlSample(example.json, example.key))
       : [curlSample(undefined, '')];
 
@@ -582,6 +625,7 @@ function buildOne(input: BuildOneInput): OperationView {
   };
 
   if (operation['deprecated'] === true) view.deprecated = true;
+  if (isWebhook) view.isWebhook = true;
 
   return view;
 }

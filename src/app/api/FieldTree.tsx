@@ -186,7 +186,7 @@ function Field({ field, anchorPrefix, expanded, onToggle, depth }: FieldProps) {
             section title for a parameter search match. */}
         <code className={styles.name}>{field.path}</code>
 
-        {/* Always the literal type — "object", "string", "array<Money>" —
+        {/* Always the literal type — "object", "string", "array of objects" —
             never substituted with the `$ref` component name. An object field
             reads as "object" whether or not it happens to be a named schema.
             The leading <Sep/> in this and every span below it is invisible

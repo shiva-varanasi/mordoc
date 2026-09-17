@@ -10,6 +10,7 @@ import { contentComponents } from '../component-map.js';
 import { Breadcrumb } from '../../breadcrumb/Breadcrumb.js';
 import { useBreadcrumbEntries } from '../../breadcrumb/useBreadcrumb.js';
 import styles from './ArticlePage.module.css';
+import typography from '../Typography.module.css';
 
 /**
  * Renders the article flavor of a content page: breadcrumb, title/description
@@ -58,7 +59,7 @@ export function ArticlePage() {
         <Breadcrumb entries={breadcrumb} />
       </div>
       <header className={styles.articleHeader}>
-        <h1 className={styles.title} data-pagefind-meta="title">{pageData.frontmatter.title}</h1>
+        <h1 className={typography.title} data-pagefind-meta="title">{pageData.frontmatter.title}</h1>
         {typeof pageData.frontmatter.description === 'string' && (
           <p className={styles.description}>{pageData.frontmatter.description}</p>
         )}
@@ -66,7 +67,7 @@ export function ArticlePage() {
           <span className={styles.readTime}>{formatUiString(t.article.readTime, { count: readTime })}</span>
         </div>
       </header>
-      <div className={styles.prose}>{rendered}</div>
+      <div className={typography.prose}>{rendered}</div>
     </article>
   );
 }

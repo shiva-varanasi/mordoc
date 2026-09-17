@@ -2,12 +2,24 @@
    OPERATION PAGE TOKENS
    ============================================================ */
 :root {
-  --operation-rail-width:  420px;
-  --operation-max-width:   48rem; /* max-w-3xl, for the description only */
+  --operation-rail-width:      420px;
+  --operation-max-width:       48rem; /* max-w-3xl, for the description only */
+  /* Sized off ArticlePage/Content's own tokens so this box lines up with
+     the guide page's reading column on the left, and covers exactly the
+     surface a guide page spends on its reading column *plus* its TOC rail
+     (this page has no TOC — that space instead goes to the fields/rail
+     split below, and to the footer, which matches this same width — see
+     .footerArea). Centering a box `--toc-width` wider than the reading
+     column, in the same full-width containing block the reading column's
+     *narrower* containing block (which already excludes `--toc-width`)
+     sits in, yields an identical left margin on both — the extra width
+     lands only on the right. */
+  --operation-page-max-width:  calc(var(--article-max-width) + var(--toc-width));
 }
 
 /* ── Content container ─────────────────────────────────────
-   mx-auto max-w-[1440px] px-5 py-8 lg:px-10 lg:py-12
+   Padding and breakpoint match .article's exactly — any mismatch there
+   would throw the two pages' gutters out of sync below 1024px.
 
    Grid rows [content: 1fr] / [footer: auto], same structure as
    Content.module.css's .contentAreaGrid — content grows to fill the
@@ -27,14 +39,14 @@
   display: grid;
   grid-template-rows: 1fr auto;
   min-height: calc(100svh - var(--header-height));
-  max-width: 1440px;
+  max-width: var(--operation-page-max-width);
   margin: 0 auto;
-  padding: 2rem 1.25rem 0;
+  padding: 3rem 1.5rem 0;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   .page {
-    padding: 3rem 2.5rem 0;
+    padding: 3rem 2rem 0;
   }
 }
 
@@ -49,23 +61,24 @@
   }
 }
 
+/* Widens Footer (default: --article-max-width) to match this page's own
+   width, so it spans to the code-sample rail's right edge instead of
+   stopping at the narrower prose reading-width used by .narrative.
+   Also zeroes Footer's own horizontal padding: unlike Content's grid
+   (which applies no padding of its own, leaving Footer's default padding
+   as the only gutter), .page above already applies its own gutter at
+   the container level — Footer's default padding would double up on
+   top of it and inset the footer's content from fieldsCol/railCol,
+   which have no padding of their own either. */
 .footerArea {
-  max-width: var(--operation-max-width);
+  --footer-max-width: var(--operation-page-max-width);
+  --footer-padding-x: 0;
 }
 
 /* ── Header ─────────────────────────────────────────────────── */
 
 .breadcrumbRow {
   margin-bottom: 1.75rem; /* mt-7 after breadcrumb */
-}
-
-.title {
-  font-size: 40px;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  color: var(--color-fg);
-  margin: 0 0 1rem; /* mt-4 after H1 */
 }
 
 .deprecated {
@@ -86,9 +99,6 @@
 
 .narrative {
   max-width: var(--operation-max-width);
-  font-size: 1rem;
-  line-height: 1.7;
-  color: var(--color-content-fg);
 }
 
 /* ── Sections ───────────────────────────────────────────────── */

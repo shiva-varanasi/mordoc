@@ -11,6 +11,7 @@ import { RequestExamplePanel, ResponseExamplePanel } from './ExamplePanel.js';
 import { FieldTree } from './FieldTree.js';
 import type { FieldView, OperationView } from '../../types/api.js';
 import styles from './Operation.module.css';
+import typography from '../content/Typography.module.css';
 
 /**
  * An API operation page.
@@ -132,7 +133,7 @@ export function Operation() {
         </div>
 
         <header>
-          <h1 className={styles.title} data-pagefind-meta="title">
+          <h1 className={typography.title} data-pagefind-meta="title">
             {view.summary}
           </h1>
           {view.deprecated && <p className={styles.deprecated}>This operation is deprecated.</p>}
@@ -141,7 +142,7 @@ export function Operation() {
 
         <hr className={styles.separator} />
 
-        {narrative && <div className={styles.narrative}>{narrative}</div>}
+        {narrative && <div className={`${styles.narrative} ${typography.prose}`}>{narrative}</div>}
 
         {/* Request always renders — even an operation with no parameters or
             body still has a cURL sample worth showing beside it. */}

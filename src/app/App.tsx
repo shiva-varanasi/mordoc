@@ -6,6 +6,7 @@ import { SearchModal, switchPagefind } from './header/SearchModal.js';
 import { Skeleton } from './content/skeleton/Skeleton.js';
 import { useMordocData } from './data-context.js';
 import { detectCurrentLang } from './lang-utils.js';
+import type { LayoutKind } from './routes.js';
 import styles from './App.module.css';
 
 export function App() {
@@ -17,8 +18,8 @@ export function App() {
   const currentLang = detectCurrentLang(location.pathname, language, site.defaultLanguage);
 
   const routerNav = useNavigation();
-  const currentLayout = (matches.at(-1)?.handle as { layout?: string } | undefined)?.layout ?? 'content';
-  const isLanding = currentLayout === 'landing';
+  const layoutKind = (matches.at(-1)?.handle as { layout?: LayoutKind } | undefined)?.layout;
+  const isLanding = layoutKind === 'landing';
 
   // Close sidenav on navigation (mobile)
   useEffect(() => {

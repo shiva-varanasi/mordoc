@@ -8,6 +8,15 @@ import { Operation } from './api/Operation.js';
 import { NotFound } from './content/not-found/NotFound.js';
 
 /**
+ * The one canonical fact about which shell a page renders in. Set once per
+ * route here (the only place that has both `pageIndex.kind` and
+ * `pageIndex.layout` at hand) and read via `useMatches()` by both `App`
+ * (macro grid: sidenav/menu) and `Content` (micro grid: landing vs. article)
+ * — neither should re-derive this from frontmatter independently.
+ */
+export type LayoutKind = 'landing' | 'article' | 'operation';
+
+/**
  * Builds the React Router route config from Mordoc's eager virtual
  * modules.
  *
@@ -52,10 +61,12 @@ export function buildRoutes(): RouteObject[] {
     // module; `kind` decides only which component consumes it. Operation
     // pages therefore inherit code-splitting, preloading and SSR hydration
     // from the existing machinery rather than needing a parallel path.
+    const layoutKind: LayoutKind =
+      pageIndex.kind === 'operation' ? 'operation' : pageIndex.layout === 'landing' ? 'landing' : 'article';
     const common = {
       loader: async () => (await pageLoader()).default,
       Component: pageIndex.kind === 'operation' ? Operation : Content,
-      handle: { layout: pageIndex.layout ?? 'content' },
+      handle: { layout: layoutKind },
     };
     return pageIndex.routePath === '/'
       ? { index: true, ...common }
@@ -67,7 +78,10 @@ export function buildRoutes(): RouteObject[] {
       path: '/',
       Component: App,
       HydrateFallback: () => null,
-      children: [...pageRoutes, { path: '*', Component: NotFound }],
+      children: [
+        ...pageRoutes,
+        { path: '*', Component: NotFound, handle: { layout: 'article' as LayoutKind } },
+      ],
     },
   ];
 }

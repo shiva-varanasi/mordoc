@@ -32,6 +32,14 @@ export interface RunApiStagesInput {
   variables: Record<string, unknown>;
   defaultLanguage: string;
   languages: string[];
+  /** When true, `flush()` prints full warning detail inline instead of a `--verbose` hint. */
+  verbose: boolean;
+}
+
+export interface RunApiStagesResult {
+  operations: OperationView[];
+  /** Count of distinct warnings recorded across every stage — lets the CLI print a final tally. */
+  warningCount: number;
 }
 
 /**
@@ -43,8 +51,8 @@ export interface RunApiStagesInput {
  * hard-failure class was recorded — or, under `strict: true`, if anything at
  * all was.
  */
-export async function runApiStages(input: RunApiStagesInput): Promise<OperationView[]> {
-  const { projectRoot, registry, contentMap, navigation, variables, defaultLanguage, languages } = input;
+export async function runApiStages(input: RunApiStagesInput): Promise<RunApiStagesResult> {
+  const { projectRoot, registry, contentMap, navigation, variables, defaultLanguage, languages, verbose } = input;
 
   const diagnostics = new Diagnostics(registry.strict);
 
@@ -114,6 +122,6 @@ export async function runApiStages(input: RunApiStagesInput): Promise<OperationV
     });
   }
 
-  diagnostics.flush();
-  return operations;
+  const warningCount = diagnostics.flush({ verbose });
+  return { operations, warningCount };
 }

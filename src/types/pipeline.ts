@@ -74,6 +74,12 @@ export interface MordocData {
    * is absent. Typical use: third-party analytics or cookie-consent scripts.
    */
   customHead: string | null;
+  /**
+   * Count of distinct warnings the API reference stages recorded (0 for
+   * projects without `config/api.yaml`). CLI reporting metadata only —
+   * nothing downstream (virtual modules, SSG) reads this.
+   */
+  apiWarnings: number;
 }
 
 /**

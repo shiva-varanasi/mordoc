@@ -668,11 +668,11 @@ function reportDescriptionCoverage(views: OperationView[], diagnostics: Diagnost
   for (const [specId, stats] of bySpec) {
     if (stats.missing.length === 0 || stats.total === 0) continue;
     const documented = Math.round(((stats.total - stats.missing.length) / stats.total) * 100);
-    const shown = stats.missing.slice(0, 10).join(', ');
-    diagnostics.warn(
-      `${specId}: ${stats.missing.length} of ${stats.total} fields have no description in any ` +
-        `layer (${documented}% documented). First few: ${shown}` +
-        `${stats.missing.length > 10 ? ', …' : ''}.`,
-    );
+    diagnostics.warn({
+      summary:
+        `${specId}: ${documented}% of fields documented ` +
+        `(${stats.missing.length.toLocaleString('en-US')} of ${stats.total.toLocaleString('en-US')} missing)`,
+      detail: stats.missing.map((field) => `  - ${field}`).join('\n'),
+    });
   }
 }

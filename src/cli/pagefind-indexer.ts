@@ -1,6 +1,7 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { createIndex } from 'pagefind';
+import { beginStep } from '../utils/reporter.js';
 import type { MordocData } from '../types/pipeline.js';
 
 /**
@@ -51,15 +52,22 @@ async function getContentDirs(distDir: string, exclude: string[]): Promise<strin
  * language lives at the root, so its index is built by including root HTML
  * files plus every content subdirectory that is NOT claimed by another lang.
  */
-export async function runPagefindIndexer(data: MordocData, distDir: string): Promise<void> {
+export async function runPagefindIndexer(
+  data: MordocData,
+  distDir: string,
+  verbose: boolean,
+): Promise<void> {
   const { language, site } = data;
 
   if (!language || language.languages.length <= 1) {
+    const step = verbose ? null : beginStep('building search index');
     await buildIndex(distDir, ['**/*.html'], path.join(distDir, 'pagefind'));
-    console.log('  pagefind index → dist/pagefind/');
+    if (verbose) console.log('  pagefind index → dist/pagefind/');
+    else step!.done('search index · 1 language');
     return;
   }
 
+  const step = verbose ? null : beginStep('building search index');
   const defaultLang = site.defaultLanguage;
   const nonDefaultLangs = language.languages.filter((l) => l !== defaultLang);
 
@@ -76,6 +84,8 @@ export async function runPagefindIndexer(data: MordocData, distDir: string): Pro
       await buildIndex(distDir, globs, outputPath);
     }
 
-    console.log(`  pagefind index → dist/pagefind-${lang}/`);
+    if (verbose) console.log(`  pagefind index → dist/pagefind-${lang}/`);
   }
+
+  if (step) step.done(`search index · ${language.languages.length} languages`);
 }

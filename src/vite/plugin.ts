@@ -17,6 +17,7 @@ import {
 } from '../pipeline.js';
 import type { MordocData } from '../types/pipeline.js';
 import type { PageData, TransformedPage } from '../types/content.js';
+import { beginStep } from '../utils/reporter.js';
 
 /**
  * The set of "eager" virtual module IDs this plugin exposes.
@@ -413,6 +414,7 @@ async function applyMordocWatchBatch(
   batch: Map<string, WatchEvent>,
   getData: () => MordocData | null,
   setData: (next: MordocData) => void,
+  verbose: boolean,
 ): Promise<void> {
   const data = getData();
   if (!data || batch.size === 0) return;
@@ -462,7 +464,7 @@ async function applyMordocWatchBatch(
     );
 
   if (needsFullPipeline) {
-    await rerunPipelineForDev(server, projectRoot, getData, setData);
+    await rerunPipelineForDev(server, projectRoot, getData, setData, verbose);
     return;
   }
 
@@ -480,7 +482,7 @@ async function applyMordocWatchBatch(
   if (configEvents.some(({ rel }) => rel === siteRel)) {
     const site = await loadSiteConfig(projectRoot);
     if (site.defaultLanguage !== data.site.defaultLanguage) {
-      await rerunPipelineForDev(server, projectRoot, getData, setData);
+      await rerunPipelineForDev(server, projectRoot, getData, setData, verbose);
       return;
     }
     data.site = site;
@@ -539,7 +541,7 @@ async function applyMordocWatchBatch(
       (p) => path.normalize(p.entry.filePath) === abs,
     );
     if (matchingPages.length === 0) {
-      await rerunPipelineForDev(server, projectRoot, getData, setData);
+      await rerunPipelineForDev(server, projectRoot, getData, setData, verbose);
       return;
     }
     for (const page of matchingPages) {
@@ -569,10 +571,11 @@ async function rerunPipelineForDev(
   projectRoot: string,
   getData: () => MordocData | null,
   setData: (next: MordocData) => void,
+  verbose: boolean,
 ): Promise<void> {
   const prev = getData();
   if (!prev) return;
-  const next = await runPipeline(projectRoot);
+  const next = await runPipeline(projectRoot, { verbose });
   setData(next);
   invalidateAllMordocVirtualModules(server, next);
   server.ws.send({ type: 'full-reload', path: '*' });
@@ -585,6 +588,8 @@ async function rerunPipelineForDev(
 interface MordocVitePluginDevOptions {
   projectRoot: string;
   mode: 'dev';
+  /** When true, pipeline warnings print full detail instead of a `--verbose` hint. */
+  verbose?: boolean;
 }
 
 /**
@@ -653,7 +658,7 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
       // updated incrementally by the file watcher throughout the session.
       // Build mode: data was pre-loaded by the caller — nothing to do here.
       if (options.mode === 'dev') {
-        data = await runPipeline(options.projectRoot);
+        data = await runPipeline(options.projectRoot, { verbose: options.verbose ?? false });
       }
     },
 
@@ -682,6 +687,18 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
         // for the *next* flush, rather than being lost or mutated mid-batch.
         const batch = new Map(pending);
         pending.clear();
+
+        const changedRels = [...batch.keys()]
+          .map((abs) => forwardProjectRel(projectRoot, abs))
+          .filter((rel): rel is string => rel !== null);
+        const label = changedRels.length === 1 ? changedRels[0] : `${changedRels.length} files`;
+        // The `done()` line repeats `label` rather than just saying "back in
+        // sync": on non-TTY output (CI, piped logs) the in-progress "→ ...
+        // changed, catching up..." line never prints — see `beginStep` — so
+        // the finish line is the only place a log reader learns what
+        // triggered this rebuild.
+        const rebuildStep = beginStep(`${label} changed, catching up`);
+
         try {
           await applyMordocWatchBatch(
             server,
@@ -691,7 +708,9 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
             (next) => {
               data = next;
             },
+            options.verbose ?? false,
           );
+          rebuildStep.done(`${label} — back in sync`);
         } catch (err) {
           // A targeted incremental update failed — fall back to rebuilding
           // everything from scratch and forcing the browser to reload, so a
@@ -706,7 +725,9 @@ export function mordocVitePlugin(options: MordocVitePluginOptions): Plugin {
               (next) => {
                 data = next;
               },
+              options.verbose ?? false,
             );
+            rebuildStep.done(`${label} — back in sync (recovered)`);
           } catch (recoverErr) {
             console.error('[mordoc] watch recovery failed:', recoverErr);
           }

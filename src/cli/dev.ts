@@ -15,6 +15,8 @@ export interface DevCommandOptions {
   projectRoot: string;
   /** Port to listen on. Defaults to Vite's default (5173). */
   port?: number;
+  /** When true, pipeline warnings print full detail instead of a `--verbose` hint. */
+  verbose?: boolean;
 }
 
 /**
@@ -43,9 +45,11 @@ export interface DevCommandOptions {
  *   4. Send response.
  */
 export async function runDevCommand(options: DevCommandOptions): Promise<void> {
-  const { projectRoot, port } = options;
+  const { projectRoot, port, verbose = false } = options;
   const mordocAppRoot = getMordocAppRoot();
   const templatePath = path.join(mordocAppRoot, 'index.html');
+
+  console.log('\n  Mordoc dev\n');
 
   const server = await createServer({
     configFile: false,
@@ -54,7 +58,7 @@ export async function runDevCommand(options: DevCommandOptions): Promise<void> {
     appType: 'custom',
     plugins: [
       react(),
-      mordocVitePlugin({ projectRoot, mode: 'dev' }),
+      mordocVitePlugin({ projectRoot, mode: 'dev', verbose }),
     ],
     server: {
       port,
@@ -201,7 +205,7 @@ export async function runDevCommand(options: DevCommandOptions): Promise<void> {
   await server.listen();
 
   const resolvedPort = server.config.server.port ?? 5173;
-  console.log(`\n  Mordoc dev server running`);
+  console.log(`\n  Mordoc dev server is up`);
   console.log(`  → http://localhost:${resolvedPort}/`);
   console.log(`  Project: ${projectRoot}\n`);
 }

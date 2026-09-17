@@ -15,6 +15,8 @@ import fs from 'node:fs/promises';
 export { loadNavTranslations, loadHeaderLinks, loadFooterConfig };
 import type { ContentEntry, PageMeta, TransformedPage } from './types/content.js';
 import type { MordocData, NavigationConfig, ShellData } from './types/pipeline.js';
+import type { OperationView } from './types/api.js';
+import { beginStep } from './utils/reporter.js';
 
 /** The subset of `src/api/index.ts` the pipeline calls, kept local so the import can stay dynamic. */
 type ApiModule = typeof import('./api/index.js');
@@ -79,7 +81,14 @@ export async function loadNavigation(projectRoot: string): Promise<NavigationCon
  *
  * @param projectRoot - Absolute path to the user's project root.
  */
-export async function runPipeline(projectRoot: string): Promise<MordocData> {
+export async function runPipeline(
+  projectRoot: string,
+  options: { verbose?: boolean } = {},
+): Promise<MordocData> {
+  const verbose = options.verbose ?? false;
+  const overallStep = beginStep('reading the project');
+
+  const configStep = beginStep('config & content loaded', { indent: '  ' });
   const site = await loadSiteConfig(projectRoot);
   const language = await loadLanguageConfig(projectRoot, site.defaultLanguage);
   const navigation = await loadNavigation(projectRoot);
@@ -103,6 +112,7 @@ export async function runPipeline(projectRoot: string): Promise<MordocData> {
   const variables = await loadVariables(projectRoot);
   const parsedContent = await parseContent(contentMap);
   const transformedContent = transformContent(parsedContent, variables);
+  configStep.done('config & content loaded');
 
   // Runs after navigation and content are both in hand, because the
   // navigation checks compare the spec's operations against the authored nav
@@ -111,7 +121,7 @@ export async function runPipeline(projectRoot: string): Promise<MordocData> {
   // keeps its independent-HMR contract.
   const api = await loadApiModule(projectRoot);
   const registry = api ? await api.loadApiRegistry(projectRoot) : null;
-  const operations =
+  const apiResult =
     api && registry
       ? await api.runApiStages({
           projectRoot,
@@ -121,8 +131,10 @@ export async function runPipeline(projectRoot: string): Promise<MordocData> {
           variables,
           defaultLanguage: site.defaultLanguage,
           languages: contentMap.languages,
+          verbose,
         })
-      : [];
+      : { operations: [] as OperationView[], warningCount: 0 };
+  const { operations, warningCount: apiWarnings } = apiResult;
 
   let customHead: string | null = null;
   try {
@@ -132,7 +144,10 @@ export async function runPipeline(projectRoot: string): Promise<MordocData> {
     // optional file — absent is the normal case
   }
 
-  return { site, language, navigation, assets, fonts, pages: transformedContent, operations, translations, headerLinks, footer, variables, customHead };
+  const opsSummary = operations.length > 0 ? `, ${operations.length} operation(s)` : '';
+  overallStep.done(`ready · ${transformedContent.length} page(s)${opsSummary}`);
+
+  return { site, language, navigation, assets, fonts, pages: transformedContent, operations, translations, headerLinks, footer, variables, customHead, apiWarnings };
 }
 
 /**

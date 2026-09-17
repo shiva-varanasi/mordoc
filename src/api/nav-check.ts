@@ -128,12 +128,12 @@ export function applyApiNavigation(input: ApiNavigationInput): void {
     // project has no nav entries at all and could never build. Teams wanting
     // CI enforcement set `strict: true`; teams with deliberately unlinked
     // operations leave it at warn, so no exemption list is needed.
-    const lines = uncovered
-      .map((view) => `      - operation: ${view.operationId}   # ${view.routePath}`)
-      .join('\n');
-    diagnostics.warn(
-      `${uncovered.length} operation(s) have no navigation entry and are reachable only by URL:\n${lines}`,
-    );
+    diagnostics.warn({
+      summary: `${uncovered.length} operation(s) reachable only by URL (no nav entry)`,
+      detail: uncovered
+        .map((view) => `  - operation: ${view.operationId}   # ${view.routePath}`)
+        .join('\n'),
+    });
   }
 }
 

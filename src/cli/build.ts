@@ -1,3 +1,4 @@
+import { performance } from 'node:perf_hooks';
 import { build as viteBuild } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'node:path';
@@ -5,6 +6,7 @@ import fs from 'node:fs/promises';
 import { runPipeline } from '../pipeline.js';
 import { mordocVitePlugin } from '../vite/plugin.js';
 import { getMordocAppRoot } from '../utils/paths.js';
+import { beginStep, formatBytes, formatElapsed } from '../utils/reporter.js';
 import { runSsg } from './ssg-runner.js';
 import { copyAndRewriteAssets } from './asset-rewrite.js';
 import { runPagefindIndexer } from './pagefind-indexer.js';
@@ -13,6 +15,8 @@ import type { MordocData } from '../types/pipeline.js';
 export interface BuildCommandOptions {
   /** Absolute path to the user's project root. */
   projectRoot: string;
+  /** When true, prints full detail (every warning, every chunk, every rendered route) instead of collapsed summaries. */
+  verbose?: boolean;
 }
 
 /** Output directories — the deployable artifact and the throwaway SSR intermediate. */
@@ -37,6 +41,52 @@ function getOutDirs(projectRoot: string): BuildOutDirs {
     clientOutDir: path.join(projectRoot, 'dist'),
     ssrOutDir: path.join(projectRoot, 'node_modules', '.mordoc', 'ssr'),
   };
+}
+
+/** One entry of a Rollup/Vite build result's output array — chunk or asset, duck-typed to avoid a hard dependency on Rollup's own types. */
+interface BuildOutputFile {
+  type: 'chunk' | 'asset';
+  fileName: string;
+  code?: string;
+  source?: string | Uint8Array;
+}
+
+function fileBytes(file: BuildOutputFile): number {
+  if (typeof file.code === 'string') return Buffer.byteLength(file.code);
+  if (typeof file.source === 'string') return Buffer.byteLength(file.source);
+  if (file.source) return file.source.byteLength;
+  return 0;
+}
+
+/**
+ * Reduces a Vite `build()` result (one `RollupOutput`, or one per
+ * environment) to the handful of numbers worth printing by default: how
+ * many JS chunks came out, the total size of everything written, and the
+ * single largest chunk — the one figure that actually flags a bloat
+ * regression. Everything else Vite would normally print per-file is
+ * suppressed via `logLevel: 'silent'` at the call site; `--verbose`
+ * restores Vite's own full table instead of calling this at all.
+ */
+function summarizeBuildOutput(result: unknown): string {
+  const outputs: BuildOutputFile[] = Array.isArray(result)
+    ? (result as { output: BuildOutputFile[] }[]).flatMap((r) => r.output)
+    : (result as { output: BuildOutputFile[] }).output;
+
+  let totalBytes = 0;
+  let chunkCount = 0;
+  let largest: { fileName: string; bytes: number } | null = null;
+
+  for (const file of outputs) {
+    const bytes = fileBytes(file);
+    totalBytes += bytes;
+    if (file.type === 'chunk') {
+      chunkCount += 1;
+      if (!largest || bytes > largest.bytes) largest = { fileName: file.fileName, bytes };
+    }
+  }
+
+  const largestText = largest ? ` · largest: ${largest.fileName} (${formatBytes(largest.bytes)})` : '';
+  return `${chunkCount} chunk${chunkCount === 1 ? '' : 's'} · ${formatBytes(totalBytes)}${largestText}`;
 }
 
 /**
@@ -77,28 +127,34 @@ function getOutDirs(projectRoot: string): BuildOutDirs {
  *      code-split into sibling files, so the SSG runner can lazily load
  *      each route's content as it renders.
  *   5. SSG runner: loads the SSR bundle, calls `render()` per route,
- *      writes the resulting HTML files. (Wired in a follow-up step.)
+ *      writes the resulting HTML files.
+ *
+ * Terminal output is collapsed to one line per phase by default (a
+ * progress line rewritten in place on a TTY, finishing as `✓ ... (Xs)`);
+ * `--verbose` restores full detail everywhere — every warning, Vite's own
+ * per-chunk table, and one line per rendered route — instead of the
+ * summarized version.
  *
  * The dev path is unaffected by any of this — its plugin instance still
  * runs the pipeline itself, exactly as before. Build is the only caller
  * that pre-loads `data`.
  */
 export async function runBuildCommand(options: BuildCommandOptions): Promise<void> {
-  const { projectRoot } = options;
+  const { projectRoot, verbose = false } = options;
   const mordocAppRoot = getMordocAppRoot();
   const publicDir = path.join(projectRoot, 'public');
   const { clientOutDir, ssrOutDir } = getOutDirs(projectRoot);
+  const buildStartedAt = performance.now();
 
   console.log('\n  Mordoc build');
   console.log(`  Project: ${projectRoot}\n`);
 
-  console.log('→ running pipeline...');
-  const rawData = await runPipeline(projectRoot);
-  console.log(`  ${rawData.pages.length} page(s) discovered\n`);
+  const rawData = await runPipeline(projectRoot, { verbose });
 
-  console.log('→ wiping previous output...');
+  const wipeStep = beginStep('clearing previous output');
   await fs.rm(clientOutDir, { recursive: true, force: true });
   await fs.rm(ssrOutDir, { recursive: true, force: true });
+  wipeStep.done('cleared previous output');
 
   // Asset rewrite has to happen before either Vite pass: both bundles
   // import `virtual:mordoc/assets` (transitively, via `main.tsx`'s
@@ -107,14 +163,16 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
   // Note: this also creates `dist/_assets/` with the copied files.
   // Vite's subsequent client build runs with `emptyOutDir: false` so
   // those copies survive.
-  console.log('→ copying assets...');
+  const assetsStep = beginStep('copying assets');
   const data = await copyAndRewriteAssets(rawData, clientOutDir);
+  assetsStep.done('copied assets');
 
-  console.log('→ building client bundle...');
-  await viteBuild({
+  const clientStep = beginStep('assembling the client bundle');
+  const clientOutput = await viteBuild({
     configFile: false,
     root: mordocAppRoot,
     publicDir,
+    logLevel: verbose ? 'info' : 'silent',
     plugins: [
       react(),
       mordocVitePlugin({ projectRoot, mode: 'build', data }),
@@ -126,11 +184,15 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
       // build and the next phase.
       emptyOutDir: false,
       manifest: true,
+      // Gzip sizing is real per-chunk work that only earns its keep when
+      // someone's actually looking at the per-file table it feeds.
+      reportCompressedSize: verbose,
     },
   });
+  clientStep.done(`client bundle · ${summarizeBuildOutput(clientOutput)}`);
 
-  console.log('→ building SSR bundle...');
-  await viteBuild({
+  const ssrStep = beginStep('preparing the SSR bundle');
+  const ssrOutput = await viteBuild({
     configFile: false,
     root: mordocAppRoot,
     // The SSR pass produces a Node-loadable bundle in a throwaway
@@ -138,6 +200,7 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
     // would put them under `node_modules/.mordoc/ssr/` rather than
     // `dist/`. Disable publicDir entirely for this pass.
     publicDir: false,
+    logLevel: verbose ? 'info' : 'silent',
     plugins: [
       react(),
       mordocVitePlugin({ projectRoot, mode: 'build', data }),
@@ -146,6 +209,7 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
       outDir: ssrOutDir,
       emptyOutDir: false,
       ssr: 'entry-server.tsx',
+      reportCompressedSize: verbose,
     },
     ssr: {
       // Bundle all node_modules into the SSR output so the throwaway
@@ -157,6 +221,7 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
       noExternal: true,
     },
   });
+  ssrStep.done(`SSR bundle · ${summarizeBuildOutput(ssrOutput)}`);
 
   // Declare the SSR output directory as an ESM scope.
   //
@@ -179,27 +244,26 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
     'utf-8',
   );
 
-  console.log('\n→ rendering routes to static HTML...');
-  await runSsg({ data, clientOutDir, ssrOutDir });
+  await runSsg({ data, clientOutDir, ssrOutDir, verbose });
 
   // The SSR bundle is a build-time intermediate; once the SSG runner has
   // finished rendering every route there's no consumer left for it.
   // Wiping it keeps `node_modules/.mordoc/` from accumulating stale
   // chunks across builds and reinforces the "anything not in dist/ is
   // not deployable" mental model.
-  console.log('\n→ cleaning up SSR intermediate...');
+  const cleanupStep = beginStep('cleaning up SSR intermediate');
   await fs.rm(ssrOutDir, { recursive: true, force: true });
+  cleanupStep.done('cleaned up SSR intermediate');
 
-  console.log('\n→ verifying output...');
   await verifyBuildOutput(data, clientOutDir);
-
-  console.log('\n→ writing sitemap and robots.txt...');
   await writeSitemapAndRobots(data, clientOutDir);
+  await runPagefindIndexer(data, clientOutDir, verbose);
 
-  console.log('\n→ building search index...');
-  await runPagefindIndexer(data, clientOutDir);
+  if (!verbose && data.apiWarnings > 0) {
+    console.log(`\n⚠ ${data.apiWarnings} warning(s) — rerun with --verbose for detail`);
+  }
 
-  console.log('\n✔ build complete');
+  console.log(`\n✔ all done — build complete (${formatElapsed(performance.now() - buildStartedAt)})`);
   console.log(`  output → ${clientOutDir}\n`);
 }
 
@@ -238,7 +302,6 @@ async function writeSitemapAndRobots(data: MordocData, clientOutDir: string): Pr
     '</urlset>\n';
 
   await fs.writeFile(path.join(clientOutDir, 'sitemap.xml'), sitemap, 'utf-8');
-  console.log(`  sitemap.xml  (${indexedRoutes.length} URL${indexedRoutes.length === 1 ? '' : 's'})`);
 
   const robots =
     'User-agent: *\n' +
@@ -247,7 +310,10 @@ async function writeSitemapAndRobots(data: MordocData, clientOutDir: string): Pr
     `Sitemap: ${baseUrl}/sitemap.xml\n`;
 
   await fs.writeFile(path.join(clientOutDir, 'robots.txt'), robots, 'utf-8');
-  console.log('  robots.txt');
+
+  console.log(
+    `✓ sitemap.xml (${indexedRoutes.length} URL${indexedRoutes.length === 1 ? '' : 's'}) · robots.txt`,
+  );
 }
 
 /**

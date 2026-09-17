@@ -15,11 +15,27 @@
  * Note that `fail` is not affected by `strict` in either direction — the
  * hard-failure list is not downgradable.
  */
+
+/**
+ * A warning is either a single short line, or a `summary` line paired with
+ * further `detail` (a per-field or per-operation breakdown) that's only
+ * worth a reader's attention when they asked for it. `flush()` prints just
+ * the summary by default and points at `--verbose` for the rest, so a
+ * 200-field API doesn't bury the one thing worth reading under a wall of
+ * individually-useless lines.
+ */
+export type WarnInput = string | { summary: string; detail: string };
+
+interface WarningRecord {
+  summary: string;
+  detail?: string;
+}
+
 export class Diagnostics {
-  // Sets, not arrays, so a problem reached more than once is reported once —
-  // the author has one thing to fix. Insertion order is preserved, so
-  // grouping still reads well.
-  private readonly warnings = new Set<string>();
+  // Keyed by summary, not a bare Set, so a problem reached more than once is
+  // reported once — the author has one thing to fix. Insertion order is
+  // preserved, so grouping still reads well.
+  private readonly warnings = new Map<string, WarningRecord>();
   private readonly errors = new Set<string>();
 
   constructor(private readonly strict: boolean) {}
@@ -28,8 +44,9 @@ export class Diagnostics {
    * Records a completeness problem. The output is still correct — just less
    * enriched — so this never stops the build unless `strict` is set.
    */
-  warn(message: string): void {
-    this.warnings.add(message);
+  warn(input: WarnInput): void {
+    const record = typeof input === 'string' ? { summary: input } : input;
+    this.warnings.set(record.summary, record);
   }
 
   /** Records a correctness problem: shipped output would be broken. */
@@ -58,19 +75,38 @@ export class Diagnostics {
 
   /**
    * Prints accumulated warnings and throws if anything fatal was recorded.
+   * Returns the number of warnings printed, so a caller can surface a final
+   * tally without keeping its own copy of the count.
    *
    * Called once at the end of the API stages rather than per-problem so a
-   * spec with twenty unmatched enrichment files reports all twenty, instead
-   * of making the author fix and re-run twenty times.
+   * spec with twenty problems reports all twenty, instead of making the
+   * author fix and re-run twenty times.
+   *
+   * Non-verbose (default): each warning prints as one summary line; a
+   * warning that carries `detail` gets a `— see --verbose` hint appended
+   * instead of the detail itself. Verbose: the detail prints indented
+   * beneath its summary — the same information the non-verbose one-liner
+   * exists to spare you from by default.
    */
-  flush(): void {
-    if (this.warnings.size > 0 && !this.strict) {
-      for (const warning of this.warnings) {
-        console.warn(`⚠ ${warning}`);
+  flush(options: { verbose?: boolean } = {}): number {
+    const verbose = options.verbose ?? false;
+    const count = this.warnings.size;
+
+    if (count > 0 && !this.strict) {
+      for (const { summary, detail } of this.warnings.values()) {
+        if (detail && verbose) {
+          console.warn(`⚠ ${summary}\n${detail}`);
+        } else if (detail) {
+          console.warn(`⚠ ${summary} — see --verbose`);
+        } else {
+          console.warn(`⚠ ${summary}`);
+        }
       }
     }
 
-    if (!this.hasErrors) return;
+    if (!this.hasErrors) return count;
+
+    const fullText = ({ summary, detail }: WarningRecord) => (detail ? `${summary}\n${detail}` : summary);
 
     const parts: string[] = [];
     if (this.errors.size > 0) {
@@ -81,7 +117,7 @@ export class Diagnostics {
     if (this.strict && this.warnings.size > 0) {
       parts.push(
         `API reference warnings (escalated by "strict: true" in config/api.yaml):\n` +
-          [...this.warnings].map((w) => `  ✗ ${w}`).join('\n'),
+          [...this.warnings.values()].map((w) => `  ✗ ${fullText(w)}`).join('\n'),
       );
     }
     throw new Error(parts.join('\n\n'));

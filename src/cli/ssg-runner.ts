@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { toShellData } from '../pipeline.js';
 import { detectCurrentLang } from '../utils/lang-utils.js';
+import { beginStep } from '../utils/reporter.js';
 import type { MordocData, ShellData } from '../types/pipeline.js';
 import type { SiteConfig } from '../types/site.js';
 
@@ -58,6 +59,8 @@ export interface SsgRunnerOptions {
    * function. Once this command finishes, this directory is deleted.
    */
   ssrOutDir: string;
+  /** When true, prints one line per rendered route instead of a collapsed progress counter. */
+  verbose: boolean;
 }
 
 /**
@@ -255,7 +258,7 @@ function toOutputPath(routePath: string, clientOutDir: string): string {
  * rejects raw absolute Windows paths in `import()` ("ERR_UNSUPPORTED_ESM_URL_SCHEME").
  */
 export async function runSsg(options: SsgRunnerOptions): Promise<void> {
-  const { data, clientOutDir, ssrOutDir } = options;
+  const { data, clientOutDir, ssrOutDir, verbose } = options;
 
   const templatePath = path.join(clientOutDir, 'index.html');
   const template = await fs.readFile(templatePath, 'utf-8');
@@ -297,6 +300,10 @@ export async function runSsg(options: SsgRunnerOptions): Promise<void> {
     })),
   ];
 
+  const total = routes.length;
+  const progress = verbose ? null : beginStep('laying out pages as static HTML');
+  let done = 0;
+
   for (const route of routes) {
     const routePath = route.routePath;
     const request = new Request(`http://localhost${routePath}`);
@@ -314,7 +321,19 @@ export async function runSsg(options: SsgRunnerOptions): Promise<void> {
     await fs.mkdir(path.dirname(outPath), { recursive: true });
     await fs.writeFile(outPath, finalHtml, 'utf-8');
 
-    const relOut = path.relative(clientOutDir, outPath).replace(/\\/g, '/');
-    console.log(`  ${routePath.padEnd(40)} → ${relOut}`);
+    done += 1;
+    if (verbose) {
+      const relOut = path.relative(clientOutDir, outPath).replace(/\\/g, '/');
+      console.log(`  ${routePath.padEnd(40)} → ${relOut}`);
+    } else {
+      progress!.update(`laying out pages as static HTML... ${done}/${total}`);
+    }
+  }
+
+  if (progress) {
+    const languageCount = data.language?.languages.length ?? 1;
+    progress.done(
+      `${total} route${total === 1 ? '' : 's'} rendered across ${languageCount} language${languageCount === 1 ? '' : 's'}`,
+    );
   }
 }

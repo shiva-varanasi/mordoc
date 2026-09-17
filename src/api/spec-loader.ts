@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import type { ApiRegistry, OpenApiDocument, ResolvedSpec } from '../types/api.js';
 import type { Diagnostics } from './diagnostics.js';
 import { routePrefixFor } from './slug.js';
+import { beginStep } from '../utils/reporter.js';
 
 /** Directory holding the machine-generated specs, relative to the project root. */
 export const SPEC_DIR = join('api', 'specs');
@@ -56,8 +57,15 @@ export async function loadApiSpecs(
   // projects that actually registered a spec. `src/api/` as a whole is
   // already dynamically imported by the pipeline, so this is belt-and-braces
   // for the case where some other entry point reaches this module directly.
+  //
+  // This import alone is the single biggest cost in the whole pipeline —
+  // ~1.5s cold, dominated by requiring the library's dependency tree (ajv,
+  // graphql, etc.) — so it gets its own visible step rather than vanishing
+  // into a silent pause before the first spec's line appears.
+  const loadStep = beginStep('loading OpenAPI validator', { indent: '  ' });
   const { bundle, createConfig, lint } = await import('@redocly/openapi-core');
   const config = await createConfig({ extends: ['minimal'] });
+  loadStep.done('loaded OpenAPI validator');
 
   const specs: ResolvedSpec[] = [];
 
@@ -76,6 +84,8 @@ export async function loadApiSpecs(
       continue;
     }
 
+    const specStep = beginStep(`${entry.spec}: linting`, { indent: '  ' });
+
     // Only error-severity problems are surfaced. The ruleset's warn-severity
     // rules are style opinions about the *API* — "every operation should have
     // security defined", "prefer no trailing slash" — not defects in the
@@ -87,6 +97,7 @@ export async function loadApiSpecs(
     const problems = (await lint({ ref: specPath, config })) as unknown as SpecProblem[];
     const errors = problems.filter((p) => p.severity === 'error');
     if (errors.length > 0) {
+      specStep.done(`${entry.spec}: lint failed`);
       diagnostics.fail(
         `Spec "${entry.spec}" is not valid OpenAPI:\n` +
           errors.map((p) => `      ${formatProblem(entry.spec, p)}`).join('\n'),
@@ -94,8 +105,10 @@ export async function loadApiSpecs(
       continue;
     }
 
+    specStep.update(`${entry.spec}: bundling`);
     const result = await bundle({ ref: specPath, config, dereference: false });
     const document = result.bundle.parsed as OpenApiDocument;
+    specStep.done(`${entry.spec}: linted · bundled`);
 
     specs.push({
       id: entry.id,

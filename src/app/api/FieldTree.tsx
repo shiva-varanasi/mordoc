@@ -229,11 +229,9 @@ function Field({ field, anchorPrefix, expanded, onToggle, depth }: FieldProps) {
 
       {field.requiredWhen && <p className={styles.condition}>Required when {field.requiredWhen}</p>}
 
-      {field.description && <div className={styles.description}>{renderTree(field.description)}</div>}
-
-      {field.note && (
-        <div className={styles.note}>
-          <span className={styles.noteLabel}>On this endpoint</span>
+      {(field.description || field.note) && (
+        <div className={styles.description}>
+          {renderTree(field.description)}
           {renderTree(field.note)}
         </div>
       )}

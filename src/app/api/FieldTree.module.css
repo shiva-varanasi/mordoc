@@ -5,7 +5,6 @@
   /* Reserved for actual interactive controls (variant tabs) — the type,
      schema-ref and format labels are plain metadata and stay neutral gray. */
   --field-accent-color:      var(--accent-emphasis);
-  --field-note-bg:           var(--color-surface);
   --field-code-bg:           var(--color-surface);
   --field-required-color:    #c22c2c;
 
@@ -182,7 +181,6 @@
 /* ── Body ───────────────────────────────────────────────────── */
 
 .description,
-.note,
 .condition,
 .enumRow,
 .recursive {
@@ -192,30 +190,12 @@
   margin-top: 0.25rem; /* mt-1 */
 }
 
-.description :global(p:last-child),
-.note :global(p:last-child) {
+.description :global(p:last-child) {
   margin-bottom: 0;
 }
 
 .condition {
   font-size: 0.8125rem;
-}
-
-.note {
-  padding: 0.5rem 0.75rem;
-  border-left: 2px solid var(--color-border);
-  background-color: var(--field-note-bg);
-  border-radius: 0 4px 4px 0;
-}
-
-.noteLabel {
-  display: block;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-fg-muted);
-  margin-bottom: 0.125rem;
 }
 
 .enumRow {

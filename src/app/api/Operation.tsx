@@ -137,7 +137,7 @@ export function Operation() {
             {view.summary}
           </h1>
           {view.deprecated && <p className={styles.deprecated}>This operation is deprecated.</p>}
-          <Endpoint method={view.method} path={view.path} isWebhook={view.isWebhook} />
+          <Endpoint method={view.method} path={view.path} />
         </header>
 
         <hr className={styles.separator} />

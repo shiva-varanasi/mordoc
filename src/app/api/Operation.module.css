@@ -4,17 +4,12 @@
 :root {
   --operation-rail-width:      420px;
   --operation-max-width:       48rem; /* max-w-3xl, for the description only */
-  /* Sized off ArticlePage/Content's own tokens so this box lines up with
-     the guide page's reading column on the left, and covers exactly the
-     surface a guide page spends on its reading column *plus* its TOC rail
-     (this page has no TOC — that space instead goes to the fields/rail
-     split below, and to the footer, which matches this same width — see
-     .footerArea). Centering a box `--toc-width` wider than the reading
-     column, in the same full-width containing block the reading column's
-     *narrower* containing block (which already excludes `--toc-width`)
-     sits in, yields an identical left margin on both — the extra width
-     lands only on the right. */
-  --operation-page-max-width:  calc(var(--article-max-width) + var(--toc-width));
+  /* Deliberately wider than the guide page's reading column + TOC rail
+     (80rem): the page splits into fields and code-sample columns, so it
+     uses more of a wide screen. Beyond that width the box is centered, so
+     its left edge no longer lines up with guide pages. The footer matches
+     this width — see .footerArea. */
+  --operation-page-max-width:  90rem;
 }
 
 /* ── Content container ─────────────────────────────────────

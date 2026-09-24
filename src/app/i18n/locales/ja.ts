@@ -60,6 +60,12 @@ export const ja: UiStrings = {
     goHomeButton: 'ホームに戻る',
   },
 
+  routeError: {
+    title: '問題が発生しました',
+    description: 'このページを読み込めませんでした。もう一度お試しください。',
+    reloadButton: 'ページを再読み込み',
+  },
+
   loading: {
     pageAriaLabel: 'ページを読み込み中',
   },

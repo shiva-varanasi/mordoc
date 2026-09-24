@@ -93,6 +93,7 @@ const COMPONENT_THEME_FILES: readonly { name: string; filename: string }[] = [
   { name: 'content', filename: 'content.css' },
   { name: 'article-page', filename: 'article-page.css' },
   { name: 'not-found', filename: 'not-found.css' },
+  { name: 'route-error', filename: 'route-error.css' },
   { name: 'skeleton', filename: 'skeleton.css' },
   { name: 'toc', filename: 'toc.css' },
   { name: 'hero', filename: 'hero.css' },

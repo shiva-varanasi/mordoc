@@ -60,6 +60,12 @@ export const de: UiStrings = {
     goHomeButton: 'Zur Startseite',
   },
 
+  routeError: {
+    title: 'Etwas ist schiefgelaufen',
+    description: 'Diese Seite konnte nicht geladen werden. Bitte erneut versuchen.',
+    reloadButton: 'Seite neu laden',
+  },
+
   loading: {
     pageAriaLabel: 'Seite wird geladen',
   },

@@ -60,6 +60,12 @@ export const it: UiStrings = {
     goHomeButton: 'Torna alla home',
   },
 
+  routeError: {
+    title: 'Qualcosa è andato storto',
+    description: 'Impossibile caricare questa pagina. Riprova.',
+    reloadButton: 'Ricarica la pagina',
+  },
+
   loading: {
     pageAriaLabel: 'Caricamento della pagina',
   },

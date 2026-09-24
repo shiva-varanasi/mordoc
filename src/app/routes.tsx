@@ -6,6 +6,7 @@ import { App } from './App.js';
 import { Content } from './content/Content.js';
 import { Operation } from './api/Operation.js';
 import { NotFound } from './content/not-found/NotFound.js';
+import { RouteError } from './content/route-error/RouteError.js';
 
 /**
  * The one canonical fact about which shell a page renders in. Set once per
@@ -79,8 +80,15 @@ export function buildRoutes(): RouteObject[] {
       Component: App,
       HydrateFallback: () => null,
       children: [
-        ...pageRoutes,
-        { path: '*', Component: NotFound, handle: { layout: 'article' as LayoutKind } },
+        // Pathless wrapper so loader/render errors render inside App's
+        // <Outlet /> (header and sidenav stay) rather than replacing the shell.
+        {
+          ErrorBoundary: RouteError,
+          children: [
+            ...pageRoutes,
+            { path: '*', Component: NotFound, handle: { layout: 'article' as LayoutKind } },
+          ],
+        },
       ],
     },
   ];

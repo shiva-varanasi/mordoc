@@ -68,6 +68,12 @@ export const en: UiStrings = {
     goHomeButton: 'Go home',
   },
 
+  routeError: {
+    title: 'Something went wrong',
+    description: 'This page failed to load. Please try again.',
+    reloadButton: 'Reload page',
+  },
+
   loading: {
     pageAriaLabel: 'Loading page',
   },

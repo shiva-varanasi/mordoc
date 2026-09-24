@@ -60,6 +60,12 @@ export const ru: UiStrings = {
     goHomeButton: 'На главную',
   },
 
+  routeError: {
+    title: 'Что-то пошло не так',
+    description: 'Не удалось загрузить эту страницу. Попробуйте ещё раз.',
+    reloadButton: 'Перезагрузить страницу',
+  },
+
   loading: {
     pageAriaLabel: 'Загрузка страницы',
   },

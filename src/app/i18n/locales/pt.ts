@@ -60,6 +60,12 @@ export const pt: UiStrings = {
     goHomeButton: 'Ir para o início',
   },
 
+  routeError: {
+    title: 'Algo deu errado',
+    description: 'Não foi possível carregar esta página. Tente novamente.',
+    reloadButton: 'Recarregar página',
+  },
+
   loading: {
     pageAriaLabel: 'Carregando página',
   },

@@ -35,6 +35,7 @@ import 'virtual:mordoc/theme/search-modal';
 import 'virtual:mordoc/theme/content';
 import 'virtual:mordoc/theme/article-page';
 import 'virtual:mordoc/theme/not-found';
+import 'virtual:mordoc/theme/route-error';
 import 'virtual:mordoc/theme/skeleton';
 import 'virtual:mordoc/theme/toc';
 import 'virtual:mordoc/theme/hero';

@@ -60,6 +60,12 @@ export const nl: UiStrings = {
     goHomeButton: 'Naar home',
   },
 
+  routeError: {
+    title: 'Er is iets misgegaan',
+    description: 'Deze pagina kon niet worden geladen. Probeer het opnieuw.',
+    reloadButton: 'Pagina opnieuw laden',
+  },
+
   loading: {
     pageAriaLabel: 'Pagina wordt geladen',
   },

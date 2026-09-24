@@ -60,6 +60,12 @@ export const zh: UiStrings = {
     goHomeButton: '返回首页',
   },
 
+  routeError: {
+    title: '出了点问题',
+    description: '此页面无法加载。请重试。',
+    reloadButton: '重新加载页面',
+  },
+
   loading: {
     pageAriaLabel: '正在加载页面',
   },

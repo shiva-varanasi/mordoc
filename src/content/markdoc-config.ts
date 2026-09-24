@@ -69,7 +69,7 @@ const heading: Schema = {
  */
 const link: Schema = {
   render: 'ContentLink',
-  children: ['strong', 'em', 'code', 's', 'html', 'text'],
+  children: ['strong', 'em', 'code', 's', 'text'],
   attributes: {
     href:  { type: String, required: true },
     title: { type: String },
@@ -93,7 +93,7 @@ const link: Schema = {
  */
 const linkTag: Schema = {
   render: 'ContentLink',
-  children: ['strong', 'em', 'code', 's', 'html', 'text'],
+  children: ['strong', 'em', 'code', 's', 'text'],
   attributes: {
     path:  { type: String, required: true },
     title: { type: String },

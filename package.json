@@ -24,11 +24,9 @@
     "prepublishOnly": "npm run build"
   },
   "keywords": [
-    "documentation",
+    "documentation-site-generator",
     "static-site-generator",
-    "markdoc",
-    "vite",
-    "react"
+    "mordoc"
   ],
   "license": "MIT",
   "devDependencies": {

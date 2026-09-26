@@ -9,16 +9,12 @@
   --field-required-color:    #c22c2c;
 
   --badge-conditional-color: #b06d10;
-  --badge-beta-color:        #8a5cd6;
-  --badge-internal-color:    #64748b;
 }
 
 :global(.dark) {
   --field-required-color:    #f07070;
 
   --badge-conditional-color: #e6a94a;
-  --badge-beta-color:        #b795ee;
-  --badge-internal-color:    #94a3b8;
 }
 
 /* ── Container — the bordered box wrapping a root-level field list.
@@ -175,8 +171,17 @@
 }
 
 .badge_conditional { color: var(--badge-conditional-color); }
-.badge_beta        { color: var(--badge-beta-color); }
-.badge_internal    { color: var(--badge-internal-color); }
+
+/* Free-text badge — inline-code shape on a light accent tint. Text stays
+   neutral so it doesn't read as an interactive control. */
+.badgeCode {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.0625rem 0.3125rem;
+  border-radius: 3px;
+  background-color: var(--accent-subtle);
+  color: var(--color-fg);
+}
 
 /* ── Body ───────────────────────────────────────────────────── */
 

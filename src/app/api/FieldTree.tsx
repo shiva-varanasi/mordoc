@@ -2,6 +2,7 @@ import React from 'react';
 import Markdoc from '@markdoc/markdoc';
 import type { RenderableTreeNode } from '@markdoc/markdoc';
 import { contentComponents } from '../content/component-map.js';
+import { CONDITIONAL_BADGE } from '../../types/api.js';
 import type { Badge, FieldView } from '../../types/api.js';
 import styles from './FieldTree.module.css';
 
@@ -66,12 +67,23 @@ function Sep() {
   return <span className={styles.sep}> </span>;
 }
 
-/** The badge keyword is its own label — the vocabulary is closed and English. */
+/**
+ * `conditional` is the reserved keyword and keeps its dedicated uppercase
+ * style. Any other badge is free text, shown verbatim as an inline-code chip.
+ */
 function BadgeChip({ badge }: { badge: Badge }) {
+  if (badge === CONDITIONAL_BADGE) {
+    return (
+      <span className={`${styles.badge} ${styles.badge_conditional}`}>
+        <Sep />
+        {badge}
+      </span>
+    );
+  }
   return (
-    <span className={`${styles.badge} ${styles[`badge_${badge}`] ?? ''}`}>
+    <span>
       <Sep />
-      {badge}
+      <code className={styles.badgeCode}>{badge}</code>
     </span>
   );
 }

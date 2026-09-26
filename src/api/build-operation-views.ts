@@ -1,5 +1,6 @@
 import type { Config, RenderableTreeNode } from '@markdoc/markdoc';
 import { createDefaultMarkdocConfig } from '../content/markdoc-config.js';
+import { CONDITIONAL_BADGE } from '../types/api.js';
 import type {
   EnrichmentField,
   ExampleView,
@@ -347,7 +348,7 @@ function checkConditionalBadges(
   diagnostics: Diagnostics,
 ): void {
   for (const field of flatten(fields)) {
-    if (!field.badges.includes('conditional')) continue;
+    if (!field.badges.includes(CONDITIONAL_BADGE)) continue;
     if (field.description || field.note || field.requiredWhen) continue;
     diagnostics.warn(
       `${operationId}: field "${field.path}" is badged "conditional" but has no description ` +

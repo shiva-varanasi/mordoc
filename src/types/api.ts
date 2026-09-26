@@ -132,15 +132,22 @@ export interface EnrichmentEntry {
 // ---------------------------------------------------------------------------
 
 /**
- * The closed badge vocabulary. Closed so typos are caught at build and
- * styling stays consistent instead of drifting into free-text visual noise.
- * The keyword is also the rendered label.
- *
- * `deprecated` is deliberately absent — it is derived from the spec's own
- * `deprecated: true` and is never authored.
+ * The one reserved badge keyword. OpenAPI cannot express every conditional
+ * rule, so a writer marks such a field `conditional` and Mordoc renders it
+ * with a dedicated style (and requires an explanation — see
+ * `checkConditionalBadges`). Matched case-insensitively; normalized to this
+ * lowercase form at parse time.
  */
-export const BADGES = ['conditional', 'beta', 'internal'] as const;
-export type Badge = (typeof BADGES)[number];
+export const CONDITIONAL_BADGE = 'conditional';
+
+/**
+ * An authored badge: either the reserved `conditional` keyword, or any other
+ * free text, rendered verbatim as an inline-code chip.
+ *
+ * `deprecated` is deliberately not authored — it is derived from the spec's
+ * own `deprecated: true`.
+ */
+export type Badge = string;
 
 /** Which namespace of an operation a `{% params %}` block addresses. */
 export type ParamsScope =
@@ -212,7 +219,7 @@ export interface FieldView {
   format?: string;
   default?: unknown;
   deprecated?: boolean;
-  /** Authored in enrichment; closed vocabulary; usually empty. */
+  /** Authored in enrichment; `conditional` or free text; usually empty. */
   badges: Badge[];
   description: RenderableTreeNode | null;
   descriptionSource: DescriptionSource;

@@ -3,7 +3,7 @@ import Markdoc from '@markdoc/markdoc';
 import type { Config, Node, RenderableTreeNode } from '@markdoc/markdoc';
 import { createDefaultMarkdocConfig } from '../content/markdoc-config.js';
 import { createSlugger } from '../content/slug.js';
-import { BADGES } from '../types/api.js';
+import { CONDITIONAL_BADGE } from '../types/api.js';
 import type {
   Badge,
   EnrichmentEntry,
@@ -84,7 +84,11 @@ function transformNodes(nodes: Node[], config: Config): RenderableTreeNode | nul
   return rendered;
 }
 
-/** Reads the `badge` heading annotation, validating it against the closed vocabulary. */
+/**
+ * Reads the `badge` heading annotation. `conditional` (any case) is the
+ * reserved keyword and is normalized to lowercase; any other non-empty string
+ * is free text and passes through verbatim.
+ */
 function readBadge(
   node: Node,
   fieldPath: string,
@@ -93,15 +97,16 @@ function readBadge(
 ): Badge | null {
   const raw = node.attributes['badge'];
   if (raw === undefined || raw === null) return null;
-  if (typeof raw === 'string' && (BADGES as readonly string[]).includes(raw)) {
-    return raw as Badge;
+  if (typeof raw === 'string') {
+    const text = raw.trim();
+    if (text === '') return null;
+    return text.toLowerCase() === CONDITIONAL_BADGE ? CONDITIONAL_BADGE : text;
   }
-  // Dropped rather than fatal: an unknown badge leaves the field rendering
-  // correctly, just without its marker. Listing the vocabulary makes the
-  // typo self-correcting.
+  // Dropped rather than fatal: a malformed badge leaves the field rendering
+  // correctly, just without its marker.
   diagnostics.warn(
-    `${filePath}: field "${fieldPath}" has unknown badge "${String(raw)}" — badge dropped. ` +
-      `Valid badges: ${BADGES.join(', ')}.`,
+    `${filePath}: field "${fieldPath}" has a non-text badge — badge dropped. ` +
+      `Write it as a quoted string, e.g. {% badge="Read-only" %}.`,
   );
   return null;
 }

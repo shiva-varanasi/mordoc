@@ -199,6 +199,21 @@
   margin-bottom: 0;
 }
 
+/* Inline code inside a description/note — this block never inherits
+   Typography.module.css's `.prose code` rule (it isn't wrapped in `.prose`,
+   only the operation's top-level narrative is — see Operation.tsx), so
+   without this it renders as bare unstyled text instead of a code chip. */
+.description :global(code) {
+  padding: 0.1em 0.375em;
+  background: var(--field-code-bg);
+  color: var(--color-content-fg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--inline-code-radius, 4px);
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  font-weight: 400;
+}
+
 .condition {
   font-size: 0.8125rem;
 }

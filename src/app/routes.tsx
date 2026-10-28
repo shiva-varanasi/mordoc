@@ -4,7 +4,18 @@ import pagesIndex from 'virtual:mordoc/pages-index';
 import loaders from 'virtual:mordoc/page-loaders';
 import { App } from './App.js';
 import { Content } from './content/Content.js';
+import { Operation } from './api/Operation.js';
 import { NotFound } from './content/not-found/NotFound.js';
+import { RouteError } from './content/route-error/RouteError.js';
+
+/**
+ * The one canonical fact about which shell a page renders in. Set once per
+ * route here (the only place that has both `pageIndex.kind` and
+ * `pageIndex.layout` at hand) and read via `useMatches()` by both `App`
+ * (macro grid: sidenav/menu) and `Content` (micro grid: landing vs. article)
+ * — neither should re-derive this from frontmatter independently.
+ */
+export type LayoutKind = 'landing' | 'article' | 'operation';
 
 /**
  * Builds the React Router route config from Mordoc's eager virtual
@@ -47,10 +58,16 @@ export function buildRoutes(): RouteObject[] {
           `virtual:mordoc/pages-index and virtual:mordoc/page-loaders are out of sync.`,
       );
     }
+    // Both flavors resolve their payload through the same lazy per-route
+    // module; `kind` decides only which component consumes it. Operation
+    // pages therefore inherit code-splitting, preloading and SSR hydration
+    // from the existing machinery rather than needing a parallel path.
+    const layoutKind: LayoutKind =
+      pageIndex.kind === 'operation' ? 'operation' : pageIndex.layout === 'landing' ? 'landing' : 'article';
     const common = {
       loader: async () => (await pageLoader()).default,
-      Component: Content,
-      handle: { layout: pageIndex.layout ?? 'content' },
+      Component: pageIndex.kind === 'operation' ? Operation : Content,
+      handle: { layout: layoutKind },
     };
     return pageIndex.routePath === '/'
       ? { index: true, ...common }
@@ -62,7 +79,17 @@ export function buildRoutes(): RouteObject[] {
       path: '/',
       Component: App,
       HydrateFallback: () => null,
-      children: [...pageRoutes, { path: '*', Component: NotFound }],
+      children: [
+        // Pathless wrapper so loader/render errors render inside App's
+        // <Outlet /> (header and sidenav stay) rather than replacing the shell.
+        {
+          ErrorBoundary: RouteError,
+          children: [
+            ...pageRoutes,
+            { path: '*', Component: NotFound, handle: { layout: 'article' as LayoutKind } },
+          ],
+        },
+      ],
     },
   ];
 }

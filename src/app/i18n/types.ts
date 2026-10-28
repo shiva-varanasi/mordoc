@@ -104,6 +104,15 @@ export interface UiStrings {
     goHomeButton: string;
   };
 
+  routeError: {
+    /** Generic page-load error heading. Original: "Something went wrong" */
+    title: string;
+    /** Generic page-load error body text. Original: "This page failed to load. Please try again." */
+    description: string;
+    /** Page-load error button label (reloads the page). Original: "Reload page" */
+    reloadButton: string;
+  };
+
   loading: {
     /** Skeleton page aria-label shown during SPA navigations. Original: "Loading page" */
     pageAriaLabel: string;

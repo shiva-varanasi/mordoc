@@ -40,10 +40,18 @@ const LANG_ALIASES: Record<string, string> = {
   js:   'javascript',
   ts:   'typescript',
   sh:   'bash',
+  // Prism has no "curl" grammar — a curl invocation is shell syntax, so it
+  // highlights (and its display name still reads "cURL") via the bash
+  // grammar already loaded above.
+  curl: 'bash',
 };
 
+// Keyed by the *original* language, before aliasing — "curl" would otherwise
+// display as "Bash" once it's resolved to the bash grammar for highlighting.
 const DISPLAY_NAMES: Record<string, string> = {
+  html: 'HTML',
   markup: 'HTML',
+  curl: 'cURL',
 };
 
 function normalize(lang: string): string {
@@ -51,8 +59,9 @@ function normalize(lang: string): string {
   return LANG_ALIASES[lower] ?? lower;
 }
 
-function displayName(normalized: string): string {
-  return DISPLAY_NAMES[normalized] ?? (normalized.charAt(0).toUpperCase() + normalized.slice(1));
+function displayName(original: string): string {
+  const lower = original.toLowerCase();
+  return DISPLAY_NAMES[lower] ?? (lower.charAt(0).toUpperCase() + lower.slice(1));
 }
 
 export function CodeBlock({ language = '', content = '' }: CodeBlockProps) {
@@ -94,7 +103,7 @@ export function CodeBlock({ language = '', content = '' }: CodeBlockProps) {
   return (
     <div className={styles.wrapper} data-pagefind-ignore>
       <div className={styles.header}>
-        <span className={styles.language}>{displayName(lang)}</span>
+        <span className={styles.language}>{displayName(language)}</span>
         <button
           className={styles.copyButton}
           onClick={handleCopy}

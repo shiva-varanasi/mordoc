@@ -60,6 +60,12 @@ export const fr: UiStrings = {
     goHomeButton: 'Retour à l’accueil',
   },
 
+  routeError: {
+    title: 'Une erreur s’est produite',
+    description: 'Cette page n’a pas pu être chargée. Veuillez réessayer.',
+    reloadButton: 'Recharger la page',
+  },
+
   loading: {
     pageAriaLabel: 'Chargement de la page',
   },

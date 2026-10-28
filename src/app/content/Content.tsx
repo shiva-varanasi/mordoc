@@ -1,9 +1,10 @@
-import { useLoaderData } from 'react-router';
+import { useLoaderData, useMatches } from 'react-router';
 import { ArticlePage } from './article/ArticlePage.js';
 import { LandingPage } from './landing/LandingPage.js';
 import { Toc } from './toc/Toc.js';
 import { Footer } from './footer/Footer.js';
 import type { PageData } from '../../types/content.js';
+import type { LayoutKind } from '../routes.js';
 import styles from './Content.module.css';
 
 /**
@@ -21,16 +22,17 @@ import styles from './Content.module.css';
  *    ArticlePage's own content.
  *  - Landing flavor: full width, no TOC, Footer stacked below.
  *
- * `pageData.frontmatter.layout` (already present on `Frontmatter`) is what
- * routes.tsx's `handle.layout` mirrors for App's own sidenav/hamburger
- * decision — this is the same information, read directly off the
- * already-resolved loader data instead of via route handle, since Content
- * has it at hand anyway.
+ * Reads `layoutKind` off the route `handle` (the same value App reads for
+ * its own sidenav/hamburger decision) rather than re-deriving it from
+ * `pageData.frontmatter.layout` — one canonical source instead of two that
+ * could drift apart.
  */
 export function Content() {
   const pageData = useLoaderData() as PageData;
+  const matches = useMatches();
+  const layoutKind = (matches.at(-1)?.handle as { layout?: LayoutKind } | undefined)?.layout;
 
-  if (pageData.frontmatter.layout === 'landing') {
+  if (layoutKind === 'landing') {
     return (
       <div className={styles.landingLayout}>
         <LandingPage />

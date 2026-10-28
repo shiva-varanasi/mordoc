@@ -1,0 +1,278 @@
+/* ============================================================
+   FIELD TREE TOKENS
+   ============================================================ */
+:root {
+  /* Reserved for actual interactive controls (variant tabs) — the type,
+     schema-ref and format labels are plain metadata and stay neutral gray. */
+  --field-accent-color:      var(--accent-emphasis);
+  --field-code-bg:           var(--color-surface);
+  --field-required-color:    #c22c2c;
+
+  --badge-conditional-color: #b06d10;
+}
+
+:global(.dark) {
+  --field-required-color:    #f07070;
+
+  --badge-conditional-color: #e6a94a;
+}
+
+/* ── Container — the bordered box wrapping a root-level field list.
+   Nested levels sit inside it, indented, rather than each getting their
+   own box (see `.children` below). ───────────────────────────────── */
+.list[data-depth='0'] {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 0 1rem;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item + .item {
+  border-top: 1px solid color-mix(in oklch, var(--color-border) 60%, transparent);
+}
+
+.field {
+  padding: 0.75rem 0;
+}
+
+/* ── Header row ─────────────────────────────────────────────── */
+
+/* This is an <h4> (see FieldTree.tsx) purely so Pagefind can anchor search
+   sub-results to it — reset every default heading style so it still renders
+   as a plain metadata row, not a heading. */
+.row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: inherit;
+  font-weight: normal;
+  /* Deep-linked fields are scrolled to by the browser; offset so the sticky
+     header doesn't cover the row that was just navigated to. Lives here now
+     rather than on .field because .row is the element the id (and so the
+     scroll target) actually lives on. */
+  scroll-margin-top: calc(var(--header-height) + 1rem);
+}
+
+.anchorLink {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  opacity: 0;
+  color: var(--color-fg-muted);
+  text-decoration: none;
+  transition: opacity 0.15s ease, color 0.15s ease;
+  position: relative;
+}
+
+.row:hover .anchorLink {
+  opacity: 1;
+}
+
+.anchorLink:hover {
+  color: var(--field-accent-color);
+}
+
+.anchorLink:focus-visible {
+  outline: 2px solid var(--field-accent-color);
+  outline-offset: 2px;
+  border-radius: 2px;
+  opacity: 1;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-surface);
+  color: var(--color-fg);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 0.2em 0.55em;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.name {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-fg);
+}
+
+/* See Sep() in FieldTree.tsx — a real space character, zero-width. */
+.sep {
+  font-size: 0;
+  line-height: 0;
+}
+
+.type,
+.format,
+.schemaRef {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-fg-muted);
+}
+
+.required,
+.deprecated,
+.badge {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.required   { color: var(--field-required-color); }
+.deprecated { color: var(--color-fg-muted); text-decoration: line-through; }
+
+/* ── Expand control ─────────────────────────────────────────── */
+
+.expandToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem; /* gap-1.5 */
+  height: 1.75rem; /* h-7 */
+  margin-top: 0.5rem;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  padding: 0 0.5rem; /* px-2 */
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem; /* text-xs */
+  font-weight: 500; /* font-medium */
+  color: color-mix(in oklch, var(--color-fg) 80%, transparent); /* text-foreground/80 */
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.expandToggle:hover {
+  color: var(--color-fg);
+  background-color: var(--color-bg-hover);
+}
+
+.expandIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.875rem; /* h-3.5 w-3.5 */
+  height: 0.875rem;
+  flex-shrink: 0;
+}
+
+.badge_conditional { color: var(--badge-conditional-color); }
+
+/* Free-text badge — inline-code shape on a light accent tint. Text stays
+   neutral so it doesn't read as an interactive control. */
+.badgeCode {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.0625rem 0.3125rem;
+  border-radius: 3px;
+  background-color: var(--accent-subtle);
+  color: var(--color-fg);
+}
+
+/* ── Body ───────────────────────────────────────────────────── */
+
+.description,
+.condition,
+.enumRow,
+.recursive {
+  font-size: 0.875rem; /* text-sm */
+  line-height: 1.5; /* leading-6 */
+  color: var(--color-fg-muted);
+  margin-top: 0.25rem; /* mt-1 */
+}
+
+.description :global(p:last-child) {
+  margin-bottom: 0;
+}
+
+/* Inline code inside a description/note — this block never inherits
+   Typography.module.css's `.prose code` rule (it isn't wrapped in `.prose`,
+   only the operation's top-level narrative is — see Operation.tsx), so
+   without this it renders as bare unstyled text instead of a code chip. */
+.description :global(code) {
+  padding: 0.1em 0.375em;
+  background: var(--field-code-bg);
+  color: var(--color-content-fg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--inline-code-radius, 4px);
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  font-weight: 400;
+}
+
+.condition {
+  font-size: 0.8125rem;
+}
+
+.enumRow {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.metaLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--color-fg-muted);
+}
+
+.enumValue {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.0625rem 0.3125rem;
+  border-radius: 3px;
+  background-color: var(--field-code-bg);
+  color: var(--color-fg);
+}
+
+/* ── Nesting ────────────────────────────────────────────────── */
+
+.children {
+  margin-top: 0.5rem;
+  margin-left: 1rem; /* ml-4 */
+  padding-left: 1rem; /* pl-4 */
+  border-left: 1px solid var(--color-border);
+}
+
+/* ── Variants ───────────────────────────────────────────────── */
+
+.variantTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.variantTab {
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.1875rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: none;
+  color: var(--color-fg-muted);
+  cursor: pointer;
+}
+
+.variantTabActive {
+  color: var(--field-accent-color);
+  border-color: currentColor;
+}

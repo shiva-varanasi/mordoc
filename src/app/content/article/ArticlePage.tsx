@@ -1,30 +1,16 @@
 import { useEffect } from 'react';
-import { Link, useLoaderData, useLocation } from 'react-router';
+import { useLoaderData } from 'react-router';
 import React from 'react';
 import Markdoc from '@markdoc/markdoc';
 import { useMordocData } from '../../data-context.js';
-import { detectCurrentLang, buildLangPrefix, stripLangPrefix, resolveLabel, applyLangToSidenav } from '../../lang-utils.js';
-import { samePath } from '../../path-utils.js';
 import { useUiStrings } from '../../i18n/useUiStrings.js';
 import { formatUiString } from '../../i18n/format.js';
 import type { PageData } from '../../../types/content.js';
-import type { SidenavConfig } from '../../../types/navigation.js';
-import { CodeBlock } from '../code-block/CodeBlock.js';
-import { Image } from '../image/Image.js';
-import { Clip } from '../clip/Clip.js';
-import { VideoEmbed } from '../video-embed/VideoEmbed.js';
-import { Diagram } from '../diagram/Diagram.js';
-import { Callout } from '../callout/Callout.js';
-import { Card } from '../card/Card.js';
-import { CardGrid } from '../card/CardGrid.js';
-import { Accordion } from '../accordion/Accordion.js';
-import { Accordions } from '../accordion/Accordions.js';
-import { Column } from '../columns/Column.js';
-import { Columns } from '../columns/Columns.js';
-import { ContentLink } from '../link/ContentLink.js';
-import { Heading } from '../heading/Heading.js';
-import { Button } from '../landing/button/Button.js';
+import { contentComponents } from '../component-map.js';
+import { Breadcrumb } from '../../breadcrumb/Breadcrumb.js';
+import { useBreadcrumbEntries } from '../../breadcrumb/useBreadcrumb.js';
 import styles from './ArticlePage.module.css';
+import typography from '../Typography.module.css';
 
 /**
  * Renders the article flavor of a content page: breadcrumb, title/description
@@ -44,126 +30,18 @@ import styles from './ArticlePage.module.css';
  * them. Same rule as `markdoc-config.ts` on the Node side.
  */
 
-interface BreadcrumbEntry {
-  label: string;
-  path?: string;
-}
-
-function findBreadcrumb(
-  items: SidenavConfig,
-  targetPath: string,
-  ancestors: BreadcrumbEntry[],
-): BreadcrumbEntry[] | null {
-  for (const item of items) {
-    const current: BreadcrumbEntry = { label: item.label, path: item.path };
-    if (item.path !== undefined && samePath(item.path, targetPath)) {
-      return [...ancestors, current];
-    }
-    if (item.children) {
-      const found = findBreadcrumb(item.children, targetPath, [...ancestors, current]);
-      if (found) return found;
-    }
-  }
-  return null;
-}
-
-function resolveActiveSidenavRaw(
-  navigation: ReturnType<typeof useMordocData>['navigation'],
-  contentPath: string,
-): { sectionLabel: string | null; sectionPath: string | null; sidenav: SidenavConfig } {
-  if (navigation.kind === 'sidenav') {
-    return { sectionLabel: null, sectionPath: null, sidenav: navigation.sidenav };
-  }
-  const match = navigation.topnav
-    .filter((item) => samePath(contentPath, item.path) || contentPath.startsWith(item.path + '/'))
-    .sort((a, b) => b.path.length - a.path.length)[0];
-  return {
-    sectionLabel: match?.label ?? null,
-    sectionPath: match?.path ?? null,
-    sidenav: match?.sidenav ?? [],
-  };
-}
-
 function estimateReadTime(renderable: unknown): number {
   const text = JSON.stringify(renderable);
   const wordCount = text.split(/\s+/).length;
   return Math.max(1, Math.round(wordCount / 200));
 }
 
-function BreadcrumbSep() {
-  return (
-    <span className={styles.breadcrumbSep} aria-hidden="true">
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="m9 18 6-6-6-6" />
-      </svg>
-    </span>
-  );
-}
-
-function Breadcrumb({ entries }: { entries: BreadcrumbEntry[] }) {
-  const t = useUiStrings();
-  if (entries.length === 0) return null;
-  const lastIndex = entries.length - 1;
-  return (
-    <nav className={styles.breadcrumb} aria-label={t.breadcrumb.ariaLabel}>
-      {entries.map((entry, i) => {
-        const isCurrent = i === lastIndex;
-        const isLink = !isCurrent && entry.path !== undefined;
-        return (
-          <span key={i} className={styles.breadcrumbItem}>
-            {i > 0 && <BreadcrumbSep />}
-            {isCurrent ? (
-              <span className={styles.breadcrumbCurrent} aria-current="page">
-                {entry.label}
-              </span>
-            ) : isLink ? (
-              <Link to={entry.path!} className={styles.breadcrumbLink}>
-                {entry.label}
-              </Link>
-            ) : (
-              <span className={styles.breadcrumbMuted}>{entry.label}</span>
-            )}
-          </span>
-        );
-      })}
-    </nav>
-  );
-}
-
 export function ArticlePage() {
   const pageData = useLoaderData() as PageData;
-  const { site, navigation, language, translations } = useMordocData();
-  const { pathname } = useLocation();
+  const { site } = useMordocData();
   const t = useUiStrings();
 
-  const currentLang = detectCurrentLang(pathname, language, site.defaultLanguage);
-  const contentPath = stripLangPrefix(pathname, currentLang, site.defaultLanguage);
-  const prefix = buildLangPrefix(currentLang, site.defaultLanguage);
-
-  const { sectionLabel, sectionPath, sidenav } = resolveActiveSidenavRaw(navigation, contentPath);
-  const processedSidenav = applyLangToSidenav(sidenav, prefix, currentLang, site.defaultLanguage, translations);
-
-  const rawBreadcrumb = findBreadcrumb(processedSidenav, pathname, []) ?? [];
-  const resolvedSectionLabel = sectionLabel
-    ? resolveLabel(sectionLabel, currentLang, site.defaultLanguage, translations)
-    : null;
-  const breadcrumb: BreadcrumbEntry[] = [
-    { label: t.breadcrumb.home, path: prefix || '/' },
-    ...(resolvedSectionLabel && sectionPath
-      ? [{ label: resolvedSectionLabel, path: `${prefix}${sectionPath}` }]
-      : []),
-    ...rawBreadcrumb,
-  ];
-
+  const breadcrumb = useBreadcrumbEntries();
   const readTime = estimateReadTime(pageData.renderable);
 
   useEffect(() => {
@@ -172,7 +50,7 @@ export function ArticlePage() {
   }, [pageData.frontmatter.title, site.name]);
 
   const rendered = Markdoc.renderers.react(pageData.renderable, React, {
-    components: { CodeBlock, Image, Clip, VideoEmbed, Callout, Card, CardGrid, Accordion, Accordions, Column, Columns, ContentLink, Heading, Button, Diagram },
+    components: contentComponents,
   });
 
   return (
@@ -181,7 +59,7 @@ export function ArticlePage() {
         <Breadcrumb entries={breadcrumb} />
       </div>
       <header className={styles.articleHeader}>
-        <h1 className={styles.title} data-pagefind-meta="title">{pageData.frontmatter.title}</h1>
+        <h1 className={typography.title} data-pagefind-meta="title">{pageData.frontmatter.title}</h1>
         {typeof pageData.frontmatter.description === 'string' && (
           <p className={styles.description}>{pageData.frontmatter.description}</p>
         )}
@@ -189,7 +67,7 @@ export function ArticlePage() {
           <span className={styles.readTime}>{formatUiString(t.article.readTime, { count: readTime })}</span>
         </div>
       </header>
-      <div className={styles.prose}>{rendered}</div>
+      <div className={typography.prose}>{rendered}</div>
     </article>
   );
 }

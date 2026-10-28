@@ -136,6 +136,16 @@ export interface PageMeta {
   routePath: string;
   /** Language code this page belongs to. */
   language: string;
+  /**
+   * Which flavor of route this is.
+   *
+   * `'page'` is an authored markdown page and renders through `Content`;
+   * `'operation'` is a generated API operation page and renders through
+   * `Operation`. Both resolve their payload through the same per-route lazy
+   * module, so the route table needs only this one discriminant to pick a
+   * component — the loader mechanism is identical.
+   */
+  kind: 'page' | 'operation';
   /** Present only when the page opts into the landing layout via `layout: landing` in frontmatter. */
   layout?: 'landing';
   /** True when this page's content falls back to the default language because no translation exists. */

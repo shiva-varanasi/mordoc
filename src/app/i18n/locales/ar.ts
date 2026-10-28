@@ -65,6 +65,12 @@ export const ar: UiStrings = {
     goHomeButton: 'العودة إلى الرئيسية',
   },
 
+  routeError: {
+    title: 'حدث خطأ ما',
+    description: 'تعذّر تحميل هذه الصفحة. يُرجى المحاولة مرة أخرى.',
+    reloadButton: 'إعادة تحميل الصفحة',
+  },
+
   loading: {
     pageAriaLabel: 'جارٍ تحميل الصفحة',
   },

@@ -1,8 +1,8 @@
 .footer {
-  max-width: var(--article-max-width);
+  max-width: var(--footer-max-width, var(--article-max-width));
   width: 100%;
   margin: 0 auto;
-  padding: 0 1.5rem 2rem;
+  padding: 0 var(--footer-padding-x, 1.5rem) 2rem;
   background: var(--color-bg);
   font-size: 0.875rem;
   color: var(--color-fg-muted);
@@ -10,8 +10,8 @@
 
 @media (min-width: 768px) {
   .footer {
-    padding-left: 2rem;
-    padding-right: 2rem;
+    padding-left: var(--footer-padding-x, 2rem);
+    padding-right: var(--footer-padding-x, 2rem);
   }
 }
 

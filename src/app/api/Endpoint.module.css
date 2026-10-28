@@ -1,0 +1,55 @@
+/* ============================================================
+   ENDPOINT TOKENS — method pill colors.
+
+   Deliberately independent of the site accent. HTTP method colors
+   are a shared vocabulary across every API reference a reader has
+   ever used, and that recognition is worth more than brand
+   consistency on this one element. A solid chip with light text
+   works the same in both themes, so unlike most tokens here these
+   have no dark-mode override.
+   ============================================================ */
+:root {
+  --method-fg:             #fff;
+  --method-get-color:      #15803d;
+  --method-post-color:     #1d63b5;
+  --method-put-color:      #b45309;
+  --method-patch-color:    #7c3aed;
+  --method-delete-color:   #c22c2c;
+  --method-default-color:  #475569;
+}
+
+.endpoint {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.method {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--method-fg);
+  background-color: var(--method-default-color);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+}
+
+.get    { background-color: var(--method-get-color); }
+.post   { background-color: var(--method-post-color); }
+.put    { background-color: var(--method-put-color); }
+.patch  { background-color: var(--method-patch-color); }
+.delete { background-color: var(--method-delete-color); }
+
+.path {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--color-fg);
+  /* A long path template must scroll inside the line rather than
+     stretching the article column. */
+  overflow-x: auto;
+  white-space: nowrap;
+}

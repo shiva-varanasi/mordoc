@@ -60,6 +60,12 @@ export const ko: UiStrings = {
     goHomeButton: '홈으로 이동',
   },
 
+  routeError: {
+    title: '문제가 발생했습니다',
+    description: '이 페이지를 불러오지 못했습니다. 다시 시도해 주세요.',
+    reloadButton: '페이지 새로고침',
+  },
+
   loading: {
     pageAriaLabel: '페이지를 불러오는 중',
   },

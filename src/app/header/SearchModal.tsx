@@ -8,10 +8,44 @@ import styles from './SearchModal.module.css';
  * Pagefind indexes built pages as directories, so result URLs have a
  * trailing slash (`/foo/`) while Mordoc's own routes never do (`/foo`).
  * Strip it before navigating so location.pathname matches sidenav/breadcrumb
- * config paths exactly.
+ * config paths exactly. A sub-result's URL may carry a `#fragment` (see
+ * bestAnchoredSubResult below) — that has to survive the strip, since it's
+ * the whole reason the click lands on the matched section instead of the
+ * top of the page.
  */
 function normalizePath(url: string): string {
-  return url.length > 1 && url.endsWith('/') ? url.slice(0, -1) : url;
+  const hashIndex = url.indexOf('#');
+  const path = hashIndex === -1 ? url : url.slice(0, hashIndex);
+  const hash = hashIndex === -1 ? '' : url.slice(hashIndex);
+  const normalizedPath = path.length > 1 && path.endsWith('/') ? path.slice(0, -1) : path;
+  return normalizedPath + hash;
+}
+
+/**
+ * Picks the sub-result to link to instead of the bare page.
+ *
+ * Pagefind always returns at least one sub-result per page, but the first
+ * one is frequently just "everything before the first heading" wearing the
+ * sub-result shape (no `anchor`, no `#fragment` in its `url`) — linking to
+ * that would be no different from linking to the page itself. Only a
+ * sub-result with `anchor` set actually starts at a real heading (a guide's
+ * section, or — since FieldTree.tsx gives every field row its own heading —
+ * an API parameter), so those are the only candidates.
+ *
+ * Among those, picks the one Pagefind itself scored highest for this query
+ * (the sum of its `weighted_locations`' `balanced_score`s) rather than the
+ * first by document position, so a page matching in several sections links
+ * to the section that actually matched best.
+ *
+ * Returns undefined when nothing beat the top-of-page bucket, so the caller
+ * falls back to the plain page result exactly as before this existed.
+ */
+function bestAnchoredSubResult(subResults: PagefindSubResult[] | undefined): PagefindSubResult | undefined {
+  const anchored = (subResults ?? []).filter((sr) => sr.anchor);
+  if (anchored.length === 0) return undefined;
+  const score = (sr: PagefindSubResult) =>
+    (sr.weighted_locations ?? []).reduce((sum, loc) => sum + loc.balanced_score, 0);
+  return anchored.reduce((best, sr) => (score(sr) > score(best) ? sr : best));
 }
 
 // Module-level singleton so the loaded Pagefind instance is reused across
@@ -64,6 +98,11 @@ interface SearchResult {
   id: string;
   url: string;
   title: string;
+  /** The matched section's own heading text — e.g. a guide's "Rate limits",
+   *  or (per FieldTree.tsx's per-field headings) an API parameter's name —
+   *  shown as a secondary line under `title`. Undefined when the best match
+   *  was the top-of-page bucket rather than a real heading. */
+  sectionTitle: string | undefined;
   excerpt: string;
 }
 
@@ -137,11 +176,17 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
         const resolved = await Promise.all(
           raw.slice(0, 8).map(async (r) => {
             const data = await r.data();
+            const section = bestAnchoredSubResult(data.sub_results);
             return {
               id: r.id,
-              url: data.url,
+              // The page title always stays primary (see .resultTitle below)
+              // — a bare section/parameter name read on its own would lose
+              // which page it's even on — so only the link target and
+              // excerpt switch to the matched section's.
+              url: section?.url ?? data.url,
               title: data.meta?.title ?? data.url,
-              excerpt: data.excerpt,
+              sectionTitle: section?.title,
+              excerpt: section?.excerpt ?? data.excerpt,
             };
           }),
         );
@@ -243,6 +288,9 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
                 onMouseEnter={() => setSelectedIndex(i)}
               >
                 <span className={styles.resultTitle}>{result.title}</span>
+                {result.sectionTitle && (
+                  <span className={styles.resultSection}>{result.sectionTitle}</span>
+                )}
                 {/* Pagefind wraps matched terms in <mark> — safe to inject as HTML */}
                 <span
                   className={styles.resultExcerpt}

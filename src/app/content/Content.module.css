@@ -1,19 +1,23 @@
 /* ============================================================
    CONTENT TOKENS — layout sizing shared across multiple sibling
    subtrees of content/ (Footer, NotFound, Skeleton, and ArticlePage
-   all read --article-max-width to align on the same column width).
-   Owned here because Content is the top-level component for this
-   subtree; App owns only the outer .contentArea box (App.module.css).
+   all read --article-max-width to align on the same column width;
+   Hero, Section, and Footer's landing override below all read
+   --landing-max-width the same way). Owned here because Content is
+   the top-level component for this subtree; App owns only the outer
+   .contentArea box (App.module.css).
    --page-gutter used to live here too, but it was only ever consumed
    by Hero and Section inside landing/ — not shared across content/'s
    siblings the way the tokens above are, so it didn't belong at this
-   level. It also didn't need to be a token at all: Hero and Section
-   already each hardcode their own matching --hero-inner-max/max-width
-   (72rem) with no shared token keeping those in sync, so the gutter is
-   now the same kind of plain literal, inlined directly in each file. */
+   level; it stays a plain literal inlined in each file instead.
+   --landing-max-width is different: Footer now has to match it too
+   (see .landingLayout below), so unlike the gutter it can't be left
+   as a same-value literal repeated in three places without them
+   silently drifting apart the next time one changes. */
 :root {
-  --toc-width:         16rem;
-  --article-max-width: 64rem;
+  --toc-width:          16rem;
+  --article-max-width:  64rem;
+  --landing-max-width:  72rem;
 }
 
 /* ── Article layout ──────────────────────────────────────────
@@ -67,9 +71,13 @@
   }
 }
 
-/* ── Landing layout — full width, no TOC column, Footer stacked below ── */
+/* ── Landing layout — full width, no TOC column, Footer stacked below ──
+   --footer-max-width widens Footer (default: --article-max-width, sized
+   for the guide reading column) to match Hero/Section's own width here,
+   so Footer doesn't sit narrower than the content above it. */
 .landingLayout {
   display: flex;
   flex-direction: column;
   min-height: calc(100svh - var(--header-height));
+  --footer-max-width: var(--landing-max-width);
 }

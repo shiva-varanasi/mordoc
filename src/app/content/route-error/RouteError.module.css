@@ -1,0 +1,43 @@
+/* ── Page shell — mirrors the article-column layout from Content ── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: calc(100svh - var(--header-height));
+}
+
+.articleArea {
+  flex: 1;
+}
+
+.article {
+  max-width: var(--article-max-width);
+  width: 100%;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .article {
+    padding: 3rem 2rem;
+  }
+}
+
+/* ── Heading + description ──────────────────────────────────── */
+
+.title {
+  margin: 0 0 0.75rem;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--color-fg);
+}
+
+.description {
+  margin: 0 0 2rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--color-content-fg);
+}

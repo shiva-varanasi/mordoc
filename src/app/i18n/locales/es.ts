@@ -60,6 +60,12 @@ export const es: UiStrings = {
     goHomeButton: 'Ir al inicio',
   },
 
+  routeError: {
+    title: 'Algo salió mal',
+    description: 'No se pudo cargar esta página. Inténtalo de nuevo.',
+    reloadButton: 'Recargar página',
+  },
+
   loading: {
     pageAriaLabel: 'Cargando página',
   },

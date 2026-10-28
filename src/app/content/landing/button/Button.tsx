@@ -23,6 +23,8 @@ import styles from './Button.module.css';
 interface ButtonProps {
   path: string;
   variant?: 'primary' | 'secondary';
+  /** Force a full document load instead of a client-side navigation. Internal paths only. */
+  reloadDocument?: boolean;
   children?: React.ReactNode;
 }
 
@@ -30,7 +32,7 @@ function isExternal(path: string) {
   return path.startsWith('http://') || path.startsWith('https://') || path.startsWith('//');
 }
 
-export function Button({ path, variant = 'primary', children }: ButtonProps) {
+export function Button({ path, variant = 'primary', reloadDocument, children }: ButtonProps) {
   const className = `${styles.button} ${styles[variant]}`;
 
   if (isExternal(path)) {
@@ -42,7 +44,7 @@ export function Button({ path, variant = 'primary', children }: ButtonProps) {
   }
 
   return (
-    <Link to={path} className={className} data-pagefind-ignore>
+    <Link to={path} className={className} reloadDocument={reloadDocument} data-pagefind-ignore>
       {children}
     </Link>
   );

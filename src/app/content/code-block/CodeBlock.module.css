@@ -17,6 +17,14 @@
   border-radius: var(--cb-radius);
   border: 1px solid var(--cb-border);
   overflow: hidden;
+  /* Inert in normal prose flow (a plain block with no imposed height lays
+     out identically whether or not it's also a flex container). Only
+     matters when an ancestor caps this wrapper's height — like the
+     operation page's example rail — in which case it lets `.pre` below be
+     the one part that stretches or shrinks to fill it. */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 /* ── Header ─────────────────────────────────────────────────── */
@@ -25,17 +33,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 1rem;
+  height: 2.75rem; /* h-11 */
+  padding: 0 1rem;
   background-color: var(--cb-bg);
   border-bottom: 1px solid var(--cb-border);
+  flex-shrink: 0;
 }
 
 .language {
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--color-fg-muted);
-  text-transform: capitalize;
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
 }
 
 /* ── Copy button ─────────────────────────────────────────────── */
@@ -44,7 +53,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.25rem;
+  width: 1.75rem; /* h-7 w-7 */
+  height: 1.75rem;
   background: transparent;
   border: none;
   color: var(--color-fg-muted);
@@ -71,6 +81,11 @@
   overflow-x: auto;
   overflow-y: auto;
   max-height: var(--cb-max-height);
+  /* Only grows/shrinks when `.wrapper`'s own height is externally
+     constrained (see `.wrapper`'s comment above) — a no-op in normal prose
+     flow, where there's no extra space to distribute. */
+  flex: 1 1 auto;
+  min-height: 0;
   font-family: var(--font-mono);
   font-size: 0.875rem;
   line-height: 1.7;

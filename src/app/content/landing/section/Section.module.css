@@ -33,7 +33,7 @@
 .inner {
   position: relative;
   z-index: 1;
-  max-width: 72rem;
+  max-width: var(--landing-max-width);
   margin: 0 auto;
   padding: 4rem 2.5rem;
 }

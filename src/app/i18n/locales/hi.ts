@@ -60,6 +60,12 @@ export const hi: UiStrings = {
     goHomeButton: 'होम पर जाएं',
   },
 
+  routeError: {
+    title: 'कुछ गलत हो गया',
+    description: 'यह पेज लोड नहीं हो सका। कृपया पुनः प्रयास करें।',
+    reloadButton: 'पेज रीलोड करें',
+  },
+
   loading: {
     pageAriaLabel: 'पेज लोड हो रहा है',
   },

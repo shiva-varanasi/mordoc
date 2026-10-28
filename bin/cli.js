@@ -8,10 +8,11 @@ import { runDevCommand } from '../dist/cli/dev.js';
 import { runBuildCommand } from '../dist/cli/build.js';
 
 const command = process.argv[2];
+const verbose = process.argv.includes('--verbose');
 
 if (command === 'dev') {
   try {
-    await runDevCommand({ projectRoot: process.cwd() });
+    await runDevCommand({ projectRoot: process.cwd(), verbose });
   } catch (err) {
     console.error('\n✘ Dev server failed to start:\n');
     console.error(err.message);
@@ -19,16 +20,18 @@ if (command === 'dev') {
   }
 } else if (command === 'build') {
   try {
-    await runBuildCommand({ projectRoot: process.cwd() });
+    await runBuildCommand({ projectRoot: process.cwd(), verbose });
   } catch (err) {
     console.error('\n✘ Build failed:\n');
     console.error(err.stack ?? err.message);
     process.exit(1);
   }
 } else {
-  console.log('Usage: mordoc <command>');
+  console.log('Usage: mordoc <command> [--verbose]');
   console.log('\nCommands:');
   console.log('  dev      Start the Mordoc dev server');
   console.log('  build    Render the project to static HTML in dist/');
+  console.log('\nOptions:');
+  console.log('  --verbose    Print full detail instead of collapsed summaries');
   process.exit(1);
 }

@@ -2,7 +2,6 @@ import React from 'react';
 import Markdoc from '@markdoc/markdoc';
 import type { RenderableTreeNode } from '@markdoc/markdoc';
 import { contentComponents } from '../content/component-map.js';
-import { CONDITIONAL_BADGE } from '../../types/api.js';
 import type { Badge, FieldView } from '../../types/api.js';
 import styles from './FieldTree.module.css';
 
@@ -72,7 +71,8 @@ function Sep() {
  * style. Any other badge is free text, shown verbatim as an inline-code chip.
  */
 function BadgeChip({ badge }: { badge: Badge }) {
-  if (badge === CONDITIONAL_BADGE) {
+  // Keep in sync with CONDITIONAL_BADGE in src/types/api.ts (not shipped in the npm package).
+  if (badge === 'conditional') {
     return (
       <span className={`${styles.badge} ${styles.badge_conditional}`}>
         <Sep />

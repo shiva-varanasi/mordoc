@@ -17,3 +17,14 @@ Then in this folder:
 npm run build   # static site in dist/
 npm run dev     # development server
 ```
+
+## Open the built site
+
+Build the site, then serve `dist/` with any static file server, for example:
+
+```bash
+npm run build
+python3 -m http.server 4173 -d dist
+```
+
+Open http://localhost:4173. This is the site as it is published. Stop the server with Ctrl+C.

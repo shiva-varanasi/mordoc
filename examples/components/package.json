@@ -1,0 +1,9 @@
+{
+  "name": "mordoc-example-components",
+  "private": true,
+  "description": "Every Mordoc component and page type in the default look.",
+  "scripts": {
+    "dev": "node ../../bin/cli.js dev",
+    "build": "node ../../bin/cli.js build"
+  }
+}

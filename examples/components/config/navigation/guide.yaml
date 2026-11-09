@@ -1,0 +1,26 @@
+- label: Overview
+  path: /guide
+
+- label: Components
+  expanded: true
+  children:
+    - label: Callouts
+      path: /guide/callouts
+    - label: Cards
+      path: /guide/cards
+    - label: Buttons
+      path: /guide/buttons
+    - label: Accordions
+      path: /guide/accordions
+    - label: Columns
+      path: /guide/columns
+
+- label: Text
+  expanded: true
+  children:
+    - label: Headings and tables
+      path: /guide/text
+    - label: Links
+      path: /guide/links
+    - label: Code
+      path: /guide/code

@@ -1,0 +1,7 @@
+- label: Guide
+  path: /guide
+  sidenav: guide.yaml
+
+- label: Media
+  path: /media
+  sidenav: media.yaml

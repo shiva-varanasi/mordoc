@@ -79,7 +79,7 @@
 }
 
 /* ── Play toggle — same circular-button vocabulary as Clip.module.css's
-   .toggle and Image.module.css's .closeButton, centered over the card. ── */
+   .toggle and AdvImage.module.css's .closeButton, centered over the card. ── */
 
 .toggle {
   position: absolute;

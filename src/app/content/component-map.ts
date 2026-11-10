@@ -1,5 +1,6 @@
 import { CodeBlock } from './code-block/CodeBlock.js';
 import { Image } from './image/Image.js';
+import { AdvImage } from './adv-image/AdvImage.js';
 import { Clip } from './clip/Clip.js';
 import { VideoEmbed } from './video-embed/VideoEmbed.js';
 import { Diagram } from './diagram/Diagram.js';
@@ -31,6 +32,7 @@ import { Button } from './landing/button/Button.js';
 export const contentComponents = {
   CodeBlock,
   Image,
+  AdvImage,
   Clip,
   VideoEmbed,
   Callout,

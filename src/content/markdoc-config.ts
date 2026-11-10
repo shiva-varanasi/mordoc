@@ -141,7 +141,7 @@ const fence: Schema = {
 };
 
 /**
- * Routes inline images to the Image React component, which adds a lightbox.
+ * Routes Markdown images to the Image React component, a plain <img>.
  * Markdoc's built-in image node provides `src`, `alt`, and `title` attributes.
  */
 const image: Schema = {
@@ -173,6 +173,29 @@ const imageTag: Schema = {
     src:   { type: String, required: true },
     alt:   { type: String },
     title: { type: String },
+  },
+};
+
+/**
+ * Advanced image tag — an image with a visible caption, which opens larger
+ * when clicked: `{% advImage src="..." alt="..." caption="..." /%}`.
+ *
+ * It renders a <figure>, a block element, and HTML allows no block element
+ * inside a paragraph. `inline: false` makes Markdoc's validation report an
+ * advanced image written inside a sentence or a link, so it only stands on
+ * its own line.
+ *
+ * `caption` (not `title`) because it is visible text below the image, where
+ * an image's `title` only shows when hovering.
+ */
+const advImageTag: Schema = {
+  render: 'AdvImage',
+  children: [],
+  inline: false,
+  attributes: {
+    src:     { type: String, required: true },
+    alt:     { type: String },
+    caption: { type: String },
   },
 };
 
@@ -513,6 +536,6 @@ const params: Schema = {
 export function createDefaultMarkdocConfig(): Config {
   return {
     nodes: { heading, link, fence, image },
-    tags: { callout, card, cardGrid, hero, section, button, link: linkTag, image: imageTag, clip, videoEmbed, accordion, accordions, column, columns, params },
+    tags: { callout, card, cardGrid, hero, section, button, link: linkTag, image: imageTag, advImage: advImageTag, clip, videoEmbed, accordion, accordions, column, columns, params },
   };
 }

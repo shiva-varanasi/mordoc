@@ -1,0 +1,14 @@
+- label: Overview
+  path: /media
+
+- label: Media
+  expanded: true
+  children:
+    - label: Images
+      path: /media/images
+    - label: Advanced images
+      path: /media/advanced-images
+    - label: Video
+      path: /media/video
+    - label: Diagrams
+      path: /media/diagrams

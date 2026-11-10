@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-label="A map of the Orbit system">
+  <rect width="640" height="360" fill="#0f172a"/>
+  <circle cx="320" cy="180" r="28" fill="#fbbf24"/>
+  <ellipse cx="320" cy="180" rx="110" ry="60" fill="none" stroke="#64748b" stroke-width="2"/>
+  <ellipse cx="320" cy="180" rx="200" ry="110" fill="none" stroke="#64748b" stroke-width="2"/>
+  <ellipse cx="320" cy="180" rx="290" ry="160" fill="none" stroke="#64748b" stroke-width="2"/>
+  <circle cx="430" cy="180" r="10" fill="#38bdf8"/>
+  <circle cx="200" cy="100" r="14" fill="#f87171"/>
+  <circle cx="560" cy="250" r="18" fill="#a78bfa"/>
+</svg>

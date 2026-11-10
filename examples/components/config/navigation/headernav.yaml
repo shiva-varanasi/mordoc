@@ -1,0 +1,10 @@
+- label: Guide
+  path: /guide
+
+- label: Status
+  path: https://status.example.com
+  variant: secondary
+
+- label: Get Orbit
+  path: /guide/buttons
+  variant: primary

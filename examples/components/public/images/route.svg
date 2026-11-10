@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="480" viewBox="0 0 1280 480">
+  <title>A dashed route with stops on a dark background, as on the map</title>
+  <rect width="1280" height="480" fill="#1d1a17"/>
+  <g fill="none" stroke="#D9A94E" stroke-width="3" stroke-linecap="round" stroke-dasharray="12 10" opacity="0.7">
+    <path d="M-20 460 C140 430 240 400 360 420 S560 440 680 380 S880 180 1000 200 S1180 300 1300 240"/>
+    <path d="M-20 60 C140 90 240 30 380 45 S600 120 760 95 S1010 30 1300 70" opacity="0.6"/>
+  </g>
+  <g fill="#D9A94E" opacity="0.8">
+    <circle cx="360" cy="420" r="7"/>
+    <circle cx="680" cy="380" r="7"/>
+    <circle cx="1000" cy="200" r="7"/>
+    <circle cx="380" cy="45" r="5"/>
+    <circle cx="760" cy="95" r="5"/>
+  </g>
+</svg>

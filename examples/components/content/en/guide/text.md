@@ -31,19 +31,19 @@ This heading has the ID `custom-id`, so [this link](#custom-id) goes straight to
 ## A table
 
 {% table %}
-* Planet
-* Moons
-* Distance from the sun
+* Stop
+* Days on foot
+* Distance from the Shire
 ---
-* Mercury
-* 0
-* 58 million km
+* Rivendell
+* 40
+* 750 km
 ---
-* Earth
-* 1
-* 150 million km
+* Moria
+* 55
+* 1,050 km
 ---
-* Mars
-* 2
-* 228 million km
+* Mordor
+* 120
+* 2,200 km
 {% /table %}

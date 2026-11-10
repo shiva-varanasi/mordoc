@@ -1,6 +1,6 @@
 {
-  "name": "Orbit",
-  "description": "A fictional app that shows every Mordoc component.",
+  "name": "Mordoc - Components",
+  "description": "Components is an example website that shows every Mordoc component.",
   "baseUrl": "https://components.example.com",
   "defaultLanguage": "en"
 }

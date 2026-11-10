@@ -7,19 +7,19 @@ A callout highlights a short message. There are four types, each with or without
 ## With a title
 
 {% callout type="note" title="Note" %}
-Orbit saves your work every minute.
+The guide saves your route every evening.
 {% /callout %}
 
 {% callout type="tip" title="Tip" %}
-Press the space bar to pause the orbit view.
+Rest in Rivendell before you cross the mountains.
 {% /callout %}
 
 {% callout type="warning" title="Warning" %}
-Deleting a planet also deletes its moons.
+The mountain pass closes when the first snow falls.
 {% /callout %}
 
 {% callout type="danger" title="Danger" %}
-Resetting the universe cannot be undone.
+Never enter Mordor without a guide.
 {% /callout %}
 
 ## Without a title
@@ -42,13 +42,13 @@ A danger without a title.
 
 ## With other content
 
-{% callout type="note" title="Before you start" %}
-- Install Orbit.
-- Open a new universe.
+{% callout type="note" title="Before you leave" %}
+- Pack food for the road.
+- Plan your route.
 
 ```bash
-orbit new my-universe
+journey plan the-shire mordor
 ```
 
-> Every universe starts with one star.
+> Every journey starts at your own front door.
 {% /callout %}

@@ -7,37 +7,37 @@ Code blocks show code with highlighting and a copy button.
 ## JavaScript
 
 ```js
-const planets = ['Mercury', 'Venus', 'Earth'];
-console.log(planets.length);
+const stops = ['The Shire', 'Rivendell', 'Moria'];
+console.log(stops.length);
 ```
 
 ## TypeScript
 
 ```ts
-interface Planet {
+interface Stop {
   name: string;
-  moons: number;
+  daysOnFoot: number;
 }
 ```
 
 ## Shell
 
 ```bash
-orbit new my-universe
-cd my-universe
+journey plan the-shire mordor
+cd my-journey
 ```
 
 ## JSON
 
 ```json
-{ "name": "Earth", "moons": 1 }
+{ "name": "Rivendell", "daysOnFoot": 40 }
 ```
 
 ## YAML
 
 ```yaml
-planet: Mars
-moons: 2
+stop: Moria
+daysOnFoot: 55
 ```
 
 ## Without a language

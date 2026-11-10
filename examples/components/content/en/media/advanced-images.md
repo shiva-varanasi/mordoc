@@ -6,12 +6,12 @@ An advanced image shows an image with a caption below it. A reader can click it,
 
 ## With a caption
 
-{% advancedImage src="/images/orbit-map.svg" alt="A map of the Orbit system" caption="The Orbit system" /%}
+{% advancedImage src="/images/mordor-map.jpg" alt="A map of the road to Mordor" caption="The road to Mordor" /%}
 
 ## Without a caption
 
-{% advancedImage src="/images/stars.svg" alt="A field of stars" /%}
+{% advancedImage src="/images/volcano.jpg" alt="A volcano in Mordor" /%}
 
 ## From a variable
 
-{% advancedImage src=$diagramImage alt="The Orbit system, from a variable" caption="The Orbit system, from a variable" /%}
+{% advancedImage src=$diagramImage alt="The road to Mordor, from a variable" caption="The road to Mordor, from a variable" /%}

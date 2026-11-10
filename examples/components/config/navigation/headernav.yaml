@@ -5,6 +5,6 @@
   path: https://status.example.com
   variant: secondary
 
-- label: Get Orbit
+- label: Plan your journey
   path: /guide/buttons
   variant: primary

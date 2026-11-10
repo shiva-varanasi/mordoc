@@ -178,7 +178,7 @@ const imageTag: Schema = {
 
 /**
  * Advanced image tag — an image with a visible caption, which opens larger
- * when clicked: `{% advImage src="..." alt="..." caption="..." /%}`.
+ * when clicked: `{% advancedImage src="..." alt="..." caption="..." /%}`.
  *
  * It renders a <figure>, a block element, and HTML allows no block element
  * inside a paragraph. `inline: false` makes Markdoc's validation report an
@@ -188,8 +188,8 @@ const imageTag: Schema = {
  * `caption` (not `title`) because it is visible text below the image, where
  * an image's `title` only shows when hovering.
  */
-const advImageTag: Schema = {
-  render: 'AdvImage',
+const advancedImageTag: Schema = {
+  render: 'AdvancedImage',
   children: [],
   inline: false,
   attributes: {
@@ -536,6 +536,6 @@ const params: Schema = {
 export function createDefaultMarkdocConfig(): Config {
   return {
     nodes: { heading, link, fence, image },
-    tags: { callout, card, cardGrid, hero, section, button, link: linkTag, image: imageTag, advImage: advImageTag, clip, videoEmbed, accordion, accordions, column, columns, params },
+    tags: { callout, card, cardGrid, hero, section, button, link: linkTag, image: imageTag, advancedImage: advancedImageTag, clip, videoEmbed, accordion, accordions, column, columns, params },
   };
 }

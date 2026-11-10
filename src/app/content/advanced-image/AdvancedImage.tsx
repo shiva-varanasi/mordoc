@@ -1,5 +1,5 @@
 /**
- * AdvImage — the `advImage` tag: an image with a caption, which opens larger
+ * AdvancedImage — the `advancedImage` tag: an image with a caption, which opens larger
  * in a lightbox.
  *
  * Renders a <figure>; its image sits in a button, so the lightbox opens with
@@ -10,7 +10,7 @@
  * SSR safety: the portal is only rendered when `isOpen` is true, which starts
  * as false — so document.body is never accessed during server-side rendering.
  *
- * A <figure> is a block element, so the `advImage` tag in markdoc-config.ts may
+ * A <figure> is a block element, so the `advancedImage` tag in markdoc-config.ts may
  * only stand on its own line (`inline: false`), never inside a paragraph.
  * Registered in component-map.ts and LandingPage.tsx's components map.
  */
@@ -18,15 +18,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useUiStrings } from '../../i18n/useUiStrings.js';
-import styles from './AdvImage.module.css';
+import styles from './AdvancedImage.module.css';
 
-interface AdvImageProps {
+interface AdvancedImageProps {
   src: string;
   alt?: string;
   caption?: string;
 }
 
-export function AdvImage({ src, alt = '', caption }: AdvImageProps) {
+export function AdvancedImage({ src, alt = '', caption }: AdvancedImageProps) {
   const [isOpen, setIsOpen] = useState(false);
   const t = useUiStrings();
 
@@ -102,4 +102,4 @@ export function AdvImage({ src, alt = '', caption }: AdvImageProps) {
   );
 }
 
-export default AdvImage;
+export default AdvancedImage;

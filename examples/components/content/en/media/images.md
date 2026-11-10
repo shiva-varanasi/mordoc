@@ -22,4 +22,4 @@ Click the ![bell icon](/icons/bell.svg "Notifications") icon to see your notific
 
 ## An image in a link
 
-[![Orbit app](/icons/app.svg)](/guide) opens the guide.
+[{% image src="/icons/app.svg" alt="Orbit app" /%}](/guide) opens the guide.

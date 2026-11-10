@@ -1,5 +1,5 @@
 import Markdoc from '@markdoc/markdoc';
-import type { Config, RenderableTreeNode } from '@markdoc/markdoc';
+import type { Config, RenderableTreeNode, ValidateError } from '@markdoc/markdoc';
 import { createSlugger } from './slug.js';
 import { createDefaultMarkdocConfig } from './markdoc-config.js';
 import type { ParsedPage, TransformedPage, TocEntry } from '../types/content.js';
@@ -65,12 +65,18 @@ function extractToc(root: RenderableTreeNode): TocEntry[] {
  * The function is synchronous — no I/O happens here; the AST is already
  * in memory from the parse stage.
  *
+ * Before transforming, each page is validated with the same config, and the
+ * results of `Markdoc.validate()` are added to `validateErrors`, so the
+ * caller decides whether to report them or stop.
+ *
  * @param variables - Flat key-value map from config/variables.yaml. Merged
  *   before `slugger` so internal variables always take precedence.
+ * @param validateErrors - Collects the validation results of every page.
  */
 export function transformContent(
   pages: ParsedPage[],
   variables: Record<string, unknown> = {},
+  validateErrors: ValidateError[] = [],
 ): TransformedPage[] {
   const base = createDefaultMarkdocConfig();
   const out: TransformedPage[] = [];
@@ -83,6 +89,8 @@ export function transformContent(
       ...base,
       variables: { ...(base.variables ?? {}), ...variables, slugger },
     };
+
+    validateErrors.push(...Markdoc.validate(page.ast, config));
 
     const raw = Markdoc.transform(page.ast, config);
 

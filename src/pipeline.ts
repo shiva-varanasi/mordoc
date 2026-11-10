@@ -10,6 +10,12 @@ import { loadHeaderLinks } from './config/header-loader.js';
 import { loadFooterConfig } from './config/footer-loader.js';
 import { parseContent } from './content/content-parser.js';
 import { transformContent } from './content/content-transformer.js';
+import type { ValidateError } from '@markdoc/markdoc';
+import {
+  ValidationFailedError,
+  hasBlockingErrors,
+  reportValidateErrors,
+} from './content/content-validation.js';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 export { loadNavTranslations, loadHeaderLinks, loadFooterConfig };
@@ -80,10 +86,14 @@ export async function loadNavigation(projectRoot: string): Promise<NavigationCon
  * different bundler) can be added without touching this code.
  *
  * @param projectRoot - Absolute path to the user's project root.
+ * @param options.failOnContentErrors - Stop with a `ValidationFailedError`
+ *   when content validation finds an error. `mordoc build` sets it; the dev
+ *   server does not, so a mistake while writing is reported but the server
+ *   keeps running.
  */
 export async function runPipeline(
   projectRoot: string,
-  options: { verbose?: boolean } = {},
+  options: { verbose?: boolean; failOnContentErrors?: boolean } = {},
 ): Promise<MordocData> {
   const verbose = options.verbose ?? false;
   const overallStep = beginStep('reading the project');
@@ -111,8 +121,14 @@ export async function runPipeline(
 
   const variables = await loadVariables(projectRoot);
   const parsedContent = await parseContent(contentMap);
-  const transformedContent = transformContent(parsedContent, variables);
+  const validateErrors: ValidateError[] = [];
+  const transformedContent = transformContent(parsedContent, variables, validateErrors);
   configStep.done('config & content loaded');
+
+  reportValidateErrors(validateErrors, projectRoot);
+  if (options.failOnContentErrors && hasBlockingErrors(validateErrors)) {
+    throw new ValidationFailedError(validateErrors);
+  }
 
   // Runs after navigation and content are both in hand, because the
   // navigation checks compare the spec's operations against the authored nav
@@ -173,7 +189,11 @@ export async function reparsePage(
     entries: [entry],
     languages: [entry.language],
   });
-  const [transformed] = transformContent(parsed, variables);
+  // Reported, never thrown: this runs on every save in the dev server, which
+  // keeps running while the author fixes the page.
+  const validateErrors: ValidateError[] = [];
+  const [transformed] = transformContent(parsed, variables, validateErrors);
+  reportValidateErrors(validateErrors, process.cwd());
   if (!transformed) {
     // parseContent + transformContent both produce one output per input
     // entry, so this branch should be unreachable. Guarded so a future

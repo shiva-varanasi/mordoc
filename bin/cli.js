@@ -23,7 +23,9 @@ if (command === 'dev') {
     await runBuildCommand({ projectRoot: process.cwd(), verbose });
   } catch (err) {
     console.error('\n✘ Build failed:\n');
-    console.error(err.stack ?? err.message);
+    // Content errors are already listed for the author; a stack trace would
+    // only bury them.
+    console.error(err.name === 'ValidationFailedError' ? err.message : (err.stack ?? err.message));
     process.exit(1);
   }
 } else {

@@ -149,7 +149,7 @@ export async function runBuildCommand(options: BuildCommandOptions): Promise<voi
   console.log('\n  Mordoc build');
   console.log(`  Project: ${projectRoot}\n`);
 
-  const rawData = await runPipeline(projectRoot, { verbose });
+  const rawData = await runPipeline(projectRoot, { verbose, failOnContentErrors: true });
 
   const wipeStep = beginStep('clearing previous output');
   await fs.rm(clientOutDir, { recursive: true, force: true });

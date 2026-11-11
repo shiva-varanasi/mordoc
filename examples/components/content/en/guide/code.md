@@ -51,13 +51,13 @@ Plain text, with no highlighting.
 The address and the version come from the site's settings.
 
 ```js
-import { Orbit } from '@orbit/sdk';
+import { Journey } from '@components/journey';
 
-const orbit = new Orbit({ baseUrl: '{% $apiBaseUrl %}' });
+const journey = new Journey({ baseUrl: '{% $exampleApiBaseUrl %}' });
 ```
 
 ```bash
-npm install @orbit/sdk@{% $sdkVersion %}
+npm install @components/journey@{% $exampleSdkVersion %}
 ```
 
 ## Shown as written
@@ -66,6 +66,6 @@ A code block marked `{% process=false %}` shows Markdoc syntax exactly as writte
 
 ```markdown {% process=false %}
 {% callout type="tip" %}
-Orbit version {% $sdkVersion %} is out.
+Journey version {% $exampleSdkVersion %} is out.
 {% /callout %}
 ```

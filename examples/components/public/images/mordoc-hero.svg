@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400" viewBox="0 0 1200 400" fill="none">
+  <title>Abstract sandstone valley and watchtower</title>
+  <desc>Transparent hero banner with geometric terrain and a copper eye tower on the right, leaving open space for headings.</desc>
+  <g stroke-linejoin="round">
+    <path d="M0 295 100 315 165 310 265 350 390 372 550 386 700 375 835 343 925 326 1010 286 1100 269 1200 286V400H0Z" fill="#B5A18A" fill-opacity=".32"/>
+    <path d="m0 318 142 26 90-5 132 37 190 17 155-18 132-15 119-40 121-19 119 17v82H0Z" fill="#AA9176" fill-opacity=".48"/>
+    <path d="m0 352 130 7 126 25 195 12 214-5 141-25 102-8 126-31 166 8v65H0Z" fill="#917A63" fill-opacity=".68"/>
+    <path d="m0 380 180 5 135 15h415l148-20 130-2 88-23 104 7v38H0Z" fill="#80674F" fill-opacity=".65"/>
+    <g stroke="#B99B78" stroke-width="1.5" stroke-opacity=".65">
+      <path d="m0 318 142 26 90-5 132 37 190 17 155-18 132-15 119-40 121-19 119 17"/>
+      <path d="m0 352 130 7 126 25 195 12m214-5 141-25 102-8 126-31 166 8"/>
+      <path d="m878 380 130-2 88-23 104 7"/>
+    </g>
+    <path d="m1014 305 34-49 18-105-23-47 22-42-2 39 23 22 24-22-2-39 22 42-23 47 18 105 34 49-39-10-21-7-22 7Z" fill="#9D8264"/>
+    <path d="m1086 123 24-22-2-39 22 42-23 47 18 105 34 49-39-10-21-7-13 4Z" fill="#79624D"/>
+    <path d="m1063 101 23 22v169m-38-36 18-105m41 0 18 105" stroke="#C5AB8A" stroke-width="2"/>
+    <path d="M1074 290V192l12-16 13 16v96" stroke="#D1B997" stroke-width="4"/>
+    <path d="M1058 100q28-27 57 0-29 27-57 0Z" fill="#CB9760"/>
+    <path d="M1058 100q28-15 57 0" stroke="#E2BE8C" stroke-width="1.5"/>
+    <path d="M1086 85q-8 15 0 30 8-15 0-30Z" fill="#614B38"/>
+    <path d="m1002 320 45-19 39 9 32-18 82 20" stroke="#C4A780" stroke-width="2"/>
+  </g>
+</svg>

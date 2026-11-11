@@ -1,6 +1,6 @@
 ---
 title: Guide
-description: The components Orbit's docs use, one page each.
+description: The components this example website uses, one page each.
 ---
 
 The guide shows Mordoc's content components. Each page covers one component and all its options.

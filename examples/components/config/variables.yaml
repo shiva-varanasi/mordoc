@@ -1,5 +1,3 @@
-productName: Orbit
-supportEmail: help@orbit.example
-diagramImage: /images/orbit-map.svg
-apiBaseUrl: https://api.orbit.example
-sdkVersion: 2.4.0
+productName: Components
+supportEmail: help@components.example
+mapImage: /images/route-map.jpg

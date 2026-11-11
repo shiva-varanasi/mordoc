@@ -1,0 +1,9 @@
+<svg width="24" height="22" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="40" height="36" rx="8" fill="#FAF0EB"/>
+<!-- Pencil body -->
+<path d="M24 9L29 14L17 26L12 26L12 21L24 9Z" stroke="#D64518" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<!-- Eraser band -->
+<path d="M25.5 10.5L27.5 12.5" stroke="#D64518" stroke-width="2" stroke-linecap="round"/>
+<!-- Tip mark -->
+<path d="M12 21L12 26L17 26" stroke="#D64518" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

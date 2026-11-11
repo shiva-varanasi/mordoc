@@ -6,11 +6,11 @@ A clip plays a video file from the site. A video embed shows a video from a host
 
 ## A clip with a thumbnail and title
 
-{% clip src="/videos/orbit.mp4" thumbnail="/images/orbit-map.svg" title="Orbit in motion" alt="A planet circling a star" /%}
+{% clip src="/videos/volcano.mp4" thumbnail="/images/volcano-thumbnail.jpg" title="The volcano" alt="Smoke rising from a glowing volcano" /%}
 
 ## A clip without a thumbnail
 
-{% clip src="/videos/orbit.mp4" alt="A planet circling a star" /%}
+{% clip src="/videos/volcano.mp4" alt="Smoke rising from a glowing volcano" /%}
 
 ## A video embed
 
@@ -22,4 +22,4 @@ A clip plays a video file from the site. A video embed shows a video from a host
 
 ## A video from an unknown service
 
-{% videoEmbed src="https://video.example.com/watch/orbit" title="A video from an unknown service" thumbnail="/images/stars.svg" /%}
+{% videoEmbed src="https://video.example.com/watch/volcano" title="A video from an unknown service" thumbnail="/images/volcano.jpg" /%}

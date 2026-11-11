@@ -10,10 +10,10 @@ A card shows a short piece of content. Its look depends on the options it has.
 {% card title="Plain card" %}
 A card with only a title and text.
 {% /card %}
-{% card title="Icon card" icon="/icons/bell.svg" %}
+{% card title="Icon card" icon="/icons/writing.svg" %}
 A card with an icon.
 {% /card %}
-{% card title="Image card" image="/images/orbit-map.svg" %}
+{% card title="Image card" image="/images/route-map.jpg" %}
 A card with an image.
 {% /card %}
 {% /cardGrid %}
@@ -32,8 +32,8 @@ A tag shows a short label on the card.
 ## A card with only a title
 
 {% cardGrid cols="4" %}
-{% card title="Mercury" /%}
-{% card title="Venus" /%}
-{% card title="Earth" /%}
-{% card title="Mars" /%}
+{% card title="Stop A" /%}
+{% card title="Stop B" /%}
+{% card title="Stop C" /%}
+{% card title="Stop D" /%}
 {% /cardGrid %}

@@ -1,6 +1,6 @@
 # Components example site
 
-Every Mordoc component and page type, in Mordoc's default look. The site runs on the Mordoc code in this repository.
+An example website with every Mordoc component and page type, used to see them working and to test them. Its content follows a journey in four stops. The site runs on the Mordoc code in this repository.
 
 ## Run it
 

@@ -37,6 +37,18 @@ Sections group content on landing pages. This one has a background image.
 A section can also have no title.
 {% /section %}
 
+{% section title="A diagram on a landing page" %}
+Diagrams work on landing pages as they do on other pages.
+
+```sequence-diagram
+actor Traveller as "Traveller" icon=/icons/traveller.svg
+actor Guide as "Travel guide" icon=/icons/guide.svg
+
+Traveller -> Guide: Plan a journey
+Guide --> Traveller: Show the route
+```
+{% /section %}
+
 {% hero
   title="A hero with an image"
   description="A hero can also show an image with its text."

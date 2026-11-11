@@ -7,7 +7,7 @@ Code blocks show code with highlighting and a copy button.
 ## JavaScript
 
 ```js
-const stops = ['The Shire', 'Rivendell', 'Moria'];
+const stops = ['Stop A', 'Stop B', 'Stop C'];
 console.log(stops.length);
 ```
 
@@ -23,20 +23,20 @@ interface Stop {
 ## Shell
 
 ```bash
-journey plan the-shire mordor
+journey plan stop-a stop-d
 cd my-journey
 ```
 
 ## JSON
 
 ```json
-{ "name": "Rivendell", "daysOnFoot": 40 }
+{ "name": "Stop B", "daysOnFoot": 40 }
 ```
 
 ## YAML
 
 ```yaml
-stop: Moria
+stop: Stop C
 daysOnFoot: 55
 ```
 

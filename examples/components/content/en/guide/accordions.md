@@ -22,12 +22,12 @@ journey status
 
 {% accordions %}
 {% accordion title="First stop" %}
-The Shire is where the journey begins.
+Stop A is where the journey begins.
 {% /accordion %}
 {% accordion title="Second stop" %}
-Rivendell is the best place to rest on the way.
+Stop B is the best place to rest on the way.
 {% /accordion %}
 {% accordion title="Third stop" %}
-Moria is the long road under the mountains.
+Stop C is the long road under the mountains.
 {% /accordion %}
 {% /accordions %}

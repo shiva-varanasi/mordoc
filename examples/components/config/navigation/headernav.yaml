@@ -1,10 +1,10 @@
 - label: Guide
   path: /guide
 
-- label: Status
-  path: https://status.example.com
+- label: Media
+  path: /media
   variant: secondary
 
-- label: Plan your journey
-  path: /guide/buttons
+- label: Home
+  path: /
   variant: primary

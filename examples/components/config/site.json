@@ -1,6 +1,6 @@
 {
   "name": "Mordoc - Components",
-  "description": "Components is an example website that shows every Mordoc component.",
+  "description": "Components is an example website showcasing all supported Mordoc components.",
   "baseUrl": "https://components.example.com",
   "defaultLanguage": "en"
 }

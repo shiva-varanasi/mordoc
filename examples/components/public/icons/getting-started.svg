@@ -1,0 +1,9 @@
+<svg width="24" height="22" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="40" height="36" rx="8" fill="#FAF0EB"/>
+<!-- Flag pole -->
+<path d="M14 27V9" stroke="#D64518" stroke-width="2" stroke-linecap="round"/>
+<!-- Flag -->
+<path d="M14 9L27 13L14 17" stroke="#D64518" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<!-- Ground line -->
+<path d="M11 27H29" stroke="#D64518" stroke-width="2" stroke-linecap="round"/>
+</svg>

@@ -1,4 +1,4 @@
-/* Hero background: white in light mode, Mordoc's default (transparent) in dark mode. */
+/* Hero background: light grey in light mode, dark grey in dark mode. */
 :root {
   --hero-bg: #F1F2F0;
 }

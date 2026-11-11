@@ -6,12 +6,12 @@ An advanced image shows an image with a caption below it. A reader can click it,
 
 ## With a caption
 
-{% advancedImage src="/images/mordor-map.jpg" alt="A map of the road to Mordor" caption="The road to Mordor" /%}
+{% advancedImage src="/images/route-map.jpg" alt="A route with four stops, from A to D" caption="The journey in four stops" /%}
 
 ## Without a caption
 
-{% advancedImage src="/images/volcano.jpg" alt="A volcano in Mordor" /%}
+{% advancedImage src="/images/volcano.jpg" alt="A volcano at the end of the route" /%}
 
 ## From a variable
 
-{% advancedImage src=$diagramImage alt="The road to Mordor, from a variable" caption="The road to Mordor, from a variable" /%}
+{% advancedImage src=$mapImage alt="A route with four stops, from a variable" caption="The journey in four stops, from a variable" /%}

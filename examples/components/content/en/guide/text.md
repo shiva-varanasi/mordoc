@@ -33,17 +33,17 @@ This heading has the ID `custom-id`, so [this link](#custom-id) goes straight to
 {% table %}
 * Stop
 * Days on foot
-* Distance from the Shire
+* Distance from stop A
 ---
-* Rivendell
+* Stop B
 * 40
 * 750 km
 ---
-* Moria
+* Stop C
 * 55
 * 1,050 km
 ---
-* Mordor
+* Stop D
 * 120
 * 2,200 km
 {% /table %}

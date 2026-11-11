@@ -11,7 +11,7 @@ The guide saves your route every evening.
 {% /callout %}
 
 {% callout type="tip" title="Tip" %}
-Rest in Rivendell before you cross the mountains.
+Rest at stop B before you cross the mountains.
 {% /callout %}
 
 {% callout type="warning" title="Warning" %}
@@ -19,7 +19,7 @@ The mountain pass closes when the first snow falls.
 {% /callout %}
 
 {% callout type="danger" title="Danger" %}
-Never enter Mordor without a guide.
+Never climb the volcano without a guide.
 {% /callout %}
 
 ## Without a title
@@ -47,7 +47,7 @@ A danger without a title.
 - Plan your route.
 
 ```bash
-journey plan the-shire mordor
+journey plan stop-a stop-d
 ```
 
 > Every journey starts at your own front door.

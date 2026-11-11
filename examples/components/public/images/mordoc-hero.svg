@@ -1,23 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400" viewBox="0 0 1200 400" fill="none">
-  <title>Abstract sandstone valley and watchtower</title>
-  <desc>Transparent hero banner with geometric terrain and a copper eye tower on the right, leaving open space for headings.</desc>
-  <g stroke-linejoin="round">
-    <path d="M0 295 100 315 165 310 265 350 390 372 550 386 700 375 835 343 925 326 1010 286 1100 269 1200 286V400H0Z" fill="#B5A18A" fill-opacity=".32"/>
-    <path d="m0 318 142 26 90-5 132 37 190 17 155-18 132-15 119-40 121-19 119 17v82H0Z" fill="#AA9176" fill-opacity=".48"/>
-    <path d="m0 352 130 7 126 25 195 12 214-5 141-25 102-8 126-31 166 8v65H0Z" fill="#917A63" fill-opacity=".68"/>
-    <path d="m0 380 180 5 135 15h415l148-20 130-2 88-23 104 7v38H0Z" fill="#80674F" fill-opacity=".65"/>
-    <g stroke="#B99B78" stroke-width="1.5" stroke-opacity=".65">
-      <path d="m0 318 142 26 90-5 132 37 190 17 155-18 132-15 119-40 121-19 119 17"/>
-      <path d="m0 352 130 7 126 25 195 12m214-5 141-25 102-8 126-31 166 8"/>
-      <path d="m878 380 130-2 88-23 104 7"/>
-    </g>
-    <path d="m1014 305 34-49 18-105-23-47 22-42-2 39 23 22 24-22-2-39 22 42-23 47 18 105 34 49-39-10-21-7-22 7Z" fill="#9D8264"/>
-    <path d="m1086 123 24-22-2-39 22 42-23 47 18 105 34 49-39-10-21-7-13 4Z" fill="#79624D"/>
-    <path d="m1063 101 23 22v169m-38-36 18-105m41 0 18 105" stroke="#C5AB8A" stroke-width="2"/>
-    <path d="M1074 290V192l12-16 13 16v96" stroke="#D1B997" stroke-width="4"/>
-    <path d="M1058 100q28-27 57 0-29 27-57 0Z" fill="#CB9760"/>
-    <path d="M1058 100q28-15 57 0" stroke="#E2BE8C" stroke-width="1.5"/>
-    <path d="M1086 85q-8 15 0 30 8-15 0-30Z" fill="#614B38"/>
-    <path d="m1002 320 45-19 39 9 32-18 82 20" stroke="#C4A780" stroke-width="2"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="600" viewBox="0 0 1600 600" fill="none"><title>Abstract sandstone contours</title><desc>Transparent flowing terrain contours framing an open centre for a responsive website hero.</desc><defs><linearGradient id="land" x1="0" y1="350" x2="0" y2="600" gradientUnits="userSpaceOnUse"><stop stop-color="#B69A78" stop-opacity=".04"/><stop offset="1" stop-color="#A48868" stop-opacity=".24"/></linearGradient></defs>
+<path d="M0 345C210 240 310 440 550 485S930 585 1180 439S1460 300 1600 342V600H0Z" fill="url(#land)"/>
+<path d="M-100 402C120 208 270 268 430 384S790 541 1040 410S1390 208 1700 339" stroke="#C19563" stroke-opacity="0.38" stroke-width="1.6"/>
+<path d="M-100 425C120 231 270 291 430 407S790 564 1040 433S1390 231 1700 362" stroke="#B18C62" stroke-opacity="0.2" stroke-width="1"/>
+<path d="M-100 448C120 254 270 314 430 430S790 587 1040 456S1390 254 1700 385" stroke="#B18C62" stroke-opacity="0.2" stroke-width="1"/>
+<path d="M-100 471C120 277 270 337 430 453S790 610 1040 479S1390 277 1700 408" stroke="#B18C62" stroke-opacity="0.2" stroke-width="1"/>
+<path d="M-100 494C120 300 270 360 430 476S790 633 1040 502S1390 300 1700 431" stroke="#C19563" stroke-opacity="0.38" stroke-width="1.6"/>
+<path d="M-100 517C120 323 270 383 430 499S790 656 1040 525S1390 323 1700 454" stroke="#B18C62" stroke-opacity="0.2" stroke-width="1"/>
+<path d="M-100 540C120 346 270 406 430 522S790 679 1040 548S1390 346 1700 477" stroke="#B18C62" stroke-opacity="0.2" stroke-width="1"/>
+<path d="M-100 563C120 369 270 429 430 545S790 702 1040 571S1390 369 1700 500" stroke="#B18C62" stroke-opacity="0.2" stroke-width="1"/>
+<path d="M-100 586C120 392 270 452 430 568S790 725 1040 594S1390 392 1700 523" stroke="#C19563" stroke-opacity="0.38" stroke-width="1.6"/>
+<path d="M-100 609C120 415 270 475 430 591S790 748 1040 617S1390 415 1700 546" stroke="#B18C62" stroke-opacity="0.2" stroke-width="1"/>
+<path d="M-100 632C120 438 270 498 430 614S790 771 1040 640S1390 438 1700 569" stroke="#B18C62" stroke-opacity="0.2" stroke-width="1"/>
+<path d="M-100 655C120 461 270 521 430 637S790 794 1040 663S1390 461 1700 592" stroke="#B18C62" stroke-opacity="0.2" stroke-width="1"/>
+<path d="M-100 678C120 484 270 544 430 660S790 817 1040 686S1390 484 1700 615" stroke="#C19563" stroke-opacity="0.38" stroke-width="1.6"/>
+<path d="M-70 38C70 115 170 51 249 -60" stroke="#B18C62" stroke-opacity=".18" stroke-width="1"/>
+<path d="M1345 -60C1430 62 1540 62 1670 10" stroke="#B18C62" stroke-opacity=".18" stroke-width="1"/>
+<path d="M-70 60C70 132 170 69 249 -47" stroke="#B18C62" stroke-opacity=".18" stroke-width="1"/>
+<path d="M1345 -44C1430 80 1540 82 1670 34" stroke="#B18C62" stroke-opacity=".18" stroke-width="1"/>
+<path d="M-70 82C70 149 170 87 249 -34" stroke="#B18C62" stroke-opacity=".18" stroke-width="1"/>
+<path d="M1345 -28C1430 98 1540 102 1670 58" stroke="#B18C62" stroke-opacity=".18" stroke-width="1"/>
+<path d="M-70 104C70 166 170 105 249 -21" stroke="#B18C62" stroke-opacity=".18" stroke-width="1"/>
+<path d="M1345 -12C1430 116 1540 122 1670 82" stroke="#B18C62" stroke-opacity=".18" stroke-width="1"/>
+<path d="M-70 126C70 183 170 123 249 -8" stroke="#B18C62" stroke-opacity=".18" stroke-width="1"/>
+<path d="M1345 4C1430 134 1540 142 1670 106" stroke="#B18C62" stroke-opacity=".18" stroke-width="1"/>
+<path d="M-70 148C70 200 170 141 249 5" stroke="#B18C62" stroke-opacity=".18" stroke-width="1"/>
+<path d="M1345 20C1430 152 1540 162 1670 130" stroke="#B18C62" stroke-opacity=".18" stroke-width="1"/>
+<path d="M-70 170C70 217 170 159 249 18" stroke="#B18C62" stroke-opacity=".18" stroke-width="1"/>
+<path d="M1345 36C1430 170 1540 182 1670 154" stroke="#B18C62" stroke-opacity=".18" stroke-width="1"/>
 </svg>

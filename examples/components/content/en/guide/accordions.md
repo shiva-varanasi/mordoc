@@ -6,28 +6,28 @@ An accordion hides content until a reader opens it. In a group, opening one clos
 
 ## On its own
 
-{% accordion title="What is Orbit?" %}
-Orbit is a fictional app used to show Mordoc's components.
+{% accordion title="What is this site?" %}
+Components is an example website used to show Mordoc's components.
 {% /accordion %}
 
 {% accordion title="Open when the page loads" defaultOpen=true %}
 This accordion starts open.
 
 ```bash
-orbit status
+journey status
 ```
 {% /accordion %}
 
 ## In a group
 
 {% accordions %}
-{% accordion title="First planet" %}
-Mercury is closest to the sun.
+{% accordion title="First stop" %}
+Stop A is where the journey begins.
 {% /accordion %}
-{% accordion title="Second planet" %}
-Venus is the hottest planet.
+{% accordion title="Second stop" %}
+Stop B is the best place to rest on the way.
 {% /accordion %}
-{% accordion title="Third planet" %}
-Earth is where Orbit's team lives.
+{% accordion title="Third stop" %}
+Stop C is the long road under the mountains.
 {% /accordion %}
 {% /accordions %}

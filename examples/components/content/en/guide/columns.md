@@ -9,11 +9,11 @@ Columns place content side by side, with or without a line between them.
 {% columns %}
 {% column %}
 ### Before
-Orbit showed one planet at a time.
+The guide showed one stop at a time.
 {% /column %}
 {% column %}
 ### After
-Orbit shows the whole system.
+The guide shows the whole route.
 {% /column %}
 {% /columns %}
 
@@ -22,17 +22,17 @@ Orbit shows the whole system.
 {% columns divider=true %}
 {% column %}
 ### Left
-- Planets
-- Moons
+- Hills
+- Rivers
 {% /column %}
 {% column %}
 ### Middle
-- Stars
-- Comets
+- Forests
+- Mountains
 {% /column %}
 {% column %}
 ### Right
-- Galaxies
-- Nebulae
+- Deserts
+- Volcanoes
 {% /column %}
 {% /columns %}

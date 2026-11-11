@@ -6,13 +6,13 @@ A sequence diagram shows messages between people and systems, written as plain t
 
 ```sequence-diagram
 # Comments start with a hash and are not shown.
-actor User as "Orbit user" icon=/icons/user.svg
-actor App as "Orbit app" icon=/icons/app.svg
-actor Server as "Orbit server"
+actor Traveller as "Traveller" icon=/icons/traveller.svg
+actor Guide as "Travel guide" icon=/icons/guide.svg
+actor Tower as "Watchtower"
 
-User -> App: Open a universe
-App -> Server: Load planets\nand moons
-Server --> App: 8 planets
-App --> User: Show the system
-App -> Cache: Save for later
+Traveller -> Guide: Plan a journey
+Guide -> Tower: Check the road\nto the volcano
+Tower --> Guide: The pass is open
+Guide --> Traveller: Show the route
+Guide -> Map: Save for later
 ```

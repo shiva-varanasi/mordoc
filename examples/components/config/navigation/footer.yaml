@@ -1,7 +1,7 @@
 start:
-  - "Orbit is a fictional app."
+  - "Components is an example website."
 center:
   - "[Guide](/guide)"
   - "[Media](/media)"
 end:
-  - "[Example status page](https://status.example.com)"
+  - "[Mordoc on GitHub](https://github.com/getmordoc/mordoc)"

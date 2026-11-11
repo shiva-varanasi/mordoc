@@ -23,23 +23,9 @@ import { useLoaderData } from 'react-router';
 import React from 'react';
 import Markdoc from '@markdoc/markdoc';
 import { useMordocData } from '../../data-context.js';
-import { CodeBlock } from '../code-block/CodeBlock.js';
-import { Image } from '../image/Image.js';
-import { AdvancedImage } from '../advanced-image/AdvancedImage.js';
-import { Clip } from '../clip/Clip.js';
-import { VideoEmbed } from '../video-embed/VideoEmbed.js';
-import { Callout } from '../callout/Callout.js';
-import { Card } from '../card/Card.js';
-import { CardGrid } from '../card/CardGrid.js';
-import { Accordion } from '../accordion/Accordion.js';
-import { Accordions } from '../accordion/Accordions.js';
-import { Column } from '../columns/Column.js';
-import { Columns } from '../columns/Columns.js';
-import { ContentLink } from '../link/ContentLink.js';
-import { Heading } from '../heading/Heading.js';
+import { contentComponents } from '../component-map.js';
 import { Hero } from './hero/Hero.js';
 import { Section } from './section/Section.js';
-import { Button } from './button/Button.js';
 import type { PageData } from '../../../types/content.js';
 import styles from './LandingPage.module.css';
 
@@ -53,7 +39,9 @@ export function LandingPage() {
   }, [pageData.frontmatter.title, site.name]);
 
   const rendered = Markdoc.renderers.react(pageData.renderable, React, {
-    components: { CodeBlock, Image, AdvancedImage, Clip, VideoEmbed, Callout, Card, CardGrid, Accordion, Accordions, Column, Columns, ContentLink, Heading, Hero, Section, Button },
+    // Every component an article page can show, plus the two that only
+    // exist on landing pages, so the two lists cannot grow apart.
+    components: { ...contentComponents, Hero, Section },
   });
 
   return (

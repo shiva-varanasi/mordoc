@@ -118,15 +118,12 @@ const linkTag: Schema = {
 };
 
 /**
- * The text a code block shows, after Markdoc has processed it.
+ * The text a code block shows.
  *
- * Markdoc parses the variables and tags in a code block into its children
- * while parsing. When the code block's `process` attribute is false, those
- * are ignored and the code block shows its `content` as written. Variables, functions
- * and tags such as `if`/`else` produce text, which is joined back into one
- * string for highlighting and copying. A tag that renders a component, such
- * as a callout, cannot be shown inside Mordoc's text-only code block yet, so
- * such a code block shows its source exactly as written instead.
+ * Markdoc processes the variables and tags in a code block into its children
+ * while parsing. Those produce text, which is joined back into one string for
+ * highlighting and copying. Without processed text, or when `process` is
+ * false, the code block shows its `content` as written.
  */
 function codeBlockContent(node: Node, config: Config, process: boolean): string {
   const raw = typeof node.attributes['content'] === 'string' ? node.attributes['content'] : '';
@@ -582,9 +579,9 @@ const articleTags: Record<string, Schema> = { callout, card, cardGrid, button, l
 const landingTags: Record<string, Schema> = { ...articleTags, hero, section };
 
 /**
- * The Markdoc config for article pages and the texts for the API reference.
- * A tag that is not in it, such as `hero`, is reported by Markdoc as an
- * undefined tag.
+ * The Markdoc config for article pages, and the base for the API reference
+ * texts. A tag that is not in it, such as `hero`, is reported by Markdoc as
+ * an undefined tag.
  */
 export function createArticleMarkdocConfig(): Config {
   return createMarkdocConfig(articleTags);

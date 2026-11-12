@@ -40,7 +40,12 @@ export function notInsideClickable(what: string): Schema['validate'] {
   };
 }
 
-/** `content/en/guide/setup.md:12  error  Undefined variable: 'productName'` */
+/**
+ * Formats one validation result as one line: the file relative to the
+ * project, the line number as editors count it, the level and the message.
+ *
+ * Example: `content/en/guide/setup.md:12  error  Undefined variable: 'productName'`
+ */
 export function formatValidateError(result: ValidateError, projectRoot: string): string {
   const filePath = result.location?.file ?? '';
   const file = filePath ? path.relative(projectRoot, filePath).replace(/\\/g, '/') : '(unknown file)';

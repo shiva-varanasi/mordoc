@@ -22,8 +22,8 @@ import type { Diagnostics } from './diagnostics.js';
  * That is what makes §9's trace true: a `###` inside a params block is
  * consumed as a lookup key and never reaches the heading transform, so it
  * produces no `Heading` tag, no anchor id, and no TOC entry. Each entry's
- * body is then transformed on its own, through the same
- * `createArticleMarkdocConfig()` guides use — so `{% callout %}`, tables,
+ * body is then transformed on its own, through the enrichment config, which
+ * is the article config guides use plus `badge` — so `{% callout %}`, tables,
  * variables and links behave identically inside a field description.
  *
  * The structural problems found here are warnings: a malformed block is

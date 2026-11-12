@@ -142,17 +142,20 @@ const linkTag: Schema = {
  * The text a code block shows, after Markdoc has processed it.
  *
  * Markdoc parses the variables and tags in a code block into its children
- * (none when the author wrote `{% process=false %}`). Variables, functions
+ * while parsing. When the code block's `process` attribute is false, those
+ * are ignored and the code block shows its `content` as written. Variables, functions
  * and tags such as `if`/`else` produce text, which is joined back into one
  * string for highlighting and copying. A tag that renders a component, such
  * as a callout, cannot be shown inside Mordoc's text-only code block yet, so
  * such a code block shows its source exactly as written instead.
  */
-function codeBlockContent(node: Node, config: Config): string {
+function codeBlockContent(node: Node, config: Config, process: boolean): string {
   const raw = typeof node.attributes['content'] === 'string' ? node.attributes['content'] : '';
-  if (node.children.length === 0) return raw;
+  const hasProcessedText = process && node.children.length > 0;
+  if (!hasProcessedText) return raw;
 
   const parts = node.transformChildren(config);
+  // A component, such as a callout, cannot be shown inside a code block yet.
   if (parts.some((part) => Markdoc.Tag.isTag(part))) return raw;
 
   return parts.map((part) => (part === null || part === undefined ? '' : String(part))).join('');
@@ -176,18 +179,22 @@ function codeBlockContent(node: Node, config: Config): string {
  * tags inside it are evaluated, unless the author writes
  * ```lang {% process=false %} to show it exactly as written. See
  * `codeBlockContent()` for how the processed result becomes text.
+ *
+ * `process` is not rendered to the page: the transform below builds the
+ * `CodeBlock` from `language` and `content` only. It is left renderable so
+ * `transformAttributes` hands it over with its default applied.
  */
 const fence: Schema = {
   render: 'CodeBlock',
   attributes: {
     language: { type: String },
     content:  { type: String, render: true },
-    process:  { type: Boolean, render: false, default: true },
+    process:  { type: Boolean, default: true },
   },
   transform(node, config) {
     const attributes = node.transformAttributes(config);
     const language = typeof attributes['language'] === 'string' ? attributes['language'] : '';
-    const content = codeBlockContent(node, config);
+    const content = codeBlockContent(node, config, attributes['process'] !== false);
 
     if (language.endsWith('-diagram')) {
       const scene = buildScene(language, content);
@@ -241,9 +248,10 @@ const imageTag: Schema = {
  * when clicked: `{% advancedImage src="..." alt="..." caption="..." /%}`.
  *
  * It renders a <figure>, a block element, and HTML allows no block element
- * inside a paragraph. `inline: false` makes Markdoc's validation report an
- * advanced image written inside a sentence or a link, so it only stands on
- * its own line.
+ * inside a paragraph, so it can only stand on its own line. Its own
+ * `validate()` reports an advanced image inside a sentence or a link with a
+ * message that says so. `inline` is left `undefined` because `inline: false`
+ * would add Markdoc's general "should be block" message for the same mistake.
  *
  * `caption` (not `title`) because it is visible text below the image, where
  * an image's `title` only shows when hovering.
@@ -251,12 +259,20 @@ const imageTag: Schema = {
 const advancedImageTag: Schema = {
   render: 'AdvancedImage',
   children: [],
-  // A block: only on its own line, never inside a sentence or a link.
-  inline: false,
+  // Placement is checked by its own validate(), with its own message.
+  inline: undefined,
   attributes: {
     src:     { type: String, required: true },
     alt:     { type: String },
     caption: { type: String },
+  },
+  validate(node) {
+    if (!node.inline) return [];
+    return [{
+      id: 'advanced-image-not-on-own-line',
+      level: 'critical',
+      message: `'advancedImage' can only stand on its own line.`,
+    }];
   },
 };
 
@@ -598,31 +614,34 @@ const params: Schema = {
 };
 
 /**
- * The default Markdoc config used by Mordoc's content transformer.
- *
- * Currently minimal:
- *   - Custom `heading` node (adds stable, deduplicated anchor IDs).
- *   - Custom `fence` node (routes to CodeBlock for syntax highlighting).
- *   - Custom `image` node (routes to Image for lightbox support).
- *   - Custom `callout` tag (routes to Callout for note/warning/danger boxes).
- *   - Custom `card` / `cardGrid` tags (routes to Card / CardGrid components).
- *   - `link` / `image` tags (variable-capable counterparts to the native
- *     `link` / `image` nodes above — see their own doc comments).
- *   - `clip` tag (click-to-play demo clips — see its own doc comment).
- *   - `videoEmbed` tag (YouTube/Vimeo/Loom embeds — see its own doc comment).
- *   - `accordion` / `accordions` tags (collapsible sections — see their own
- *     doc comments).
- *   - `column` / `columns` tags (side-by-side content — see their own doc
- *     comments).
- *   - `params` tag (API field entries in enrichment files — see its own doc
- *     comment).
- *
- * Enrichment prose goes through this same config, so `{% callout %}`,
- * `{% table %}`, variables and links behave identically inside an API field
- * description and inside a guide.
+ * The tags every page can use: article pages, landing pages, and the texts
+ * for the API reference. It matches `contentComponents`, the components
+ * those pages render with.
  */
-export function createDefaultMarkdocConfig(): Config {
-  const tags: Record<string, Schema> = { callout, card, cardGrid, hero, section, button, link: linkTag, image: imageTag, advancedImage: advancedImageTag, clip, videoEmbed, accordion, accordions, column, columns, params };
+const articleTags: Record<string, Schema> = { callout, card, cardGrid, button, link: linkTag, image: imageTag, advancedImage: advancedImageTag, clip, videoEmbed, accordion, accordions, column, columns, params };
+
+/**
+ * The tags a landing page can use: every article tag, plus `hero` and
+ * `section`, as a landing page renders with `contentComponents` plus `Hero`
+ * and `Section`.
+ */
+const landingTags: Record<string, Schema> = { ...articleTags, hero, section };
+
+/**
+ * The Markdoc config for article pages and the texts for the API reference.
+ * A tag that is not in it, such as `hero`, is reported by Markdoc as an
+ * undefined tag.
+ */
+export function createArticleMarkdocConfig(): Config {
+  return createMarkdocConfig(articleTags);
+}
+
+/** The Markdoc config for pages with `layout: landing` in their frontmatter. */
+export function createLandingMarkdocConfig(): Config {
+  return createMarkdocConfig(landingTags);
+}
+
+function createMarkdocConfig(tags: Record<string, Schema>): Config {
   assertEveryTagStatesPlacement(tags);
   return {
     nodes: { heading, link, fence, image },

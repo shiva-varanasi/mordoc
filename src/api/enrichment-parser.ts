@@ -1,7 +1,8 @@
 import { readFile } from 'node:fs/promises';
 import Markdoc from '@markdoc/markdoc';
 import type { Config, Node, RenderableTreeNode } from '@markdoc/markdoc';
-import { createDefaultMarkdocConfig } from '../content/markdoc-config.js';
+import { createArticleMarkdocConfig } from '../content/markdoc-config.js';
+import type { ContentValidator } from '../content/content-validation.js';
 import { createSlugger } from '../content/slug.js';
 import { CONDITIONAL_BADGE } from '../types/api.js';
 import type {
@@ -22,12 +23,13 @@ import type { Diagnostics } from './diagnostics.js';
  * consumed as a lookup key and never reaches the heading transform, so it
  * produces no `Heading` tag, no anchor id, and no TOC entry. Each entry's
  * body is then transformed on its own, through the same
- * `createDefaultMarkdocConfig()` guides use — so `{% callout %}`, tables,
+ * `createArticleMarkdocConfig()` guides use — so `{% callout %}`, tables,
  * variables and links behave identically inside a field description.
  *
- * Nothing in this file can fail a build. Every problem is a warning: a
- * malformed block is skipped and the spec baseline still renders, per the
- * enrichment invariant.
+ * The structural problems found here are warnings: a malformed block is
+ * skipped and the spec baseline still renders, per the enrichment invariant.
+ * Each file is also validated by the run's `ContentValidator`, which the
+ * pipeline reports together with the pages and uses to stop the build.
  */
 
 /** Markdoc `Node.type` for a heading; entries are level-3 headings. */
@@ -87,28 +89,15 @@ function transformNodes(nodes: Node[], config: Config): RenderableTreeNode | nul
 /**
  * Reads the `badge` heading annotation. `conditional` (any case) is the
  * reserved keyword and is normalized to lowercase; any other non-empty string
- * is free text and passes through verbatim.
+ * is free text and passes through verbatim. A badge that is not text is
+ * reported by validation, as the enrichment config declares `badge` a string.
  */
-function readBadge(
-  node: Node,
-  fieldPath: string,
-  filePath: string,
-  diagnostics: Diagnostics,
-): Badge | null {
+function readBadge(node: Node): Badge | null {
   const raw = node.attributes['badge'];
-  if (raw === undefined || raw === null) return null;
-  if (typeof raw === 'string') {
-    const text = raw.trim();
-    if (text === '') return null;
-    return text.toLowerCase() === CONDITIONAL_BADGE ? CONDITIONAL_BADGE : text;
-  }
-  // Dropped rather than fatal: a malformed badge leaves the field rendering
-  // correctly, just without its marker.
-  diagnostics.warn(
-    `${filePath}: field "${fieldPath}" has a non-text badge — badge dropped. ` +
-      `Write it as a quoted string, e.g. {% badge="Read-only" %}.`,
-  );
-  return null;
+  if (typeof raw !== 'string') return null;
+  const text = raw.trim();
+  if (text === '') return null;
+  return text.toLowerCase() === CONDITIONAL_BADGE ? CONDITIONAL_BADGE : text;
 }
 
 /**
@@ -154,7 +143,7 @@ function splitEntries(
         diagnostics.warn(`${filePath}: a "###" entry has an empty name — skipped.`);
         continue;
       }
-      current = { path, badge: readBadge(child, path, filePath, diagnostics), body: [] };
+      current = { path, badge: readBadge(child), body: [] };
       continue;
     }
 
@@ -246,6 +235,7 @@ async function parseFile(
   entry: EnrichmentEntry,
   config: Config,
   diagnostics: Diagnostics,
+  validator: ContentValidator,
 ): Promise<ParsedEnrichment | null> {
   let raw: string;
   try {
@@ -257,7 +247,9 @@ async function parseFile(
     return null;
   }
 
-  const ast = Markdoc.parse(raw);
+  // Parsed with its file path, so validation results name the file.
+  const ast = Markdoc.parse(raw, entry.filePath);
+  validator.validate(ast, config);
   const fields: EnrichmentField[] = [];
   const narrativeNodes: Node[] = [];
 
@@ -326,17 +318,37 @@ export function enrichmentKey(
 }
 
 /**
+ * The Markdoc config for enrichment files: the article config, with the
+ * `badge` annotation declared on headings, as in
+ * `### willing {% badge="conditional" %}`. It is read by `readBadge()`, not
+ * rendered.
+ */
+function createApiEnrichmentMarkdocConfig(): Config {
+  const base = createArticleMarkdocConfig();
+  const heading = base.nodes?.heading ?? {};
+  return {
+    ...base,
+    nodes: {
+      ...base.nodes,
+      heading: { ...heading, attributes: { ...heading.attributes, badge: { type: String, render: false } } },
+    },
+  };
+}
+
+/**
  * Parses every discovered enrichment file, keyed for the stage-D join.
  *
  * @param variables - `config/variables.yaml`, so `{{ $VAR }}` resolves in
  *   enrichment prose exactly as it does in guides.
+ * @param validator - Validates every enrichment file of this run.
  */
 export async function parseApiDocs(
   entries: EnrichmentEntry[],
   variables: Record<string, unknown>,
   diagnostics: Diagnostics,
+  validator: ContentValidator,
 ): Promise<Map<string, ParsedEnrichment>> {
-  const base = createDefaultMarkdocConfig();
+  const base = createApiEnrichmentMarkdocConfig();
   const config: Config = {
     ...base,
     variables: { ...(base.variables ?? {}), ...variables },
@@ -344,7 +356,7 @@ export async function parseApiDocs(
 
   const out = new Map<string, ParsedEnrichment>();
   for (const entry of entries) {
-    const parsed = await parseFile(entry, config, diagnostics);
+    const parsed = await parseFile(entry, config, diagnostics, validator);
     if (!parsed) continue;
     out.set(enrichmentKey(entry.specId, entry.kind, entry.target), parsed);
   }

@@ -1,6 +1,7 @@
 import type { ApiRegistry, OperationView } from '../types/api.js';
 import type { ContentMap } from '../types/content.js';
 import type { NavigationConfig } from '../types/pipeline.js';
+import type { ContentValidator } from '../content/content-validation.js';
 import { Diagnostics } from './diagnostics.js';
 import { buildOperationViews } from './build-operation-views.js';
 import { loadEnrichment } from './enrichment-loader.js';
@@ -34,6 +35,8 @@ export interface RunApiStagesInput {
   languages: string[];
   /** When true, `flush()` prints full warning detail inline instead of a `--verbose` hint. */
   verbose: boolean;
+  /** Validates the enrichment files, in the same run as the pages. */
+  validator: ContentValidator;
 }
 
 export interface RunApiStagesResult {
@@ -52,14 +55,14 @@ export interface RunApiStagesResult {
  * all was.
  */
 export async function runApiStages(input: RunApiStagesInput): Promise<RunApiStagesResult> {
-  const { projectRoot, registry, contentMap, navigation, variables, defaultLanguage, languages, verbose } = input;
+  const { projectRoot, registry, contentMap, navigation, variables, defaultLanguage, languages, verbose, validator } = input;
 
   const diagnostics = new Diagnostics(registry.strict);
 
   const enrichmentEntries = await loadEnrichment(projectRoot, registry);
 
   const specs = await loadApiSpecs(projectRoot, registry, diagnostics);
-  const apiDocs = await parseApiDocs(enrichmentEntries, variables, diagnostics);
+  const apiDocs = await parseApiDocs(enrichmentEntries, variables, diagnostics, validator);
 
   const operations = await buildOperationViews({
     projectRoot,

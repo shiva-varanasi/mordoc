@@ -1,11 +1,12 @@
 import path from 'node:path';
-import type { ValidateError, ValidationError } from '@markdoc/markdoc';
+import Markdoc from '@markdoc/markdoc';
+import type { Config, Node, ValidateError, ValidationError } from '@markdoc/markdoc';
 
 /*
  * Mordoc works with Markdoc's own validation results: `Markdoc.validate()`
  * returns a list of `ValidateError`s, each holding a `ValidationError` (its
  * level, from `warning` to `critical`, and its message) and the location it
- * was found at. Pages are parsed with their file path, so the location names
+ * was found at. Texts are parsed with their file path, so the location names
  * the file. Markdoc never throws for validation; Mordoc decides what to do
  * with the list.
  */
@@ -17,10 +18,6 @@ import type { ValidateError, ValidationError } from '@markdoc/markdoc';
  */
 const BLOCKING_LEVELS: ReadonlySet<ValidationError['level']> = new Set(['error', 'critical']);
 
-export function hasBlockingErrors(errors: readonly ValidateError[]): boolean {
-  return errors.some((result) => BLOCKING_LEVELS.has(result.error.level));
-}
-
 /** `content/en/guide/setup.md:12  error  Undefined variable: 'productName'` */
 export function formatValidateError(result: ValidateError, projectRoot: string): string {
   const filePath = result.location?.file ?? '';
@@ -30,15 +27,48 @@ export function formatValidateError(result: ValidateError, projectRoot: string):
   return `${file}:${line}  ${result.error.level}  ${result.error.message}`;
 }
 
-/** Prints every validation result, one per line, under a short heading. */
-export function reportValidateErrors(errors: readonly ValidateError[], projectRoot: string): void {
-  if (errors.length === 0) return;
-  const noun = errors.length === 1 ? 'problem' : 'problems';
-  console.log(`\n  Markdoc found ${errors.length} ${noun} in your content:\n`);
-  for (const result of errors) {
-    console.log(`  ${formatValidateError(result, projectRoot)}`);
+/** Where a report goes; the console by default. */
+export type ReportOutput = (text: string) => void;
+
+/**
+ * Validates every Markdoc text of one run — the pages and the texts for the
+ * API reference — and keeps the results, so they are reported as one list.
+ *
+ * Create a new one for every run: it starts empty, so a run never shows the
+ * results of an earlier one.
+ */
+export class ContentValidator {
+  private readonly results: ValidateError[] = [];
+
+  constructor(
+    private readonly projectRoot: string,
+    private readonly output: ReportOutput = (text) => console.log(text),
+  ) {}
+
+  /** Validates one parsed text with the config it will be transformed with. */
+  validate(ast: Node, config: Config): void {
+    this.results.push(...Markdoc.validate(ast, config));
   }
-  console.log('');
+
+  /** Writes every result, one per line under a short heading, to the output in one go. */
+  report(): void {
+    if (this.results.length === 0) return;
+    const noun = this.results.length === 1 ? 'problem' : 'problems';
+    const lines = [
+      '',
+      `  Markdoc found ${this.results.length} ${noun} in your content:`,
+      '',
+      ...this.results.map((result) => `  ${formatValidateError(result, this.projectRoot)}`),
+      '',
+    ];
+    this.output(lines.join('\n'));
+  }
+
+  /** Throws a `ValidationFailedError` when a result is an error. */
+  stopOnErrors(): void {
+    const blocking = this.results.filter((result) => BLOCKING_LEVELS.has(result.error.level)).length;
+    if (blocking > 0) throw new ValidationFailedError(blocking);
+  }
 }
 
 /**
@@ -47,10 +77,9 @@ export function reportValidateErrors(errors: readonly ValidateError[], projectRo
  * message, without a stack trace.
  */
 export class ValidationFailedError extends Error {
-  constructor(errors: readonly ValidateError[]) {
-    const blocking = errors.filter((result) => BLOCKING_LEVELS.has(result.error.level)).length;
-    const noun = blocking === 1 ? 'error' : 'errors';
-    super(`Your content has ${blocking} ${noun}, listed above. Fix them and build again.`);
+  constructor(errorCount: number) {
+    const noun = errorCount === 1 ? 'error' : 'errors';
+    super(`Your content has ${errorCount} ${noun}, listed above. Fix them and build again.`);
     this.name = 'ValidationFailedError';
   }
 }

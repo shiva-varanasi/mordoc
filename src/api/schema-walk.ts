@@ -1,5 +1,6 @@
 import Markdoc from '@markdoc/markdoc';
 import type { Config, RenderableTreeNode } from '@markdoc/markdoc';
+import { createArticleMarkdocConfig } from '../content/markdoc-config.js';
 import { createSlugger } from '../content/slug.js';
 import type { DescriptionSource, FieldView, OpenApiDocument } from '../types/api.js';
 
@@ -51,6 +52,25 @@ function isObject(value: unknown): value is Schema {
 
 function joinPath(prefix: string, name: string): string {
   return prefix === '' ? name : `${prefix}.${name}`;
+}
+
+/**
+ * The Markdoc config for the descriptions in OpenAPI files: the article
+ * config, except that a code block shows exactly what is in it. The
+ * descriptions are CommonMark from the API's own files, not Markdoc written
+ * for the site, so their code blocks are not processed unless a description
+ * says `{% process=true %}`.
+ */
+export function createApiDescriptionMarkdocConfig(): Config {
+  const base = createArticleMarkdocConfig();
+  const fence = base.nodes?.fence ?? {};
+  return {
+    ...base,
+    nodes: {
+      ...base.nodes,
+      fence: { ...fence, attributes: { ...fence.attributes, process: { type: Boolean, default: false } } },
+    },
+  };
 }
 
 /**

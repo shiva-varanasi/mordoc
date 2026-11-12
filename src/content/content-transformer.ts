@@ -1,8 +1,9 @@
 import Markdoc from '@markdoc/markdoc';
 import type { Config, RenderableTreeNode } from '@markdoc/markdoc';
 import { createSlugger } from './slug.js';
-import { createDefaultMarkdocConfig } from './markdoc-config.js';
+import { createArticleMarkdocConfig, createLandingMarkdocConfig } from './markdoc-config.js';
 import type { ParsedPage, TransformedPage, TocEntry } from '../types/content.js';
+import type { ContentValidator } from './content-validation.js';
 
 /**
  * Concatenates the text content of a renderable subtree for TOC display.
@@ -65,17 +66,28 @@ function extractToc(root: RenderableTreeNode): TocEntry[] {
  * The function is synchronous — no I/O happens here; the AST is already
  * in memory from the parse stage.
  *
+ * Before transforming, each page is validated with the same config by the
+ * run's `validator`, so the caller decides whether to report or stop.
+ *
  * @param variables - Flat key-value map from config/variables.yaml. Merged
  *   before `slugger` so internal variables always take precedence.
+ * @param validator - Validates every page of this run.
  */
 export function transformContent(
   pages: ParsedPage[],
-  variables: Record<string, unknown> = {},
+  variables: Record<string, unknown>,
+  validator: ContentValidator,
 ): TransformedPage[] {
-  const base = createDefaultMarkdocConfig();
+  // A page is a landing page when its frontmatter says `layout: landing`;
+  // every other page is an article page.
+  const bases = {
+    landing: createLandingMarkdocConfig(),
+    article: createArticleMarkdocConfig(),
+  };
   const out: TransformedPage[] = [];
 
   for (const page of pages) {
+    const base = page.frontmatter.layout === 'landing' ? bases.landing : bases.article;
     const slugger = createSlugger();
     // `slugger` is spread last so a user variable named "slugger" can't
     // accidentally shadow the internal heading-ID generator.
@@ -83,6 +95,8 @@ export function transformContent(
       ...base,
       variables: { ...(base.variables ?? {}), ...variables, slugger },
     };
+
+    validator.validate(page.ast, config);
 
     const raw = Markdoc.transform(page.ast, config);
 

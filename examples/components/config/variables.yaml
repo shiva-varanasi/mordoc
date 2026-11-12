@@ -1,3 +1,5 @@
 productName: Components
 supportEmail: help@components.example
 mapImage: /images/route-map.jpg
+exampleApiBaseUrl: https://api.components.example
+exampleSdkVersion: 2.4.0

@@ -2,7 +2,7 @@
 title: Code
 ---
 
-Code blocks show code with highlighting and a copy button.
+Code blocks show code with highlighting and a copy button. Variables from the site's settings are filled in, unless a code block is shown as written.
 
 ## JavaScript
 
@@ -44,4 +44,28 @@ daysOnFoot: 55
 
 ```
 Plain text, with no highlighting.
+```
+
+## With variables
+
+The address and the version come from the site's settings.
+
+```js
+import { Journey } from '@components/journey';
+
+const journey = new Journey({ baseUrl: '{% $exampleApiBaseUrl %}' });
+```
+
+```bash
+npm install @components/journey@{% $exampleSdkVersion %}
+```
+
+## Shown as written
+
+A code block marked `{% process=false %}` shows Markdoc syntax exactly as written.
+
+```markdown {% process=false %}
+{% callout type="tip" %}
+Journey version {% $exampleSdkVersion %} is out.
+{% /callout %}
 ```

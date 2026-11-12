@@ -1,5 +1,4 @@
 import type { Config, RenderableTreeNode } from '@markdoc/markdoc';
-import { createDefaultMarkdocConfig } from '../content/markdoc-config.js';
 import { CONDITIONAL_BADGE } from '../types/api.js';
 import type {
   EnrichmentField,
@@ -15,6 +14,7 @@ import { buildCurlSample } from './curl-sample.js';
 import { enrichmentKey } from './enrichment-parser.js';
 import { loadAuthoredExamples, mergeExamples, type AuthoredExample } from './examples.js';
 import {
+  createApiDescriptionMarkdocConfig,
   isObject,
   makeMarkdownRenderer,
   resolveSchema,
@@ -391,7 +391,7 @@ export async function buildOperationViews(
 ): Promise<OperationView[]> {
   const { projectRoot, specs, apiDocs, languages, defaultLanguage, variables, diagnostics } = input;
 
-  const base = createDefaultMarkdocConfig();
+  const base = createApiDescriptionMarkdocConfig();
   const markdocConfig: Config = {
     ...base,
     variables: { ...(base.variables ?? {}), ...variables },

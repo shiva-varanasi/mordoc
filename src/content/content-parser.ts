@@ -57,7 +57,9 @@ export async function parseContent(contentMap: ContentMap): Promise<ParsedPage[]
       );
     }
 
-    const ast = Markdoc.parse(raw);
+    // The file path makes Markdoc put it in every node's location, so its
+    // validation results name the file without Mordoc adding it.
+    const ast = Markdoc.parse(raw, entry.filePath);
     const frontmatter = parseFrontmatter(ast.attributes['frontmatter'] as string | undefined, entry.filePath);
 
     pages.push({ entry, frontmatter, ast });

@@ -1,7 +1,8 @@
 import Markdoc from '@markdoc/markdoc';
-import type { Config, Schema, RenderableTreeNode } from '@markdoc/markdoc';
+import type { Config, Node, Schema, RenderableTreeNode } from '@markdoc/markdoc';
 import type { Slugger } from './slug.js';
 import { buildScene } from '../diagrams/build-scene.js';
+import { notInsideClickable } from './content-validation.js';
 
 /**
  * Walks a renderable subtree and concatenates its text content.
@@ -66,14 +67,20 @@ const heading: Schema = {
  * Without this override Markdoc emits a plain <a href="..."> for every
  * markdown link, which triggers a full browser navigation instead of
  * client-side routing.
+ *
+ * `children` is exactly Markdoc's own `link` node list: Mordoc allows what
+ * Markdoc allows, no more and no less. So a tag (such as `{% image /%}`) may
+ * sit inside a link, and a Markdown image inside a link is reported as a
+ * warning, as Markdoc reports it.
  */
 const link: Schema = {
   render: 'ContentLink',
-  children: ['strong', 'em', 'code', 's', 'text'],
+  children: ['strong', 'em', 's', 'code', 'text', 'tag'],
   attributes: {
     href:  { type: String, required: true },
     title: { type: String },
   },
+  validate: notInsideClickable('link'),
 };
 
 /**
@@ -90,10 +97,14 @@ const link: Schema = {
  * produced it. The attribute is named `path` (matching the `button` tag's
  * convention) rather than `href`, so it's renamed back to `href` here before
  * building the Tag.
+ *
+ * Allows the same children as the `link` node above, so both syntaxes accept
+ * the same content.
  */
 const linkTag: Schema = {
   render: 'ContentLink',
-  children: ['strong', 'em', 'code', 's', 'text'],
+  inline: undefined,
+  children: ['strong', 'em', 's', 'code', 'text', 'tag'],
   attributes: {
     path:  { type: String, required: true },
     title: { type: String },
@@ -103,7 +114,28 @@ const linkTag: Schema = {
     const children = node.transformChildren(config);
     return new Markdoc.Tag('ContentLink', { ...rest, href: path }, children);
   },
+  validate: notInsideClickable('link'),
 };
+
+/**
+ * The text a code block shows.
+ *
+ * Markdoc processes the variables and tags in a code block into its children
+ * while parsing. Those produce text, which is joined back into one string for
+ * highlighting and copying. Without processed text, or when `process` is
+ * false, the code block shows its `content` as written.
+ */
+function codeBlockContent(node: Node, config: Config, process: boolean): string {
+  const raw = typeof node.attributes['content'] === 'string' ? node.attributes['content'] : '';
+  const hasProcessedText = process && node.children.length > 0;
+  if (!hasProcessedText) return raw;
+
+  const parts = node.transformChildren(config);
+  // A component, such as a callout, cannot be shown inside a code block yet.
+  if (parts.some((part) => Markdoc.Tag.isTag(part))) return raw;
+
+  return parts.map((part) => (part === null || part === undefined ? '' : String(part))).join('');
+}
 
 /**
  * Routes fenced code blocks to the CodeBlock React component — except for
@@ -117,19 +149,28 @@ const linkTag: Schema = {
  * here, which fails the build with a clear error rather than shipping a
  * broken page.
  *
- * Every other fenced language falls through to the same CodeBlock rendering
- * Markdoc would have produced automatically, unchanged.
+ * Every other fenced language falls through to the CodeBlock component.
+ *
+ * Like Markdoc's own `fence` node, a code block is processed: variables and
+ * tags inside it are evaluated, unless the author writes
+ * ```lang {% process=false %} to show it exactly as written. See
+ * `codeBlockContent()` for how the processed result becomes text.
+ *
+ * `process` is not rendered to the page: the transform below builds the
+ * `CodeBlock` from `language` and `content` only. It is left renderable so
+ * `transformAttributes` hands it over with its default applied.
  */
 const fence: Schema = {
   render: 'CodeBlock',
   attributes: {
     language: { type: String },
     content:  { type: String, render: true },
+    process:  { type: Boolean, default: true },
   },
   transform(node, config) {
     const attributes = node.transformAttributes(config);
     const language = typeof attributes['language'] === 'string' ? attributes['language'] : '';
-    const content = typeof attributes['content'] === 'string' ? attributes['content'] : '';
+    const content = codeBlockContent(node, config, attributes['process'] !== false);
 
     if (language.endsWith('-diagram')) {
       const scene = buildScene(language, content);
@@ -168,6 +209,7 @@ const image: Schema = {
  */
 const imageTag: Schema = {
   render: 'Image',
+  inline: undefined,
   children: [],
   attributes: {
     src:   { type: String, required: true },
@@ -181,9 +223,8 @@ const imageTag: Schema = {
  * when clicked: `{% advancedImage src="..." alt="..." caption="..." /%}`.
  *
  * It renders a <figure>, a block element, and HTML allows no block element
- * inside a paragraph. `inline: false` makes Markdoc's validation report an
- * advanced image written inside a sentence or a link, so it only stands on
- * its own line.
+ * inside a paragraph, so it can only stand on its own line, like every other
+ * block tag.
  *
  * `caption` (not `title`) because it is visible text below the image, where
  * an image's `title` only shows when hovering.
@@ -232,6 +273,7 @@ const advancedImageTag: Schema = {
  */
 const clip: Schema = {
   render: 'Clip',
+  inline: false,
   children: [],
   attributes: {
     src:       { type: String, required: true },
@@ -274,6 +316,7 @@ const clip: Schema = {
  */
 const videoEmbed: Schema = {
   render: 'VideoEmbed',
+  inline: false,
   children: [],
   attributes: {
     src:         { type: String, required: true },
@@ -293,6 +336,7 @@ const videoEmbed: Schema = {
  */
 const callout: Schema = {
   render: 'Callout',
+  inline: false,
   children: ['paragraph', 'list', 'fence', 'blockquote'],
   attributes: {
     type:  { type: String, default: 'note', matches: ['note', 'warning', 'danger', 'tip'] },
@@ -310,6 +354,7 @@ const callout: Schema = {
  */
 const card: Schema = {
   render: 'Card',
+  inline: false,
   children: ['paragraph', 'inline', 'list'],
   attributes: {
     title: { type: String, required: true },
@@ -320,18 +365,28 @@ const card: Schema = {
   },
 };
 
+/** The most columns a card grid can have; more makes the cards too narrow. */
+export const CARD_GRID_MAX_COLUMNS = 4;
+
 /**
  * CardGrid tag — responsive grid container for card tags.
  *
- * `cols` controls the number of columns (1–4, default 3). The grid
- * collapses responsively: 2-col at medium viewports, 1-col at small.
+ * `cols` controls the number of columns, from 1 to `CARD_GRID_MAX_COLUMNS`
+ * (default 3). Validation allows no other value, so the component uses it
+ * as it is. The grid collapses responsively: 2-col at medium viewports,
+ * 1-col at small.
  * Authors use: {% cardGrid cols="3" %}...{% /cardGrid %}
  */
 const cardGrid: Schema = {
   render: 'CardGrid',
+  inline: false,
   children: ['tag'],
   attributes: {
-    cols: { type: String, default: '3' },
+    cols: {
+      type: String,
+      default: '3',
+      matches: Array.from({ length: CARD_GRID_MAX_COLUMNS }, (_, i) => String(i + 1)),
+    },
   },
 };
 
@@ -349,6 +404,7 @@ const cardGrid: Schema = {
  */
 const hero: Schema = {
   render: 'Hero',
+  inline: false,
   children: ['tag', 'paragraph'],
   attributes: {
     title:       { type: String, required: true },
@@ -369,6 +425,7 @@ const hero: Schema = {
  */
 const section: Schema = {
   render: 'Section',
+  inline: false,
   children: ['heading', 'paragraph', 'list', 'fence', 'blockquote', 'tag', 'hr'],
   attributes: {
     title:      { type: String },
@@ -384,11 +441,13 @@ const section: Schema = {
  */
 const button: Schema = {
   render: 'Button',
+  inline: undefined,
   children: ['paragraph', 'inline', 'text', 'strong', 'em'],
   attributes: {
     path:    { type: String, required: true },
     variant: { type: String, default: 'primary', matches: ['primary', 'secondary'] },
   },
+  validate: notInsideClickable('button'),
 };
 
 /**
@@ -407,6 +466,7 @@ const button: Schema = {
  */
 const accordion: Schema = {
   render: 'Accordion',
+  inline: false,
   children: ['heading', 'paragraph', 'list', 'fence', 'blockquote', 'tag', 'hr'],
   attributes: {
     title:       { type: String, required: true },
@@ -429,6 +489,7 @@ const accordion: Schema = {
  */
 const accordions: Schema = {
   render: 'Accordions',
+  inline: false,
   children: ['tag'],
 };
 
@@ -443,6 +504,7 @@ const accordions: Schema = {
  */
 const column: Schema = {
   render: 'Column',
+  inline: false,
   children: ['heading', 'paragraph', 'list', 'fence', 'blockquote', 'tag', 'hr'],
 };
 
@@ -466,6 +528,7 @@ const column: Schema = {
  */
 const columns: Schema = {
   render: 'Columns',
+  inline: false,
   children: ['tag'],
   attributes: {
     divider: { type: Boolean, default: false },
@@ -501,6 +564,7 @@ const columns: Schema = {
  * plain, unremarkable behavior for a tag nobody is told to use.
  */
 const params: Schema = {
+  inline: false,
   children: ['heading', 'paragraph', 'list', 'fence', 'blockquote', 'tag', 'hr'],
   attributes: {
     in:     { type: String, default: 'request', matches: ['request', 'response'] },
@@ -510,32 +574,50 @@ const params: Schema = {
 };
 
 /**
- * The default Markdoc config used by Mordoc's content transformer.
- *
- * Currently minimal:
- *   - Custom `heading` node (adds stable, deduplicated anchor IDs).
- *   - Custom `fence` node (routes to CodeBlock for syntax highlighting).
- *   - Custom `image` node (routes to Image for lightbox support).
- *   - Custom `callout` tag (routes to Callout for note/warning/danger boxes).
- *   - Custom `card` / `cardGrid` tags (routes to Card / CardGrid components).
- *   - `link` / `image` tags (variable-capable counterparts to the native
- *     `link` / `image` nodes above — see their own doc comments).
- *   - `clip` tag (click-to-play demo clips — see its own doc comment).
- *   - `videoEmbed` tag (YouTube/Vimeo/Loom embeds — see its own doc comment).
- *   - `accordion` / `accordions` tags (collapsible sections — see their own
- *     doc comments).
- *   - `column` / `columns` tags (side-by-side content — see their own doc
- *     comments).
- *   - `params` tag (API field entries in enrichment files — see its own doc
- *     comment).
- *
- * Enrichment prose goes through this same config, so `{% callout %}`,
- * `{% table %}`, variables and links behave identically inside an API field
- * description and inside a guide.
+ * The tags every page can use: article pages, landing pages, and the texts
+ * for the API reference. It matches `contentComponents`, the components
+ * those pages render with.
  */
-export function createDefaultMarkdocConfig(): Config {
+const articleTags: Record<string, Schema> = { callout, card, cardGrid, button, link: linkTag, image: imageTag, advancedImage: advancedImageTag, clip, videoEmbed, accordion, accordions, column, columns, params };
+
+/**
+ * The tags a landing page can use: every article tag, plus `hero` and
+ * `section`, as a landing page renders with `contentComponents` plus `Hero`
+ * and `Section`.
+ */
+const landingTags: Record<string, Schema> = { ...articleTags, hero, section };
+
+/**
+ * The Markdoc config for article pages, and the base for the API reference
+ * texts. A tag that is not in it, such as `hero`, is reported by Markdoc as
+ * an undefined tag.
+ */
+export function createArticleMarkdocConfig(): Config {
+  return createMarkdocConfig(articleTags);
+}
+
+/** The Markdoc config for pages with `layout: landing` in their frontmatter. */
+export function createLandingMarkdocConfig(): Config {
+  return createMarkdocConfig(landingTags);
+}
+
+function createMarkdocConfig(tags: Record<string, Schema>): Config {
+  assertEveryTagStatesPlacement(tags);
   return {
     nodes: { heading, link, fence, image },
-    tags: { callout, card, cardGrid, hero, section, button, link: linkTag, image: imageTag, advancedImage: advancedImageTag, clip, videoEmbed, accordion, accordions, column, columns, params },
+    tags,
   };
+}
+
+/**
+ * Every tag must say where it may stand: `inline: false` for a block, or an
+ * explicit `inline: undefined` for a tag that may also go inside a sentence
+ * or a link. Validation can only report a tag in the wrong place if its
+ * schema says so, so a tag that forgets it would let broken pages through.
+ */
+function assertEveryTagStatesPlacement(tags: Record<string, Schema>): void {
+  const missing = Object.keys(tags).filter((name) => !Object.hasOwn(tags[name]!, 'inline'));
+  if (missing.length > 0) {
+    throw new Error(`mordoc: these tags don't state where they may stand (inline): ${missing.join(', ')}`);
+  }
 }

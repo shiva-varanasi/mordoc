@@ -123,7 +123,6 @@ const link: Schema = {
  */
 const linkTag: Schema = {
   render: 'ContentLink',
-  // May stand on its own line, inside a sentence and inside a link.
   inline: undefined,
   children: ['strong', 'em', 's', 'code', 'text', 'tag'],
   attributes: {
@@ -233,7 +232,6 @@ const image: Schema = {
  */
 const imageTag: Schema = {
   render: 'Image',
-  // May stand on its own line, inside a sentence and inside a link.
   inline: undefined,
   children: [],
   attributes: {
@@ -259,7 +257,6 @@ const imageTag: Schema = {
 const advancedImageTag: Schema = {
   render: 'AdvancedImage',
   children: [],
-  // Placement is checked by its own validate(), with its own message.
   inline: undefined,
   attributes: {
     src:     { type: String, required: true },
@@ -309,7 +306,6 @@ const advancedImageTag: Schema = {
  */
 const clip: Schema = {
   render: 'Clip',
-  // A block: only on its own line, never inside a sentence or a link.
   inline: false,
   children: [],
   attributes: {
@@ -353,7 +349,6 @@ const clip: Schema = {
  */
 const videoEmbed: Schema = {
   render: 'VideoEmbed',
-  // A block: only on its own line, never inside a sentence or a link.
   inline: false,
   children: [],
   attributes: {
@@ -374,7 +369,6 @@ const videoEmbed: Schema = {
  */
 const callout: Schema = {
   render: 'Callout',
-  // A block: only on its own line, never inside a sentence or a link.
   inline: false,
   children: ['paragraph', 'list', 'fence', 'blockquote'],
   attributes: {
@@ -393,7 +387,6 @@ const callout: Schema = {
  */
 const card: Schema = {
   render: 'Card',
-  // A block: only on its own line, never inside a sentence or a link.
   inline: false,
   children: ['paragraph', 'inline', 'list'],
   attributes: {
@@ -414,7 +407,6 @@ const card: Schema = {
  */
 const cardGrid: Schema = {
   render: 'CardGrid',
-  // A block: only on its own line, never inside a sentence or a link.
   inline: false,
   children: ['tag'],
   attributes: {
@@ -436,7 +428,6 @@ const cardGrid: Schema = {
  */
 const hero: Schema = {
   render: 'Hero',
-  // A block: only on its own line, never inside a sentence or a link.
   inline: false,
   children: ['tag', 'paragraph'],
   attributes: {
@@ -458,7 +449,6 @@ const hero: Schema = {
  */
 const section: Schema = {
   render: 'Section',
-  // A block: only on its own line, never inside a sentence or a link.
   inline: false,
   children: ['heading', 'paragraph', 'list', 'fence', 'blockquote', 'tag', 'hr'],
   attributes: {
@@ -475,7 +465,6 @@ const section: Schema = {
  */
 const button: Schema = {
   render: 'Button',
-  // May stand on its own line, inside a sentence and inside a link.
   inline: undefined,
   children: ['paragraph', 'inline', 'text', 'strong', 'em'],
   attributes: {
@@ -501,7 +490,6 @@ const button: Schema = {
  */
 const accordion: Schema = {
   render: 'Accordion',
-  // A block: only on its own line, never inside a sentence or a link.
   inline: false,
   children: ['heading', 'paragraph', 'list', 'fence', 'blockquote', 'tag', 'hr'],
   attributes: {
@@ -525,7 +513,6 @@ const accordion: Schema = {
  */
 const accordions: Schema = {
   render: 'Accordions',
-  // A block: only on its own line, never inside a sentence or a link.
   inline: false,
   children: ['tag'],
 };
@@ -541,7 +528,6 @@ const accordions: Schema = {
  */
 const column: Schema = {
   render: 'Column',
-  // A block: only on its own line, never inside a sentence or a link.
   inline: false,
   children: ['heading', 'paragraph', 'list', 'fence', 'blockquote', 'tag', 'hr'],
 };
@@ -566,7 +552,6 @@ const column: Schema = {
  */
 const columns: Schema = {
   render: 'Columns',
-  // A block: only on its own line, never inside a sentence or a link.
   inline: false,
   children: ['tag'],
   attributes: {
@@ -603,7 +588,6 @@ const columns: Schema = {
  * plain, unremarkable behavior for a tag nobody is told to use.
  */
 const params: Schema = {
-  // A block: only on its own line, never inside a sentence or a link.
   inline: false,
   children: ['heading', 'paragraph', 'list', 'fence', 'blockquote', 'tag', 'hr'],
   attributes: {

@@ -2,6 +2,7 @@ import Markdoc from '@markdoc/markdoc';
 import type { Config, Node, Schema, RenderableTreeNode } from '@markdoc/markdoc';
 import type { Slugger } from './slug.js';
 import { buildScene } from '../diagrams/build-scene.js';
+import { notInsideClickable } from './content-validation.js';
 
 /**
  * Walks a renderable subtree and concatenates its text content.
@@ -19,27 +20,6 @@ function extractText(children: RenderableTreeNode[]): string {
     else if (Markdoc.Tag.isTag(child)) text += extractText(child.children);
   }
   return text;
-}
-
-/**
- * A link or button can't sit inside another link or button: one click can
- * only go to one place, and HTML doesn't allow it either. Markdoc lets any
- * tag sit inside a link, so each clickable building block checks its own
- * parents here, which Markdoc passes along as `config.validation.parents`.
- */
-function notInsideClickable(what: string): Schema['validate'] {
-  return (_node, config) => {
-    const parents = config.validation?.parents ?? [];
-    const insideClickable = parents.some(
-      (parent) => parent.type === 'link' || (parent.type === 'tag' && (parent.tag === 'link' || parent.tag === 'button')),
-    );
-    if (!insideClickable) return [];
-    return [{
-      id: 'clickable-inside-clickable',
-      level: 'critical',
-      message: `A ${what} can't be placed inside a link or a button, because one click can only go to one place.`,
-    }];
-  };
 }
 
 /**
@@ -246,10 +226,8 @@ const imageTag: Schema = {
  * when clicked: `{% advancedImage src="..." alt="..." caption="..." /%}`.
  *
  * It renders a <figure>, a block element, and HTML allows no block element
- * inside a paragraph, so it can only stand on its own line. Its own
- * `validate()` reports an advanced image inside a sentence or a link with a
- * message that says so. `inline` is left `undefined` because `inline: false`
- * would add Markdoc's general "should be block" message for the same mistake.
+ * inside a paragraph, so it can only stand on its own line, like every other
+ * block tag.
  *
  * `caption` (not `title`) because it is visible text below the image, where
  * an image's `title` only shows when hovering.
@@ -257,19 +235,11 @@ const imageTag: Schema = {
 const advancedImageTag: Schema = {
   render: 'AdvancedImage',
   children: [],
-  inline: undefined,
+  inline: false,
   attributes: {
     src:     { type: String, required: true },
     alt:     { type: String },
     caption: { type: String },
-  },
-  validate(node) {
-    if (!node.inline) return [];
-    return [{
-      id: 'advanced-image-not-on-own-line',
-      level: 'critical',
-      message: `'advancedImage' can only stand on its own line.`,
-    }];
   },
 };
 

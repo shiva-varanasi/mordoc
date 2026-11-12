@@ -1,6 +1,6 @@
 import path from 'node:path';
 import Markdoc from '@markdoc/markdoc';
-import type { Config, Node, ValidateError, ValidationError } from '@markdoc/markdoc';
+import type { Config, Node, Schema, ValidateError, ValidationError } from '@markdoc/markdoc';
 
 /*
  * Mordoc works with Markdoc's own validation results: `Markdoc.validate()`
@@ -17,6 +17,28 @@ import type { Config, Node, ValidateError, ValidationError } from '@markdoc/mark
  * still renders.
  */
 const BLOCKING_LEVELS: ReadonlySet<ValidationError['level']> = new Set(['error', 'critical']);
+
+/**
+ * A link or button can't sit inside another link or button: one click can
+ * only go to one place, and HTML doesn't allow it either. Markdoc lets any
+ * tag sit inside a link, so the link node, the link tag and the button tag
+ * each use this rule as their `validate()`, which gets the parents Markdoc
+ * passes along as `config.validation.parents`.
+ */
+export function notInsideClickable(what: string): Schema['validate'] {
+  return (_node, config) => {
+    const parents = config.validation?.parents ?? [];
+    const insideClickable = parents.some(
+      (parent) => parent.type === 'link' || (parent.type === 'tag' && (parent.tag === 'link' || parent.tag === 'button')),
+    );
+    if (!insideClickable) return [];
+    return [{
+      id: 'clickable-inside-clickable',
+      level: 'critical',
+      message: `A ${what} can't be placed inside a link or a button, because one click can only go to one place.`,
+    }];
+  };
+}
 
 /** `content/en/guide/setup.md:12  error  Undefined variable: 'productName'` */
 export function formatValidateError(result: ValidateError, projectRoot: string): string {

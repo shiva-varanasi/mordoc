@@ -1,10 +1,14 @@
 {
   "name": "mordoc",
-  "repoitory": {
+  "repository": {
     "type": "git",
-    "url": "https://github.com/shiva-varanasi/mordoc.git"
+    "url": "git+https://github.com/getmordoc/mordoc.git"
   },
-  "version": "1.9.1",
+  "homepage": "https://mordoc.dev",
+  "bugs": {
+    "url": "https://github.com/getmordoc/mordoc/issues"
+  },
+  "version": "2.0.0",
   "description": "A modern documentation site generator powered by Vite, React, and Markdoc.",
   "type": "module",
   "files": [
@@ -38,7 +42,7 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@markdoc/markdoc": "^0.5.10",
+    "@markdoc/markdoc": "^0.5.12",
     "@redocly/openapi-core": "^2.71.2",
     "@vitejs/plugin-react": "^6.1.1",
     "js-yaml": "^5.4.2",
